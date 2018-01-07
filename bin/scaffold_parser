@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+
+require 'scaffold_parser'
+require 'optparse'
+
+options = {}
+path = ARGV.shift
+abort 'Path to schema file as a first argument is required' unless path
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: scaffold_parser <path_to_schema> [options]'
+
+  opts.on("-nNAMESPACE", "--namespace=NAMESPACE") do |v|
+    options[:namespace] = v
+  end
+end.parse!
+
+ScaffoldParser.scaffold(path, options)

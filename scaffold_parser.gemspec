@@ -1,10 +1,9 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'scaffold_parser/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'scaffold_parser'
-  spec.version       = ScaffoldParser::VERSION
+  spec.version       = '0.0.3'
   spec.authors       = ['Premysl Donat']
   spec.email         = ['pdonat@seznam.cz']
 
@@ -17,10 +16,13 @@ Gem::Specification.new do |spec|
     f.match(%r{^(test|spec|features)/})
   end
   spec.bindir        = 'bin'
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.executables   = ['scaffold_parser']
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
+  spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'nokogiri'
+  spec.add_development_dependency 'activesupport'
 end
