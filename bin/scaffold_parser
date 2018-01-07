@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'scaffold_parser'
+require 'optparse'
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = 'Usage: scaffold_parser <path_to_schema>'
+
+  options[:path] = opts.parse!.first
+end
+
+abort 'Path to schema file as a first argument is required' unless options[:path]
+
+ScaffoldParser.scaffold(options[:path])
