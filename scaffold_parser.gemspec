@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
     f.match(%r{^(test|spec|features)/})
   end
   spec.bindir        = 'bin'
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.executables   = ['scaffold_parser']
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'bundler', '~> 1.16'
@@ -25,4 +25,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'nokogiri'
+  spec.add_development_dependency 'activesupport'
 end
