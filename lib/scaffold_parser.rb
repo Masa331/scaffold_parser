@@ -5,66 +5,61 @@ require 'active_support/all'
 module ScaffoldParser
   def self.scaffold(path)
     doc = Nokogiri::XML(File.open(path))
-    xscaffold(doc, path)
+
+    doc.xpath('xs:schema/xs:complexType').each do |sub_doc|
+      xscaffold(sub_doc, path)
+    end
   end
 
   def self.xscaffold(doc, path, class_name = nil)
-    complex_types = doc.xpath('xs:schema/xs:complexType')
+    class_name = class_name || doc['name'].classify
+    file_name = class_name.underscore << '.rb'
 
-    complex_types.each do |complex_type|
-      class_name = class_name || complex_type['name'].classify
-      file_name = class_name.underscore << '.rb'
+    methods = doc.xpath('xs:sequence/xs:element')
 
-      methods = complex_type.xpath('xs:sequence/xs:element')
-      methods = methods.map do |meth|
-        template = method_template
-        template.gsub!('NAME', meth['name'].underscore)
+    methods = methods.map do |meth|
+      template = method_template
+      template.gsub!('NAME', meth['name'].underscore)
 
-        if (type = meth['type'])
-          if type.start_with?('xs:')
-            template.gsub!('CONTENT', "at '#{meth['name']}'")
-          else
-            docs = collect_includes(doc, path)
-
-            type_def = find_type(type, docs)
-
-            if type_def.name == 'simpleType'
-              template.gsub!('CONTENT', "at '#{meth['name']}'")
-            else
-              # require 'pry'; binding.pry
-              #
-              # fail 'WHOA I FOUND COMPLEX TYPE'
-
-              class_name = meth['type'].classify
-              xscaffold(type_def, path, class_name)
-
-              template = "source = at '#{meth['name']}'\n\n#{class_name}.new(source) if source"
-              template.gsub!('CONTENT', "at '#{meth['name']}'")
-            end
-
-            puts 'super!'
-          end
+      if (type = meth['type'])
+        if type.start_with?('xs:')
+          template.gsub!('CONTENT', "at '#{meth['name']}'")
         else
-          if meth.xpath('xs:complexType').any?
-            class_name = meth['name'].classify
-            xscaffold(meth, path, class_name)
+          docs = collect_includes(doc, path)
 
-            template = "source = at '#{meth['name']}'\n\n#{class_name}.new(source) if source"
+          type_def = find_type(type, docs)
+
+          if type_def.name == 'simpleType'
             template.gsub!('CONTENT', "at '#{meth['name']}'")
           else
-            template.gsub!('CONTENT', "at '#{meth['name']}'")
+            new_class_name = meth['type'].classify
+            xscaffold(type_def, path, new_class_name)
+
+            content = "source = at '#{meth['name']}'\n\n#{new_class_name}.new(source) if source"
+            template.gsub!('CONTENT', content)
           end
         end
+      else
+        if meth.xpath('xs:complexType').any?
+          new_class_name = meth['name'].classify
+          xscaffold(meth, path, new_class_name)
 
-        template
+          content = "source = at '#{meth['name']}'\n\n#{new_class_name}.new(source) if source"
+          template.gsub!('CONTENT', content)
+          puts 'super!'
+        else
+          template.gsub!('CONTENT', "at '#{meth['name']}'")
+        end
       end
 
-      File.open(file_name, 'wb') do |f|
-        class_definition = class_template.gsub('CLASS_NAME', class_name)
-        class_definition.gsub!('METHODS', methods.join("\n"))
+      template
+    end
 
-        f.puts class_definition
-      end
+    File.open(file_name, 'wb') do |f|
+      class_definition = class_template.gsub('CLASS_NAME', class_name)
+      class_definition.gsub!('METHODS', methods.join("\n"))
+
+      f.puts class_definition
     end
   end
 
