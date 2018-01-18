@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:include schemaLocation="comtypes.xsd"/>
   <xs:complexType name="fakturaType">
     <xs:annotation>
       <xs:documentation>Some comment...</xs:documentation>
@@ -11,6 +12,45 @@
             <xs:maxLength value="10"/>
           </xs:restriction>
         </xs:simpleType>
+      </xs:element>
+      <xs:element name="EvCisDokl" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Evidenční číslo daňového dokladu pro kontrolní hlášení (pouze faktury vydané)
+            IMPORT. ANO
+            EXPORT: ANO</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="50"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="ZpusobUctovani" type="xs:byte" minOccurs="0">
+      </xs:element>
+      <xs:element name="Popis" type="popisType" minOccurs="0">
+      </xs:element>
+      <xs:element name="Valuty" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Mena" type="menaType">
+              <xs:annotation>
+                <xs:documentation>Identifikace cizí měny</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="SouhrnDPH" type="souhrnDPHType">
+              <xs:annotation>
+                <xs:documentation>Souhrn DPH
+                  IMPORT: ANO
+                  EXPORT: ANO</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="Celkem" type="castkaType">
+              <xs:annotation>
+                <xs:documentation>Celkem s DPH ve valutách (POUZE EXPORT)</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
       </xs:element>
     </xs:sequence>
   </xs:complexType>
