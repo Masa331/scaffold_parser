@@ -8,38 +8,19 @@ module ScaffoldParser
     def initialize(doc, includes)
       @doc = doc
       @klass = Klass.new
-      @includes = includes
+      @klass.includes = includes
     end
 
     def call
+      schema = ScaffoldParser::Types::Schema.new(@doc.xpath('xs:schema').first)
+      elements = schema.call
+
       @klass.file_name = 'faktura_type.rb'
       @klass.name = 'FakturaType'
       @klass.methods = []
-
-      root_element = @doc.at_xpath('xs:schema/xs:complexType')
-
-      methods = root_element.xpath('xs:sequence/xs:element')
-      methods.each do |meth|
-        if (type = meth['type'])
-          if type.start_with?('xs:')
-            name = meth['name'].underscore
-            @klass.methods << { name: name, at: meth['name'] }
-          else
-            type_def = find_type(type)
-
-            if type_def.name == 'simpleType'
-              name = meth['name'].underscore
-              @klass.methods << { name: name, at: meth['name'] }
-            else
-            end
-          end
-        else
-          name = meth['name'].underscore
-          @klass.methods << { name: name, at: meth['name'] }
-        end
-      end
-
       @klass
+
+      elements
     end
 
     private
