@@ -1,17 +1,8 @@
+require 'scaffold_parser/types/base_xs_type'
+
 module ScaffoldParser
   module Types
-    class XsInteger
-      def initialize(schema)
-        @schema = schema
-      end
-
-      def define_accessor(model)
-        name = @schema['name']
-
-        model.class_eval do
-          attr_accessor name
-        end
-      end
+    class XsInteger < BaseXsType
     end
   end
 end

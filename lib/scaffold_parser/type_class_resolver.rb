@@ -22,7 +22,9 @@ module ScaffoldParser
       end
 
       def type
-        @xml['type'].split(':').map(&:capitalize).join
+        _, type = @xml['type'].split(':')
+
+        "Xs#{type.classify}"
       end
 
       def name
