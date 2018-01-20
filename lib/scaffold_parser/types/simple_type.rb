@@ -5,7 +5,7 @@ module ScaffoldParser
         @schema = schema
       end
 
-      def define_accessor(model)
+      def call
         # name = @schema['name']
         #
         # model.class_eval do

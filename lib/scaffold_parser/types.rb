@@ -1,6 +1,7 @@
 require_relative 'types/xs_string'
 require_relative 'types/xs_integer'
 require_relative 'types/xs_date'
+require_relative 'types/xs_byte'
 require_relative 'types/text'
 require_relative 'types/complex_type'
 require_relative 'types/sequence'

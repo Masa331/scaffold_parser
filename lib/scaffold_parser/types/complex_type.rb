@@ -5,12 +5,24 @@ module ScaffoldParser
         @schema = schema
       end
 
-      def define_accessor(model)
-        @schema.children.map do |child|
-          type_class = TypeClassResolver.call(child, model)
+      def call
+        if @schema['name'].present?
+          children = @schema.children.flat_map do |child|
+            type_class = TypeClassResolver.call(child)
+
+            type_class.new(child).call
+          end.compact
 
           node = Node.new
-          type_class.new(child).define_accessor(node)
+          node.name = @schema['name']
+          children.each { |c| node.nodes << c }
+          node
+        else
+          @schema.children.flat_map do |child|
+            type_class = TypeClassResolver.call(child)
+
+            type_class.new(child).call
+          end.compact
         end
       end
     end

@@ -32,15 +32,14 @@ module ScaffoldParser
       end
     end
 
-    def self.call(element, model)
-      new(element, model).call
+    def self.call(element)
+      new(element).call
     end
 
-    attr_accessor :element, :model
+    attr_accessor :element
 
-    def initialize(element, model)
+    def initialize(element)
       @element = Element.new(element)
-      @model = model
     end
 
     def call

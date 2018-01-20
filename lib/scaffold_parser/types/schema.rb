@@ -8,20 +8,14 @@ module ScaffoldParser
       end
 
       def call
-        schema.children.map do |element|
-          type_class = TypeClassResolver.call(element, nil)
+        result = schema.children.map do |element|
+          type_class = TypeClassResolver.call(element)
 
-          type_class.new(element).define_accessor(nil)
+          type_class.new(element).call
         end
-      end
 
-      # def define_attributes(model)
-      #   schema.children.each do |element|
-      #     type_class = TypeClassResolver.call(element, model)
-      #
-      #     type_class.new(element).define_accessor(model)
-      #   end
-      # end
+        result.compact
+      end
     end
   end
 end

@@ -4,7 +4,7 @@ module ScaffoldParser
       def initialize(schema)
       end
 
-      def define_accessor(model)
+      def call
       end
     end
   end
