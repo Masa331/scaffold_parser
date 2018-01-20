@@ -12,12 +12,12 @@ module ScaffoldParser
   def self.scaffold(path)
     doc = Nokogiri::XML(File.open(path))
 
-    # includes = collect_includes(doc, path)
+    includes = collect_includes(doc, path)
 
     # model = Modeler.call(doc, includes)
     model = Modeler.call(doc, [])
 
-    Builder.call(model)
+    Builder.call(model, doc, includes)
   end
 
   private

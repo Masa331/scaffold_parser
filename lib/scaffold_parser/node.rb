@@ -1,10 +1,36 @@
 module ScaffoldParser
   class Node
+    class NodeSet < Array
+      # def end_nodes
+      #   select(&:end_node?)
+      # end
+
+      # def parent_nodes
+      #   select(&:parent_node?)
+      # end
+    end
+
     attr_accessor :name, :type
     attr_reader :nodes
 
     def initialize
-      @nodes = []
+      @nodes = NodeSet.new
+    end
+
+    def to_class_name
+      if type
+        type.classify
+      else
+        name.classify
+      end
+    end
+
+    def to_file_name
+      to_class_name.underscore
+    end
+
+    def to_require
+      to_class_name.underscore
     end
 
     def to_s

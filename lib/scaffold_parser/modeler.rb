@@ -10,9 +10,11 @@ module ScaffoldParser
     end
 
     def call
-      schema = @doc.xpath('xs:schema').first
+      # schema = @doc.xpath('xs:schema').first
+      # ScaffoldParser::Types::Schema.call(schema)
 
-      ScaffoldParser::Types::Schema.call(schema)
+      schema = @doc.elements.first
+      TypeClassResolver.call(schema)
     end
 
     private
