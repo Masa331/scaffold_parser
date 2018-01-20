@@ -1,11 +1,8 @@
+require 'scaffold_parser/types/base_type'
+
 module ScaffoldParser
   module Types
-    class Text
-      def initialize(schema)
-      end
-
-      def call
-      end
+    class Text < BaseType
     end
   end
 end

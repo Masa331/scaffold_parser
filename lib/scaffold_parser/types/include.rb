@@ -1,11 +1,6 @@
 module ScaffoldParser
   module Types
-    class Include
-      def initialize(schema)
-      end
-
-      def call
-      end
+    class Include < BaseType
     end
   end
 end

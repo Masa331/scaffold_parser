@@ -1,15 +1,13 @@
 module ScaffoldParser
   module Types
-    class Element
+    class Element < BaseType
       def initialize(schema)
         @schema = schema
       end
 
       def call
         children = @schema.children.flat_map do |element|
-          type_class = TypeClassResolver.call(element)
-
-          type_class.new(element).call
+          TypeClassResolver.call(element)
         end.compact
 
         node = Node.new

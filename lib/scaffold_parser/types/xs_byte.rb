@@ -1,6 +1,8 @@
+require 'scaffold_parser/types/base_type'
+
 module ScaffoldParser
   module Types
-    class XsByte
+    class XsByte < BaseType
       def initialize(schema)
         @schema = schema
       end

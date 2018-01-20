@@ -1,6 +1,6 @@
 module ScaffoldParser
   module Types
-    class ComplexType
+    class ComplexType < BaseType
       def initialize(schema)
         @schema = schema
       end
@@ -8,9 +8,7 @@ module ScaffoldParser
       def call
         if @schema['name'].present?
           children = @schema.children.flat_map do |child|
-            type_class = TypeClassResolver.call(child)
-
-            type_class.new(child).call
+            TypeClassResolver.call(child)
           end.compact
 
           node = Node.new
@@ -19,9 +17,7 @@ module ScaffoldParser
           node
         else
           @schema.children.flat_map do |child|
-            type_class = TypeClassResolver.call(child)
-
-            type_class.new(child).call
+            TypeClassResolver.call(child)
           end.compact
         end
       end

@@ -1,7 +1,6 @@
 require 'scaffold_parser/version'
 require 'scaffold_parser/modeler'
 require 'scaffold_parser/builder'
-require 'scaffold_parser/klass'
 require 'scaffold_parser/node'
 require 'nokogiri'
 require 'active_support/all'

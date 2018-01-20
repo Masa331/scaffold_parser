@@ -1,6 +1,6 @@
 module ScaffoldParser
   module Types
-    class Schema
+    class Schema < BaseType
       attr_accessor :schema
 
       def initialize(schema)
@@ -8,13 +8,9 @@ module ScaffoldParser
       end
 
       def call
-        result = schema.children.map do |element|
-          type_class = TypeClassResolver.call(element)
-
-          type_class.new(element).call
-        end
-
-        result.compact
+        schema.children.map do |element|
+          TypeClassResolver.call(element)
+        end.compact
       end
     end
   end

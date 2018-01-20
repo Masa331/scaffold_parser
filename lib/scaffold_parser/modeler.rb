@@ -7,20 +7,12 @@ module ScaffoldParser
 
     def initialize(doc, includes)
       @doc = doc
-      @klass = Klass.new
-      @klass.includes = includes
     end
 
     def call
-      schema = ScaffoldParser::Types::Schema.new(@doc.xpath('xs:schema').first)
-      elements = schema.call
+      schema = @doc.xpath('xs:schema').first
 
-      @klass.file_name = 'faktura_type.rb'
-      @klass.name = 'FakturaType'
-      @klass.methods = []
-      @klass
-
-      elements
+      ScaffoldParser::Types::Schema.call(schema)
     end
 
     private

@@ -1,6 +1,6 @@
 module ScaffoldParser
   class TypeClassResolver
-    class Element
+    class Decorator
       def initialize(xml)
         @xml = xml
       end
@@ -36,20 +36,20 @@ module ScaffoldParser
       new(element).call
     end
 
-    attr_accessor :element
+    attr_accessor :decorator, :element
 
     def initialize(element)
-      @element = Element.new(element)
+      @element = element
+      @decorator = Decorator.new(element)
     end
 
     def call
-      # tohle mi vubec nepomuze, protoze ten element neni v tomto pripade simple_type ale proste element
-      if element.simple_type? || element.no_type?
-        ScaffoldParser::Types.const_get element.name
-      elsif element.xs_type?
-        ScaffoldParser::Types.const_get element.type
-      elsif element.custom_type?
-        ScaffoldParser::Types::ElementWithUserType
+      if decorator.simple_type? || decorator.no_type?
+        ScaffoldParser::Types.const_get(decorator.name).call(element)
+      elsif decorator.xs_type?
+        ScaffoldParser::Types.const_get(decorator.type).call(element)
+      elsif decorator.custom_type?
+        ScaffoldParser::Types::ElementWithUserType.call(element)
       else
         fail 'nondeducible element type'
       end

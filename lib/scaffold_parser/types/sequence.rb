@@ -1,15 +1,13 @@
 module ScaffoldParser
   module Types
-    class Sequence
+    class Sequence < BaseType
       def initialize(schema)
         @schema = schema
       end
 
       def call
         @schema.children.flat_map do |element|
-          type_class = TypeClassResolver.call(element)
-
-          type_class.new(element).call
+          TypeClassResolver.call(element)
         end.compact
       end
     end
