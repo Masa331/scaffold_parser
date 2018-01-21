@@ -14,10 +14,11 @@ module ScaffoldParser
 
     includes = collect_includes(doc, path)
 
-    # model = Modeler.call(doc, includes)
-    model = Modeler.call(doc, [])
+    models = Modeler.call(doc, [])
 
-    Builder.call(model, doc, includes)
+    models.each do |model|
+      Builder.call(model, doc, includes)
+    end
   end
 
   private

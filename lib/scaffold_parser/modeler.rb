@@ -14,6 +14,7 @@ module ScaffoldParser
       # ScaffoldParser::Types::Schema.call(schema)
 
       schema = @doc.elements.first
+      # require 'pry'; binding.pry
       TypeClassResolver.call(schema)
     end
 
