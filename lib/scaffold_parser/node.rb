@@ -10,7 +10,7 @@ module ScaffoldParser
       # end
     end
 
-    attr_accessor :name, :type
+    attr_accessor :name, :type, :element_type
     attr_reader :nodes
 
     def initialize

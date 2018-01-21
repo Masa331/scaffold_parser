@@ -6,14 +6,15 @@ module ScaffoldParser
       end
 
       def call
-        children = @schema.children.flat_map do |element|
-          TypeClassResolver.call(element)
-        end.compact
-
-        node = Node.new
-        node.type = @schema['base']
-        children.each { |c| node.nodes << c }
-        node
+        puts 'Beware, extension there!'
+        # children = @schema.children.flat_map do |element|
+        #   TypeClassResolver.call(element)
+        # end.compact
+        #
+        # node = Node.new
+        # node.type = @schema['base']
+        # children.each { |c| node.nodes << c }
+        # node
       end
     end
   end

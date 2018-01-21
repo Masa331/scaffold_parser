@@ -1,19 +1,17 @@
 module ScaffoldParser
   module Types
-    class Group
+    class Group < BaseType
       def initialize(schema)
         @schema = schema
       end
 
-      def define_accessor(model)
-        if !@schema['ref'].nil?
-          t = @schema['ref']
-          t[0] = t[0].upcase
-          parent_class = model.name.split('::').first
-          nodule = model.const_get(parent_class).const_get(t)
+      def call
+        puts 'Beware, group there!'
 
-          model.include nodule
-        end
+        node = Node.new
+        node.name = 'group'
+        node.element_type = 'group'
+        node
       end
     end
   end
