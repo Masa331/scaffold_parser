@@ -120,9 +120,6 @@ module ScaffoldParser
         doc.at_xpath("//*[@name='#{name}']").present?
       end
 
-      # if node.type == 'xs:string'
-      #   require 'pry'; binding.pry
-      # end
       if doc.blank?
         fail "Cant find element definition for #{node.name}(#{node.type}). Might be not enough includes?"
       end

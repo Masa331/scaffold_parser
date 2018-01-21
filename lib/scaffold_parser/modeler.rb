@@ -10,26 +10,8 @@ module ScaffoldParser
     end
 
     def call
-      # schema = @doc.xpath('xs:schema').first
-      # ScaffoldParser::Types::Schema.call(schema)
-
       schema = @doc.elements.first
-      # require 'pry'; binding.pry
       TypeClassResolver.call(schema)
-    end
-
-    private
-
-    def find_type(name)
-      doc = @includes.find do |doc|
-        doc.at_xpath("//*[@name='#{name}']").present?
-      end
-
-      if doc.blank?
-        fail "Cant find element definition. Might be not enough includes?"
-      end
-
-      doc.at_xpath("//*[@name='#{name}']")
     end
   end
 end
