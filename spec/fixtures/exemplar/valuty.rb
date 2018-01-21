@@ -15,6 +15,6 @@ class Valuty
   def souhrn_dph
     element_xml = at 'SouhrnDPH'
 
-    SouhrnDphType.new(element_xml) if element_xml
+    SouhrnDPHType.new(element_xml) if element_xml
   end
 end

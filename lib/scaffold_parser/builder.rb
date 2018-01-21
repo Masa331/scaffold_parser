@@ -89,7 +89,7 @@ module ScaffoldParser
     end
 
     def element_method_template(method)
-      klass = method.type || method.name.classify
+      klass = (method.type || method.name).classify
 
       <<-DEF
   def #{method.name.underscore}
