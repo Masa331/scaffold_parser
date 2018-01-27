@@ -1,6 +1,9 @@
+require 'base_element'
 require 'valuty'
 
 class FakturaType
+  include BaseElement
+
   def doklad
     at 'Doklad'
   end

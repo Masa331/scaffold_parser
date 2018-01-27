@@ -1,7 +1,10 @@
+require 'base_element'
 require 'mena_type'
 require 'souhrn_dph_type'
 
 class Valuty
+  include BaseElement
+
   def celkem
     at 'Celkem'
   end

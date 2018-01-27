@@ -10,4 +10,12 @@ RSpec.describe ScaffoldParser do
 
     expect(File.exists?('./tmp/castka_type.rb')).to eq false
   end
+
+  it 'outputs class in module if given' do
+    ENV['XSD_PATH'] = './spec/fixtures/xsd/'
+
+    ScaffoldParser.scaffold('./spec/fixtures/xsd/order.xsd', namespace: 'Something')
+
+    expect(File.read('./tmp/order.rb')).to eq File.read('./spec/fixtures/exemplar/order.rb')
+  end
 end

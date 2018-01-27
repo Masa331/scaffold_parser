@@ -8,9 +8,9 @@ Nokogiri::XML::Element.include ScaffoldParser::NokogiriPatches::Element
 Nokogiri::XML::Document.include ScaffoldParser::NokogiriPatches::Document
 
 module ScaffoldParser
-  def self.scaffold(path)
+  def self.scaffold(path, options = {})
     doc = Nokogiri::XML(File.open(path))
 
-    Builder.call(doc)
+    Builder.call(doc, options)
   end
 end

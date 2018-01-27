@@ -1,16 +1,40 @@
 module ScaffoldParser
+  module FilePatch
+    attr_accessor :indent
+
+    def putsi(str)
+      if indent
+        puts str.prepend('  ')
+      else
+        puts str
+      end
+    end
+  end
+
+  File.include FilePatch
+
   class Builder
-    def self.call(doc)
-      self.new(doc).call
+    def self.call(doc, options)
+      self.new(doc, options).call
     end
 
-    def initialize(doc)
+    def initialize(doc, options)
       @doc = doc
+      @options = options
     end
 
     def call
+      test @doc.end_nodes.any? do |node|
+        parent.to_class_name == 'SeznamDalsiSazby'
+      end
+
+      if test
+        require 'pry'; binding.pry
+      end
+
       @doc.parent_nodes.each do |parent|
-        self.class.call(parent)
+
+        self.class.call(parent, @options)
 
         if parent.custom_type?
           scaffold_class(parent.type_def)
@@ -31,61 +55,60 @@ module ScaffoldParser
       path = "./tmp/#{node.to_file_name}.rb"
 
       File.open(path, 'wb') do |f|
+        f.indent = true if @options[:namespace]
+
+        if @options[:namespace]
+          f.puts "require '#{@options[:namespace].underscore}/base_element'"
+        else
+          f.puts "require 'base_element'"
+        end
         node.parent_nodes.each do |n|
-          f.puts "require '#{n.to_require}'"
+          if @options[:namespace]
+            f.puts "require '#{@options[:namespace].underscore}/#{n.to_require}'"
+          else
+            f.puts "require '#{n.to_require}'"
+          end
         end
+        f.puts
 
-        if node.parent_nodes.any?
-          f.puts
-        end
+        f.puts "module #{@options[:namespace]}" if @options[:namespace]
 
-        f.puts "class #{node.to_class_name}"
+        f.putsi "class #{node.to_class_name}"
+        f.putsi "  include BaseElement"
+        f.puts
 
-        methods = node.end_nodes.map do |method|
-          at_method_template(method)
-        end
+        methods = node.end_nodes
         methods.each_with_index do |m, i|
-          f.puts m
+          method_name = m.to_method_name
+          at = m.to_location
+
+          f.putsi "  def #{method_name}"
+          f.putsi "    at '#{at}'"
+          f.putsi "  end"
+
           f.puts unless i == (methods.size - 1)
         end
 
         f.puts if node.parent_nodes.any?
 
-        methods = node.parent_nodes.map do |method|
-          element_method_template(method)
-        end
+        methods = node.parent_nodes
         methods.each_with_index do |m, i|
-          f.puts m
+          klass = m.to_class_name
+          method_name = m.to_method_name
+          at = m.to_location
+
+          f.putsi "  def #{method_name}"
+          f.putsi "    element_xml = at '#{at}'"
+          f.puts
+          f.putsi "    #{klass}.new(element_xml) if element_xml"
+          f.putsi "  end"
+
           f.puts unless i == (methods.size - 1)
         end
 
-        f.puts "end"
+        f.putsi "end"
+        f.puts "end" if @options[:namespace]
       end
-    end
-
-    def at_method_template(node)
-      method_name = node.to_method_name
-      at = node.to_location
-
-      <<-DEF
-  def #{method_name}
-    at '#{at}'
-  end
-      DEF
-    end
-
-    def element_method_template(node)
-      klass = node.to_class_name
-      method_name = node.to_method_name
-      at = node.to_location
-
-      <<-DEF
-  def #{method_name}
-    element_xml = at '#{at}'
-
-    #{klass}.new(element_xml) if element_xml
-  end
-      DEF
     end
   end
 end

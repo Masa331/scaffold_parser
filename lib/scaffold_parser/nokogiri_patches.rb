@@ -118,17 +118,7 @@ module ScaffoldParser
       def includes
         original_path = ENV['XSD_PATH'] || './'
 
-        # incls = xpath('//xs:include').map { |incl| incl['schemaLocation'] }
-        #
-        # docs = [self] + incls.map do |include_path|
-        #   dir = original_path.split('/')
-        #   include_path = (dir + [include_path]).join('/')
-        #   Nokogiri::XML(File.open(include_path))
-        # end
-
-        docs = collect_includes([], [], self)
-
-        docs + [self]
+        collect_includes([], [], self) + [self]
       end
 
       def collect_includes(collection, names, doc)
@@ -157,10 +147,6 @@ module ScaffoldParser
     end
 
     module Document
-      # def end_nodes
-      #   xpath('.//xs:simpleType')
-      # end
-
       def parent_nodes
         xpath('xs:schema/xs:complexType')
       end

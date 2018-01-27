@@ -1,4 +1,8 @@
+require 'base_element'
+
 class MenaType
+  include BaseElement
+
   def kod
     at 'Kod'
   end
