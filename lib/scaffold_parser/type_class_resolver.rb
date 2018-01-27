@@ -48,14 +48,6 @@ module ScaffoldParser
     def call
       if decorator.simple_type? || decorator.no_type?
 
-        # if decorator.name == 'Xs:element'
-        #   require 'pry'; binding.pry
-        # end
-        #
-        # if element.name == 'element'
-        #   require 'pry'; binding.pry
-        # end
-
         ScaffoldParser::Types.const_get(decorator.name).call(element)
       elsif decorator.xs_type?
         ScaffoldParser::Types.const_get(decorator.type).call(element)

@@ -6,42 +6,17 @@ require 'nokogiri'
 require 'active_support/all'
 
 require 'scaffold_parser/types'
-require 'scaffold_parser/type_class_resolver'
+# require 'scaffold_parser/type_class_resolver'
+
+require 'scaffold_parser/nokogiri_patches'
+
+Nokogiri::XML::Element.include ScaffoldParser::NokogiriPatches::Element
+Nokogiri::XML::Document.include ScaffoldParser::NokogiriPatches::Document
 
 module ScaffoldParser
   def self.scaffold(path)
     doc = Nokogiri::XML(File.open(path))
 
-    includes = collect_includes(doc, path)
-
-    models = Modeler.call(doc, [])
-
-    models.each do |model|
-      Builder.call(model, doc, includes)
-    end
-  end
-
-  private
-
-  def self.collect_includes(doc, original_path)
-    includes = doc.xpath('//xs:include').map { |incl| incl['schemaLocation'] }
-
-    docs = [doc] + includes.map do |include_path|
-      dir = original_path.split('/')
-      include_path = (dir[0..-2] + [include_path]).join('/')
-      Nokogiri::XML(File.open(include_path))
-    end
-
-    second_lvl_includes = docs.flat_map { |d| d.xpath('//xs:include').map { |incl| incl['schemaLocation'] } }
-    second_lvl_includes = second_lvl_includes.uniq
-    second_lvl_includes = second_lvl_includes - includes
-
-    second_lvl_docs = second_lvl_includes.map do |include_path|
-      dir = original_path.split('/')
-      include_path = (dir[0..-2] + [include_path]).join('/')
-      Nokogiri::XML(File.open(include_path))
-    end
-
-    docs + second_lvl_docs
+    Builder.call(doc)
   end
 end
