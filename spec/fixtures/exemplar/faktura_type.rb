@@ -17,6 +17,10 @@ class FakturaType
     at 'Popis'
   end
 
+  def popis2
+    at 'Popis2'
+  end
+
   def valuty
     element_xml = at 'Valuty'
 

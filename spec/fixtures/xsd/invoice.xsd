@@ -29,6 +29,8 @@
       </xs:element>
       <xs:element name="Popis" type="popisType" minOccurs="0">
       </xs:element>
+      <xs:element name="Popis2" type="popisType2" minOccurs="0">
+      </xs:element>
       <xs:element name="Valuty" minOccurs="0">
         <xs:complexType>
           <xs:sequence>

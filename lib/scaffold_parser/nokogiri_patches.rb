@@ -109,24 +109,50 @@ module ScaffoldParser
         end
 
         if doc.blank?
-          fail "Cant find element definition for #{node.name}(#{node.type}). Might be not enough includes?"
+          fail "Cant find element definition for '#{name}'. Might be not enough includes?"
         end
 
         doc.at_xpath("//*[@name='#{name}']")
       end
 
       def includes
-        original_path = './spec/fixtures/xsd/'
+        original_path = ENV['XSD_PATH'] || './'
 
-        incls = xpath('//xs:include').map { |incl| incl['schemaLocation'] }
+        # incls = xpath('//xs:include').map { |incl| incl['schemaLocation'] }
+        #
+        # docs = [self] + incls.map do |include_path|
+        #   dir = original_path.split('/')
+        #   include_path = (dir + [include_path]).join('/')
+        #   Nokogiri::XML(File.open(include_path))
+        # end
 
-        docs = [self] + incls.map do |include_path|
-          dir = original_path.split('/')
-          include_path = (dir + [include_path]).join('/')
-          Nokogiri::XML(File.open(include_path))
+        docs = collect_includes([], [], self)
+
+        docs + [self]
+      end
+
+      def collect_includes(collection, names, doc)
+        original_path = ENV['XSD_PATH'] || './'
+
+        new_names = doc.xpath('//xs:include').map { |incl| incl['schemaLocation'] }
+
+        (new_names - names).each do |name|
+          if names.include? name
+            next
+          else
+            dir = original_path.split('/')
+            include_path = (dir + [name]).join('/')
+
+            new_doc = Nokogiri::XML(File.open(include_path))
+
+            collection << new_doc
+            names << name
+
+            collect_includes(collection, names, new_doc)
+          end
         end
 
-        docs
+        collection
       end
     end
 

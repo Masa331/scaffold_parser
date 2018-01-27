@@ -23,6 +23,11 @@ module ScaffoldParser
     private
 
     def scaffold_class(node)
+      unless Dir.exists?('./tmp/')
+        Dir.mkdir('./tmp/')
+        puts './tmp/ directory created'
+      end
+
       path = "./tmp/#{node.to_file_name}.rb"
 
       File.open(path, 'wb') do |f|
