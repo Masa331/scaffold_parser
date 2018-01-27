@@ -1,78 +1,51 @@
 require 'active_support/all'
+
 module ScaffoldParser
   module NokogiriPatches
     module Element
-      def end_nodes
-        if self.name == 'complexType'
-          xpath('xs:sequence/xs:element').select do |child|
-            child.simple_type?
-          end
-        elsif  self.name == 'element'
-          xpath('xs:complexType/xs:sequence/xs:element').select do |child|
-            child.simple_type?
-          end
+      def attribute_elements
+        if name == 'complexType'
+          xpath('xs:sequence/xs:element')
+        elsif name == 'element'
+          xpath('xs:complexType/xs:sequence/xs:element')
         else
           fail 'whatever'
-        end
-      end
-
-      def simple_type?
-        xtype = self['type']
-
-        if name == 'simpleType'
-          true
-        elsif name == 'complexType'
-          false
-        elsif xtype.blank? && xpath('xs:complexType').empty?
-          true
-        elsif xtype.blank? && xpath('xs:complexType').any?
-          false
-        elsif xtype.present? && xtype.start_with?('xs:')
-          true
-        else
-          type_def = find_type(xtype)
-
-          type_def.simple_type?
         end
       end
 
       def parent_nodes
-        if self.name == 'complexType'
-          xpath('xs:sequence/xs:element').select do |child|
-            child.parent_type?
-          end
-        elsif  self.name == 'element'
-          xpath('xs:complexType/xs:sequence/xs:element').select do |child|
-            child.parent_type?
-          end
+        attribute_elements.select do |child|
+          child.parent_type?
+        end
+      end
+
+      def end_nodes
+        attribute_elements.select do |child|
+          child.end_type?
+        end
+      end
+
+      def end_type?
+        if custom_type?
+          type_def&.end_type?
         else
-          fail 'whatever'
+          xs_type? || (no_type? && complex_types.empty? && !complex_type?)
         end
       end
 
       def parent_type?
-        if name == 'complexType'
-          true
-        elsif self['type'].blank? && xpath('xs:complexType').any?
-          true
-        elsif self['type'].blank? && xpath('xs:complexType').none?
-          false
-        elsif self['type'].present? && self['type'].start_with?('xs:')
-          false
+        if custom_type?
+          type_def&.parent_type?
         else
-          type_def = find_type(self['type'])
-
-          type_def.parent_type?
+          complex_type? || complex_types.any?
         end
       end
 
       def to_class_name
         if self['type']
           self['type'].classify
-        elsif self['name']
-          self['name'].classify
         else
-          at_xpath('..')['name'].classify
+          to_name.classify
         end
       end
 
@@ -81,19 +54,28 @@ module ScaffoldParser
       end
 
       def to_require
-        # require 'pry'; binding.pry
         to_class_name.underscore
       end
 
       def to_method_name
-        if self['name']
-          self['name'].underscore
-        else
-          at_xpath('..')['name'].underscore
-        end
+        to_name.underscore
       end
 
       def to_location
+        to_name
+      end
+
+      def custom_type?
+        self['type'].present? && !xs_type?
+      end
+
+      def type_def
+        find_type(self['type'])
+      end
+
+      private
+
+      def to_name
         if self['name']
           self['name']
         else
@@ -101,7 +83,25 @@ module ScaffoldParser
         end
       end
 
-      private
+      def complex_types
+        xpath('xs:complexType')
+      end
+
+      def xs_type?
+        self['type'].present? && self['type'].start_with?('xs:')
+      end
+
+      def no_type?
+        self['type'].blank?
+      end
+
+      def complex_type?
+        name == 'complexType'
+      end
+
+      def simple_type?
+        name == 'simpleType'
+      end
 
       def find_type(name)
         doc = includes.find do |doc|

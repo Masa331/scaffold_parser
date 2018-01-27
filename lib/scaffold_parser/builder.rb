@@ -12,7 +12,11 @@ module ScaffoldParser
       @doc.parent_nodes.each do |parent|
         self.class.call(parent)
 
-        scaffold_class(parent)
+        if parent.custom_type?
+          scaffold_class(parent.type_def)
+        else
+          scaffold_class(parent)
+        end
       end
     end
 
@@ -26,7 +30,10 @@ module ScaffoldParser
           f.puts "require '#{n.to_require}'"
         end
 
-        f.puts
+        if node.parent_nodes.any?
+          f.puts
+        end
+
         f.puts "class #{node.to_class_name}"
 
         methods = node.end_nodes.map do |method|
