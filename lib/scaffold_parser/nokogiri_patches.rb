@@ -32,7 +32,6 @@ module ScaffoldParser
         else
           type_def = find_type(xtype)
 
-
           type_def.simple_type?
         end
       end

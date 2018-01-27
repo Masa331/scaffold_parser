@@ -51,7 +51,6 @@ module ScaffoldParser
       end
     end
 
-
     def at_method_template(node)
       method_name = node.to_method_name
       at = node.to_location
