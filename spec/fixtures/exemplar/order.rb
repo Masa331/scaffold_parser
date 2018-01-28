@@ -5,7 +5,7 @@ module Something
     include BaseElement
 
     def name
-      at 'name'
+      at :name
     end
   end
 end

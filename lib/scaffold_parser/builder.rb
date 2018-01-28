@@ -14,32 +14,32 @@ module ScaffoldParser
   File.include FilePatch
 
   class Builder
-    def self.call(doc, options)
-      self.new(doc, options).call
+    def self.call(doc, options, already_scaffolded_classes = [])
+      self.new(doc, options, already_scaffolded_classes).call
     end
 
-    def initialize(doc, options)
+    def initialize(doc, options, already_scaffolded_classes)
       @doc = doc
       @options = options
+      @already_scaffolded_classes = already_scaffolded_classes
     end
 
     def call
-      test @doc.end_nodes.any? do |node|
-        parent.to_class_name == 'SeznamDalsiSazby'
+      parent_nodes = @doc.parent_nodes.select do |node|
+        !@already_scaffolded_classes.include? node.to_class_name
       end
 
-      if test
-        require 'pry'; binding.pry
-      end
-
-      @doc.parent_nodes.each do |parent|
-
-        self.class.call(parent, @options)
+      parent_nodes.each do |parent|
+        @already_scaffolded_classes << parent.to_class_name
 
         if parent.custom_type?
-          scaffold_class(parent.type_def)
+          type_def = parent.type_def
+
+          scaffold_class(type_def)
+          self.class.call(type_def, @options, @already_scaffolded_classes)
         else
           scaffold_class(parent)
+          self.class.call(parent, @options, @already_scaffolded_classes)
         end
       end
     end
@@ -75,7 +75,7 @@ module ScaffoldParser
 
         f.putsi "class #{node.to_class_name}"
         f.putsi "  include BaseElement"
-        f.puts
+        f.puts if node.end_nodes.any?
 
         methods = node.end_nodes
         methods.each_with_index do |m, i|
@@ -83,7 +83,7 @@ module ScaffoldParser
           at = m.to_location
 
           f.putsi "  def #{method_name}"
-          f.putsi "    at '#{at}'"
+          f.putsi "    at :#{at}"
           f.putsi "  end"
 
           f.puts unless i == (methods.size - 1)
@@ -98,7 +98,7 @@ module ScaffoldParser
           at = m.to_location
 
           f.putsi "  def #{method_name}"
-          f.putsi "    element_xml = at '#{at}'"
+          f.putsi "    element_xml = at :#{at}"
           f.puts
           f.putsi "    #{klass}.new(element_xml) if element_xml"
           f.putsi "  end"

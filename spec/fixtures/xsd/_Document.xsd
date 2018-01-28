@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:include schemaLocation="comtypes.xsd"/>
+  <xs:element name="MoneyData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="SeznamFaktVyd" minOccurs="0">
+          <xs:complexType>
+            <xs:complexContent>
+              <xs:extension base="seznamType">
+                <xs:sequence>
+                  <xs:element name="FaktVyd" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:complexContent>
+                        <xs:extension base="fakturaType"/>
+                      </xs:complexContent>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="seznamType"/>
+  <xs:simpleType name="actionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Append"/>
+      <xs:enumeration value="Update"/>
+      <xs:enumeration value="Delete"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

@@ -43,9 +43,9 @@ module ScaffoldParser
 
       def to_class_name
         if self['type']
-          self['type'].classify
+          self['type'].camelize
         else
-          to_name.classify
+          to_name.camelize
         end
       end
 
@@ -148,7 +148,7 @@ module ScaffoldParser
 
     module Document
       def parent_nodes
-        xpath('xs:schema/xs:complexType')
+        xpath('xs:schema/xs:complexType|xs:schema/xs:element')
       end
     end
   end

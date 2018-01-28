@@ -4,14 +4,14 @@ class MenaType
   include BaseElement
 
   def kod
-    at 'Kod'
+    at :Kod
   end
 
   def mnozstvi
-    at 'Mnozstvi'
+    at :Mnozstvi
   end
 
   def kurs
-    at 'Kurs'
+    at :Kurs
   end
 end

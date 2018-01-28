@@ -5,27 +5,27 @@ class FakturaType
   include BaseElement
 
   def doklad
-    at 'Doklad'
+    at :Doklad
   end
 
   def ev_cis_dokl
-    at 'EvCisDokl'
+    at :EvCisDokl
   end
 
   def zpusob_uctovani
-    at 'ZpusobUctovani'
+    at :ZpusobUctovani
   end
 
   def popis
-    at 'Popis'
+    at :Popis
   end
 
   def popis2
-    at 'Popis2'
+    at :Popis2
   end
 
   def valuty
-    element_xml = at 'Valuty'
+    element_xml = at :Valuty
 
     Valuty.new(element_xml) if element_xml
   end

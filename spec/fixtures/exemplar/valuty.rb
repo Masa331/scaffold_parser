@@ -6,17 +6,17 @@ class Valuty
   include BaseElement
 
   def celkem
-    at 'Celkem'
+    at :Celkem
   end
 
   def mena
-    element_xml = at 'Mena'
+    element_xml = at :Mena
 
     MenaType.new(element_xml) if element_xml
   end
 
   def souhrn_dph
-    element_xml = at 'SouhrnDPH'
+    element_xml = at :SouhrnDPH
 
     SouhrnDPHType.new(element_xml) if element_xml
   end

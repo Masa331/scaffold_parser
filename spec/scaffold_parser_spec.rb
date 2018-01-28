@@ -18,4 +18,12 @@ RSpec.describe ScaffoldParser do
 
     expect(File.read('./tmp/order.rb')).to eq File.read('./spec/fixtures/exemplar/order.rb')
   end
+
+  xit 'generates skeleton which has elements in root' do
+    ENV['XSD_PATH'] = './spec/fixtures/xsd/'
+
+    ScaffoldParser.scaffold('./spec/fixtures/xsd/_Document.xsd')
+
+    expect(File.read('./tmp/money_data.rb')).to eq File.read('./spec/fixtures/exemplar/money_data.rb')
+  end
 end
