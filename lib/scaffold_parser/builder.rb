@@ -33,6 +33,24 @@ module ScaffoldParser
           self.class.call(parent, @options, @already_scaffolded_classes)
         end
       end
+
+      list_nodes = @doc.list_nodes.select do |node|
+        !@already_scaffolded_classes.include? node.list_element.to_class_name
+      end
+
+      list_nodes.each do |list|
+        @already_scaffolded_classes << list.list_element.to_class_name
+
+        if list.list_element.custom_type?
+          type_def = list.list_element.type_def
+
+          scaffold_class(type_def)
+          self.class.call(type_def, @options, @already_scaffolded_classes)
+        elsif !list.list_element.xs_type?
+          scaffold_class(list.list_element)
+          self.class.call(list.list_element, @options, @already_scaffolded_classes)
+        end
+      end
     end
 
     private
@@ -49,7 +67,7 @@ module ScaffoldParser
 
         f.puts "require '#{namespaced('base_element')}'"
         node.parent_nodes.each { |n| f.puts "require '#{namespaced(n.to_require)}'" }
-        node.list_nodes.each { |n| f.puts "require '#{namespaced(n.to_require)}'" }
+        node.list_nodes.reject { |l| l.list_element.xs_type? }.each { |n| f.puts "require '#{namespaced(n.to_require)}'" }
         f.puts
 
         f.puts "module #{@options[:namespace]}" if @options[:namespace]
@@ -79,7 +97,7 @@ module ScaffoldParser
           f.putsi "  end"
         end
 
-        node.list_nodes.each do |method|
+        node.list_nodes.reject { |l| l.list_element.xs_type? }.each do |method|
           f.puts
 
           list_element_klass = method.list_element_klass
@@ -88,6 +106,18 @@ module ScaffoldParser
 
           f.putsi "  def #{method_name}"
           f.putsi "    array_of_at(#{list_element_klass}, [#{list_element_at}])"
+          f.putsi "  end"
+        end
+
+        node.list_nodes.select { |l| l.list_element.xs_type? }.each do |method|
+          f.puts
+
+          list_element_klass = method.list_element_klass
+          method_name = method.to_method_name
+          list_element_at = method.list_element_at.map { |e| ":#{e}" }.join(', ')
+
+          f.putsi "  def #{method_name}"
+          f.putsi "    array_of_at(String, [#{list_element_at}])"
           f.putsi "  end"
         end
 

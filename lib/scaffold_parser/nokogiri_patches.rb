@@ -103,8 +103,6 @@ module ScaffoldParser
         find_type(self['type'])
       end
 
-      private
-
       def list_element
         eles = xpath('xs:complexType/xs:sequence/xs:element')
 
@@ -112,6 +110,12 @@ module ScaffoldParser
           eles.first
         end
       end
+
+      def xs_type?
+        self['type'].present? && self['type'].start_with?('xs:')
+      end
+
+      private
 
       def to_name
         if self['name']
@@ -123,10 +127,6 @@ module ScaffoldParser
 
       def complex_types
         xpath('xs:complexType')
-      end
-
-      def xs_type?
-        self['type'].present? && self['type'].start_with?('xs:')
       end
 
       def no_type?
@@ -187,6 +187,10 @@ module ScaffoldParser
     module Document
       def parent_nodes
         xpath('xs:schema/xs:complexType|xs:schema/xs:element')
+      end
+
+      def list_nodes
+        []
       end
     end
   end

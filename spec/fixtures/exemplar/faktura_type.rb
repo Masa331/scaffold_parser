@@ -1,6 +1,7 @@
 require 'base_element'
 require 'valuty'
 require 'pol_faktury_type'
+require 'pol_objedn_type'
 
 class FakturaType
   include BaseElement
@@ -31,5 +32,13 @@ class FakturaType
 
   def seznam_polozek
     array_of_at(PolFakturyType, [:SeznamPolozek, :Polozka])
+  end
+
+  def seznam_zal_polozek
+    array_of_at(PolObjednType, [:SeznamZalPolozek, :Polozka])
+  end
+
+  def dokumenty
+    array_of_at(String, [:Dokumenty, :Dokument])
   end
 end

@@ -8,8 +8,11 @@ RSpec.describe ScaffoldParser do
     expect(File.read('./tmp/valuty.rb')).to eq File.read('./spec/fixtures/exemplar/valuty.rb')
     expect(File.read('./tmp/mena_type.rb')).to eq File.read('./spec/fixtures/exemplar/mena_type.rb')
     expect(File.read('./tmp/pol_faktury_type.rb')).to eq File.read('./spec/fixtures/exemplar/pol_faktury_type.rb')
+    expect(File.read('./tmp/pol_objedn_type.rb')).to eq File.read('./spec/fixtures/exemplar/pol_objedn_type.rb')
 
     expect(File.exists?('./tmp/castka_type.rb')).to eq false
+    expect(File.exists?('./tmp/seznam_polozek.rb')).to eq false
+    expect(File.exists?('./tmp/seznam_zal_polozek.rb')).to eq false
   end
 
   it 'outputs class in module if given' do

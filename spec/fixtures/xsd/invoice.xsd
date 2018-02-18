@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
   <xs:include schemaLocation="comtypes.xsd"/>
+  <xs:include schemaLocation="__Objedn.xsd"/>
   <xs:complexType name="fakturaType">
     <xs:annotation>
       <xs:documentation>Some comment...</xs:documentation>
@@ -58,6 +59,21 @@
         <xs:complexType>
           <xs:sequence>
             <xs:element name="Polozka" type="polFakturyType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SeznamZalPolozek" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Polozka" type="polObjednType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Dokumenty" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Dokument" type="xs:string" maxOccurs="unbounded">
+            </xs:element>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
