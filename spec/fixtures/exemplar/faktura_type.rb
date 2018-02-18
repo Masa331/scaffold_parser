@@ -1,5 +1,6 @@
 require 'base_element'
 require 'valuty'
+require 'pol_faktury_type'
 
 class FakturaType
   include BaseElement
@@ -28,5 +29,16 @@ class FakturaType
     element_xml = at :Valuty
 
     Valuty.new(element_xml) if element_xml
+  end
+
+  def seznam_polozek
+    elements = raw.dig(:SeznamPolozek, :Polozka) || []
+    if elements.is_a? Hash
+      elements = [elements]
+    end
+
+    elements.map do |raw|
+      PolFakturyType.new(raw)
+    end
   end
 end

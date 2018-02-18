@@ -54,6 +54,19 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <xs:element name="SeznamPolozek" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Polozka" type="polFakturyType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="polFakturyType">
+    <xs:sequence>
+      <xs:element name="Popis" type="popisType" minOccurs="0">
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

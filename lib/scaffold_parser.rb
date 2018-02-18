@@ -2,9 +2,11 @@ require 'scaffold_parser/builder'
 require 'nokogiri'
 require 'active_support/all'
 require 'scaffold_parser/nokogiri_patches'
+require 'scaffold_parser/file_patches'
 
 Nokogiri::XML::Element.include ScaffoldParser::NokogiriPatches::Element
 Nokogiri::XML::Document.include ScaffoldParser::NokogiriPatches::Document
+File.include ScaffoldParser::FilePatches
 
 module ScaffoldParser
   def self.scaffold(path, options = {})
