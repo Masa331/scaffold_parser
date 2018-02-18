@@ -445,61 +445,8 @@
   <xs:complexType name="doklRefType">
     <xs:sequence>
       <xs:element name="IDDokladu" type="xs:long">
-        <xs:annotation>
-          <xs:documentation>Jedinečný identifikátor dokladu</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="CisloDokladu" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>Uživatelské číslo dokladu</xs:documentation>
-        </xs:annotation>
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:maxLength value="10"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:element>
-      <xs:element name="DruhDokladu" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>Druh dokladu:
-
-            1) Hradící doklady:
-            B = bankovní
-            P = pokladní
-            I = interní doklad
-            H = pohledávka
-            Z = závazek
-
-            2) Hrazené doklady
-            FV = faktura vydaná
-            FP = faktura přijatá
-            KP = pohledávka
-            KZ = závazek
-            ID = interní doklad</xs:documentation>
-        </xs:annotation>
-        <xs:simpleType>
-          <xs:restriction base="xs:NMTOKEN">
-            <xs:maxLength value="3"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:element>
-      <xs:element name="Rok">
-        <xs:annotation>
-          <xs:documentation>Rok, do kterého doklad spadá</xs:documentation>
-        </xs:annotation>
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:maxLength value="4"/>
-          </xs:restriction>
-        </xs:simpleType>
       </xs:element>
       <xs:element name="EET" type="EETType" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>Údaje týkající se EET (pouze hradící doklad a pouze CZ verze)
-
-            EXPORT: ANO,
-            IMPORT: ANO (Pouze hradicí pohledávka nebo pokladní doklad, které jsou automaticky generovány při importu faktury. V elementu DruhDokladu musí být nastavena správná hodnota (H nebo P). Ostatní elementy týkající se úhrady jsou při importu ignorovány.)</xs:documentation>
-        </xs:annotation>
       </xs:element>
     </xs:sequence>
   </xs:complexType>

@@ -3,6 +3,7 @@ require 'valuty'
 require 'souhrn_dph_type'
 require 'pol_faktury_type'
 require 'pol_objedn_type'
+require 'uhrada_type'
 
 class FakturaType
   include BaseElement
@@ -45,6 +46,10 @@ class FakturaType
 
   def seznam_zal_polozek
     array_of_at(PolObjednType, [:SeznamZalPolozek, :Polozka])
+  end
+
+  def seznam_uhrad
+    array_of_at(UhradaType, [:SeznamUhrad, :Uhrada])
   end
 
   def dokumenty

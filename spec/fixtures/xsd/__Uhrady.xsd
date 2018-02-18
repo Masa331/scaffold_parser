@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:include schemaLocation="comtypes.xsd"/>
+  <xs:complexType name="uhradaType">
+    <xs:sequence>
+      <xs:element name="DokladUhr" type="doklRefType" minOccurs="0">
+      </xs:element>
+      <xs:element name="DokladHraz" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="doklRefType"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

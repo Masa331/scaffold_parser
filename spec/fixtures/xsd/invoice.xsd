@@ -2,6 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
   <xs:include schemaLocation="comtypes.xsd"/>
   <xs:include schemaLocation="__Objedn.xsd"/>
+  <xs:include schemaLocation="__Uhrady.xsd"/>
   <xs:complexType name="fakturaType">
     <xs:annotation>
       <xs:documentation>Some comment...</xs:documentation>
@@ -72,6 +73,13 @@
         <xs:complexType>
           <xs:sequence>
             <xs:element name="Polozka" type="polObjednType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SeznamUhrad" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Uhrada" type="uhradaType" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>

@@ -14,15 +14,27 @@ module ScaffoldParser
       end
 
       def parent_nodes
-        attribute_elements.select(&:parent_type?)
+        attribute_elements.select(&:parent_type?) + extension_parent_nodes
       end
 
       def end_nodes
-        attribute_elements.select(&:end_type?)
+        attribute_elements.select(&:end_type?) + extension_end_nodes
       end
 
       def list_nodes
-        attribute_elements.select(&:list_type?)
+        attribute_elements.select(&:list_type?) + extension_list_nodes
+      end
+
+      def extension_end_nodes
+        extension ? extension.end_nodes : []
+      end
+
+      def extension_parent_nodes
+        extension ? extension.parent_nodes : []
+      end
+
+      def extension_list_nodes
+        extension ? extension.list_nodes : []
       end
 
       def end_type?
@@ -108,6 +120,14 @@ module ScaffoldParser
 
         if eles.size == 1
           eles.first
+        end
+      end
+
+      def extension
+        elem = at_xpath('xs:complexType/xs:complexContent/xs:extension')
+
+        if elem
+          find_type(elem['base'])
         end
       end
 
