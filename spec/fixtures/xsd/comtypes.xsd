@@ -2,83 +2,19 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
   <xs:include schemaLocation="comtypes2.xsd"/>
   <xs:complexType name="souhrnDPHType">
-    <xs:annotation>
-      <xs:documentation>souhrn DPH za doklad</xs:documentation>
-    </xs:annotation>
     <xs:sequence>
       <xs:element name="Zaklad0" type="castkaType" minOccurs="0">
         <xs:annotation>
           <xs:documentation>Částka v nulové sazbě daně</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="Zaklad5" type="castkaType" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>Základ ve standardní snížené sazbě DPH</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="Zaklad22" type="castkaType" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>Základ ve standardní základní sazbě DPH</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="DPH5" type="castkaType" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>Daň ve standardní snížené sazbě</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="DPH22" type="castkaType" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>Daň ve standardní základní sazbě</xs:documentation>
-        </xs:annotation>
-      </xs:element>
       <xs:element name="SeznamDalsiSazby" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>Seznam dalších sazeb DPH
-
-            Poznámka: seznam dalších sazeb může standardně obsahovat max. 4 sazby. Pokud však není uveden žádný z elementů určený pro nulovou, standardní sníženou a standardní základní sazbu, tak se nulová sazba a standardní sazby importují z tohoto seznamu a počet elementů DalsiSazba se rozšiřuje na max. 7.
-          </xs:documentation>
-        </xs:annotation>
         <xs:complexType>
           <xs:sequence>
             <xs:element name="DalsiSazba" maxOccurs="6">
-              <xs:annotation>
-                <xs:documentation>Další sazba</xs:documentation>
-              </xs:annotation>
               <xs:complexType>
                 <xs:sequence>
                   <xs:element name="Popis" minOccurs="0">
-                    <xs:annotation>
-                      <xs:documentation>Popis</xs:documentation>
-                    </xs:annotation>
-                  </xs:element>
-                  <xs:element name="HladinaDPH" minOccurs="0">
-                    <xs:annotation>
-                      <xs:documentation>Hladina:
-                        0 = nulová sazba
-                        1 = snížená
-                        2 = základní</xs:documentation>
-                    </xs:annotation>
-                    <xs:simpleType>
-                      <xs:restriction base="xs:byte">
-                        <xs:enumeration value="1"/>
-                        <xs:enumeration value="2"/>
-                      </xs:restriction>
-                    </xs:simpleType>
-                  </xs:element>
-                  <xs:element name="Sazba" type="procentoType" minOccurs="0">
-                    <xs:annotation>
-                      <xs:documentation>Procentní sazba daně</xs:documentation>
-                    </xs:annotation>
-                  </xs:element>
-                  <xs:element name="Zaklad" type="castkaType" minOccurs="0">
-                    <xs:annotation>
-                      <xs:documentation>Základ v sazbě</xs:documentation>
-                    </xs:annotation>
-                  </xs:element>
-                  <xs:element name="DPH" type="castkaType" minOccurs="0">
-                    <xs:annotation>
-                      <xs:documentation>Daň v sazbě</xs:documentation>
-                    </xs:annotation>
                   </xs:element>
                 </xs:sequence>
               </xs:complexType>

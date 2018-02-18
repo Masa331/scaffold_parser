@@ -56,6 +56,8 @@
         </xs:complexType>
       </xs:element>
       <xs:sequence minOccurs="0">
+        <xs:element name="SouhrnDPH" type="souhrnDPHType">
+        </xs:element>
         <xs:element name="Celkem" type="castkaType">
         </xs:element>
       </xs:sequence>

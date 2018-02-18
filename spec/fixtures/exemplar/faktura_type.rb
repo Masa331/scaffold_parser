@@ -1,5 +1,6 @@
 require 'base_element'
 require 'valuty'
+require 'souhrn_dph_type'
 require 'pol_faktury_type'
 require 'pol_objedn_type'
 
@@ -32,6 +33,10 @@ class FakturaType
 
   def valuty
     submodel_at(Valuty, :Valuty)
+  end
+
+  def souhrn_dph
+    submodel_at(SouhrnDPHType, :SouhrnDPH)
   end
 
   def seznam_polozek

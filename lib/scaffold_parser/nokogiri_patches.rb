@@ -54,7 +54,7 @@ module ScaffoldParser
           if list_element['type']
             list_element['type'].camelize
           else
-            self['name'].camelize
+            list_element['name'].camelize
           end
         end
       end
