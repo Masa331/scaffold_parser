@@ -5,7 +5,7 @@ module ScaffoldParser
     module Element
       def attribute_elements
         if name == 'complexType'
-          xpath('xs:sequence/xs:element')
+          xpath('xs:sequence/xs:element|xs:sequence/xs:sequence/xs:element')
         elsif name == 'element'
           xpath('xs:complexType/xs:sequence/xs:element')
         else

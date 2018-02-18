@@ -55,6 +55,10 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <xs:sequence minOccurs="0">
+        <xs:element name="Celkem" type="castkaType">
+        </xs:element>
+      </xs:sequence>
       <xs:element name="SeznamPolozek" minOccurs="0">
         <xs:complexType>
           <xs:sequence>

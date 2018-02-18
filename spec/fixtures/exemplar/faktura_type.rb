@@ -26,6 +26,10 @@ class FakturaType
     at :Popis2
   end
 
+  def celkem
+    at :Celkem
+  end
+
   def valuty
     submodel_at(Valuty, :Valuty)
   end
