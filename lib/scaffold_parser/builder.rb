@@ -75,30 +75,19 @@ module ScaffoldParser
           at = method.to_location
 
           f.putsi "  def #{method_name}"
-          f.putsi "    element_xml = at :#{at}"
-          f.puts
-          f.putsi "    #{klass}.new(element_xml) if element_xml"
+          f.putsi "    submodel_at(#{klass}, :#{at})"
           f.putsi "  end"
         end
 
         node.list_nodes.each do |method|
           f.puts
 
-          klass = method.to_class_name
           list_element_klass = method.list_element_klass
           method_name = method.to_method_name
-          at = method.to_location
           list_element_at = method.list_element_at.map { |e| ":#{e}" }.join(', ')
 
           f.putsi "  def #{method_name}"
-          f.putsi "    elements = raw.dig(#{list_element_at}) || []"
-          f.putsi "    if elements.is_a? Hash"
-          f.putsi "      elements = [elements]"
-          f.putsi "    end"
-          f.puts
-          f.putsi "    elements.map do |raw|"
-          f.putsi "      #{list_element_klass}.new(raw)"
-          f.putsi "    end"
+          f.putsi "    array_of_at(#{list_element_klass}, [#{list_element_at}])"
           f.putsi "  end"
         end
 

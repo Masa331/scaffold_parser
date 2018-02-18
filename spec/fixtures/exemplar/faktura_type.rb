@@ -26,19 +26,10 @@ class FakturaType
   end
 
   def valuty
-    element_xml = at :Valuty
-
-    Valuty.new(element_xml) if element_xml
+    submodel_at(Valuty, :Valuty)
   end
 
   def seznam_polozek
-    elements = raw.dig(:SeznamPolozek, :Polozka) || []
-    if elements.is_a? Hash
-      elements = [elements]
-    end
-
-    elements.map do |raw|
-      PolFakturyType.new(raw)
-    end
+    array_of_at(PolFakturyType, [:SeznamPolozek, :Polozka])
   end
 end
