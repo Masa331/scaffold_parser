@@ -14,6 +14,7 @@ RSpec.describe ScaffoldParser do
     expect(File.read('./tmp/uhrada_type.rb')).to eq File.read('./spec/fixtures/exemplar/uhrada_type.rb')
     expect(File.read('./tmp/dokl_ref_type.rb')).to eq File.read('./spec/fixtures/exemplar/dokl_ref_type.rb')
     expect(File.read('./tmp/doklad_hraz.rb')).to eq File.read('./spec/fixtures/exemplar/doklad_hraz.rb')
+    expect(File.read('./tmp/neskl_polozka.rb')).to eq File.read('./spec/fixtures/exemplar/neskl_polozka.rb')
 
     expect(File.exists?('./tmp/castka_type.rb')).to eq false
     expect(File.exists?('./tmp/seznam_polozek.rb')).to eq false

@@ -5,6 +5,24 @@
     <xs:sequence>
       <xs:element name="Popis" type="popisType" minOccurs="0">
       </xs:element>
+      <xs:choice>
+        <xs:sequence minOccurs="0">
+          <xs:element name="something" type="xs:string">
+        </xs:sequence>
+        <xs:element name="NesklPolozka" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Zkrat" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>
