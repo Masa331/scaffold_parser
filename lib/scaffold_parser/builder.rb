@@ -121,6 +121,33 @@ module ScaffoldParser
           f.putsi "  end"
         end
 
+        ### to_h method
+        lines = []
+        node.end_nodes.each do |node|
+          lines << "#{node.to_method_name}: #{node.to_method_name},"
+        end
+        node.parent_nodes.each do |node|
+          lines << "#{node.to_method_name}: #{node.to_method_name}.to_h,"
+        end
+        node.list_nodes.reject { |l| l.list_element.xs_type? }.each do |node|
+          lines << "#{node.to_method_name}: #{node.to_method_name}.map(&:to_h),"
+        end
+        node.list_nodes.select { |l| l.list_element.xs_type? }.each do |node|
+          lines << "#{node.to_method_name}: #{node.to_method_name},"
+        end
+        if lines.any?
+          f.puts
+          lines.last.chop!
+          first_line = lines.shift
+
+          f.putsi "  def to_h"
+          f.putsi "    { #{first_line}"
+          lines.each do |line|
+            f.putsi "      #{line}"
+          end
+          f.putsi "    }.delete_if { |k, v| v.nil? || v.empty? }"
+          f.putsi "  end"
+        end
         f.putsi "end"
         f.puts "end" if @options[:namespace]
       end

@@ -14,4 +14,11 @@ class MenaType
   def kurs
     at :Kurs
   end
+
+  def to_h
+    { kod: kod,
+      mnozstvi: mnozstvi,
+      kurs: kurs
+    }.delete_if { |k, v| v.nil? || v.empty? }
+  end
 end

@@ -55,4 +55,20 @@ class FakturaType
   def dokumenty
     array_of_at(String, [:Dokumenty, :Dokument])
   end
+
+  def to_h
+    { doklad: doklad,
+      ev_cis_dokl: ev_cis_dokl,
+      zpusob_uctovani: zpusob_uctovani,
+      popis: popis,
+      popis2: popis2,
+      celkem: celkem,
+      valuty: valuty.to_h,
+      souhrn_dph: souhrn_dph.to_h,
+      seznam_polozek: seznam_polozek.map(&:to_h),
+      seznam_zal_polozek: seznam_zal_polozek.map(&:to_h),
+      seznam_uhrad: seznam_uhrad.map(&:to_h),
+      dokumenty: dokumenty
+    }.delete_if { |k, v| v.nil? || v.empty? }
+  end
 end

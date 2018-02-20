@@ -15,4 +15,11 @@ class PolObjednType
   def neskl_polozka
     submodel_at(NesklPolozka, :NesklPolozka)
   end
+
+  def to_h
+    { popis: popis,
+      something: something,
+      neskl_polozka: neskl_polozka.to_h
+    }.delete_if { |k, v| v.nil? || v.empty? }
+  end
 end

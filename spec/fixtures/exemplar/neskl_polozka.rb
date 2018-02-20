@@ -6,4 +6,9 @@ class NesklPolozka
   def zkrat
     at :Zkrat
   end
+
+  def to_h
+    { zkrat: zkrat
+    }.delete_if { |k, v| v.nil? || v.empty? }
+  end
 end
