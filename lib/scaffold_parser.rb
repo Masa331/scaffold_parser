@@ -3,6 +3,7 @@ require 'nokogiri'
 require 'active_support/all'
 require 'scaffold_parser/nokogiri_patches'
 require 'scaffold_parser/file_patches'
+require 'scaffold_parser/scaffolders/parser_scaffolder'
 
 Nokogiri::XML::Element.include ScaffoldParser::NokogiriPatches::Element
 Nokogiri::XML::Document.include ScaffoldParser::NokogiriPatches::Document
