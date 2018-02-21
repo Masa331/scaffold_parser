@@ -1,13 +1,13 @@
 module ScaffoldParser
   class Builder
-    def self.call(doc, options, already_scaffolded_classes = [])
-      self.new(doc, options, already_scaffolded_classes).call
+    def self.call(doc, options, already_scaffolded_subelements = [])
+      self.new(doc, options, already_scaffolded_subelements).call
     end
 
-    def initialize(doc, options, already_scaffolded_classes)
+    def initialize(doc, options, already_scaffolded_subelements)
       @doc = doc
       @options = options
-      @already_scaffolded_classes = already_scaffolded_classes
+      @already_scaffolded_subelements = already_scaffolded_subelements
     end
 
     def call
@@ -16,47 +16,29 @@ module ScaffoldParser
         puts './tmp/ directory created'
       end
 
-      parent_nodes = @doc.parent_nodes.select do |node|
-        !@already_scaffolded_classes.include? node.to_class_name
-      end
+      unscaffolded_subelements.each do |subelement|
+        @already_scaffolded_subelements << subelement.to_class_name
 
-      parent_nodes.each do |parent|
-        @already_scaffolded_classes << parent.to_class_name
+        type_def =
+          if subelement.custom_type?
+            subelement.type_def
+          else
+            subelement
+          end
 
-        if parent.custom_type?
-          type_def = parent.type_def
-
-          scaffold_class(type_def)
-          self.class.call(type_def, @options, @already_scaffolded_classes)
-        else
-          scaffold_class(parent)
-          self.class.call(parent, @options, @already_scaffolded_classes)
-        end
-      end
-
-      list_nodes = @doc.list_nodes.select do |node|
-        !@already_scaffolded_classes.include? node.list_element.to_class_name
-      end
-
-      list_nodes.each do |list|
-        @already_scaffolded_classes << list.list_element.to_class_name
-
-        if list.list_element.custom_type?
-          type_def = list.list_element.type_def
-
-          scaffold_class(type_def)
-          self.class.call(type_def, @options, @already_scaffolded_classes)
-        elsif !list.list_element.xs_type?
-          scaffold_class(list.list_element)
-          self.class.call(list.list_element, @options, @already_scaffolded_classes)
-        end
+        Scaffolders::ParserScaffolder.call(type_def, @options)
+        self.class.call(type_def, @options, @already_scaffolded_subelements)
       end
     end
 
     private
 
-    def scaffold_class(node)
-      Scaffolders::ParserScaffolder.call(node, @options)
+    def unscaffolded_subelements
+      all = @doc.parent_nodes.to_a + @doc.list_nodes.map(&:list_element)
+
+      all
+        .reject(&:xs_type?)
+        .reject { |node| @already_scaffolded_subelements.include?(node.to_class_name) }
     end
   end
 end
