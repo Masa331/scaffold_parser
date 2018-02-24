@@ -14,48 +14,48 @@ module ScaffoldParser
         end
 
         def call
-          path = "./tmp/#{node.to_file_name}.rb"
+          path = "./tmp/#{node.to_class_name.underscore}.rb"
 
           File.open(path, 'wb') do |f|
             f.indent = true if @options[:namespace]
 
             f.puts "require '#{namespaced('base_element')}'"
-            node.parent_nodes.each { |n| f.puts "require '#{namespaced(n.to_require)}'" }
-            node.list_nodes.reject { |l| l.list_element.xs_type? }.each { |n| f.puts "require '#{namespaced(n.to_require)}'" }
+            node.submodel_nodes.each { |n| f.puts "require '#{namespaced(n.to_class_name.underscore)}'" }
+            node.array_nodes.reject { |l| l.list_element.xs_type? }.each { |n| f.puts "require '#{namespaced(n.list_element.to_class_name.underscore)}'" }
             f.puts
 
             f.puts "module #{@options[:namespace]}" if @options[:namespace]
             f.putsi "class #{node.to_class_name}"
             f.putsi "  include BaseElement"
 
-            node.end_nodes.each do |method|
+            node.value_nodes.each do |method|
               f.puts
 
-              method_name = method.to_method_name
-              at = method.to_location
+              method_name = method.to_name.underscore
+              at = method.to_name
 
               f.putsi "  def #{method_name}"
               f.putsi "    at :#{at}"
               f.putsi "  end"
             end
 
-            node.parent_nodes.each do |method|
+            node.submodel_nodes.each do |method|
               f.puts
 
               klass = method.to_class_name
-              method_name = method.to_method_name
-              at = method.to_location
+              method_name = method.to_name.underscore
+              at = method.to_name
 
               f.putsi "  def #{method_name}"
               f.putsi "    submodel_at(#{klass}, :#{at})"
               f.putsi "  end"
             end
 
-            node.list_nodes.reject { |l| l.list_element.xs_type? }.each do |method|
+            node.array_nodes.reject { |l| l.list_element.xs_type? }.each do |method|
               f.puts
 
               list_element_klass = method.list_element_klass
-              method_name = method.to_method_name
+              method_name = method.to_name.underscore
               list_element_at = method.list_element_at.map { |e| ":#{e}" }.join(', ')
 
               f.putsi "  def #{method_name}"
@@ -63,11 +63,11 @@ module ScaffoldParser
               f.putsi "  end"
             end
 
-            node.list_nodes.select { |l| l.list_element.xs_type? }.each do |method|
+            node.array_nodes.select { |l| l.list_element.xs_type? }.each do |method|
               f.puts
 
               list_element_klass = method.list_element_klass
-              method_name = method.to_method_name
+              method_name = method.to_name.underscore
               list_element_at = method.list_element_at.map { |e| ":#{e}" }.join(', ')
 
               f.putsi "  def #{method_name}"
@@ -77,17 +77,17 @@ module ScaffoldParser
 
             ### to_h method
             lines = []
-            node.end_nodes.each do |node|
-              lines << "#{node.to_method_name}: #{node.to_method_name},"
+            node.value_nodes.each do |node|
+              lines << "#{node.to_name.underscore}: #{node.to_name.underscore},"
             end
-            node.parent_nodes.each do |node|
-              lines << "#{node.to_method_name}: #{node.to_method_name}.to_h,"
+            node.submodel_nodes.each do |node|
+              lines << "#{node.to_name.underscore}: #{node.to_name.underscore}.to_h,"
             end
-            node.list_nodes.reject { |l| l.list_element.xs_type? }.each do |node|
-              lines << "#{node.to_method_name}: #{node.to_method_name}.map(&:to_h),"
+            node.array_nodes.reject { |l| l.list_element.xs_type? }.each do |node|
+              lines << "#{node.to_name.underscore}: #{node.to_name.underscore}.map(&:to_h),"
             end
-            node.list_nodes.select { |l| l.list_element.xs_type? }.each do |node|
-              lines << "#{node.to_method_name}: #{node.to_method_name},"
+            node.array_nodes.select { |l| l.list_element.xs_type? }.each do |node|
+              lines << "#{node.to_name.underscore}: #{node.to_name.underscore},"
             end
             if lines.any?
               f.puts

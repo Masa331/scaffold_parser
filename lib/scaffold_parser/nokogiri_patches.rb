@@ -1,198 +1,124 @@
-require 'active_support/all'
-
 module ScaffoldParser
   module NokogiriPatches
     module Element
-      def attribute_elements
-        if name == 'complexType'
-          xpath('xs:sequence/xs:element|xs:sequence/xs:sequence/xs:element|xs:sequence/xs:choice/xs:sequence/xs:element|xs:sequence/xs:choice/xs:element')
-        elsif name == 'element'
-          xpath('xs:complexType/xs:sequence/xs:element')
-        else
-          fail 'whatever'
+      class BlankExtension
+        def submodel_nodes
+          []
+        end
+
+        def value_nodes
+          []
+        end
+
+        def array_nodes
+          []
         end
       end
 
-      def parent_nodes
-        attribute_elements.select(&:parent_type?) + extension_parent_nodes
+      def submodel_nodes
+        attribute_elements.select(&:parent_type?) + extension.submodel_nodes
       end
 
-      def end_nodes
-        attribute_elements.select(&:end_type?) + extension_end_nodes
+      def value_nodes
+        attribute_elements.select(&:end_type?) + extension.value_nodes
       end
 
-      def list_nodes
-        attribute_elements.select(&:list_type?) + extension_list_nodes
-      end
-
-      def extension_end_nodes
-        extension ? extension.end_nodes : []
-      end
-
-      def extension_parent_nodes
-        extension ? extension.parent_nodes : []
-      end
-
-      def extension_list_nodes
-        extension ? extension.list_nodes : []
+      def array_nodes
+        attribute_elements.select(&:list_type?) + extension.array_nodes
       end
 
       def end_type?
-        if custom_type?
-          type_def&.end_type?
-        else
-          xs_type? || (no_type? && complex_types.empty? && !complex_type? && !list_type?)
-        end
+        xs_type? || (no_type? && complex_types.empty? && !complex_type? && !list_type?)
       end
 
       def parent_type?
-        if custom_type?
-          type_def&.parent_type?
-        else
-          (complex_type? || complex_types.any?) && !list_type?
-        end
+        (complex_type? || complex_types.any?) && !list_type?
       end
 
       def list_type?
-        if list_element
-          max_occure = list_element['maxOccurs']
+        if definition.list_element
+          max_occure = definition.list_element['maxOccurs']
 
           max_occure == 'unbounded' || max_occure.to_i > 1
         end
       end
 
       def list_element_klass
-        if list_element
-          if list_element['type']
-            list_element['type'].camelize
-          else
-            list_element['name'].camelize
-          end
-        end
+        list_element.definition.to_name.camelize
       end
 
       def list_element_at
-        if list_element
-          [at_xpath('xs:complexType').to_location, list_element.to_location]
-        end
+        [at_xpath('xs:complexType').to_name, list_element.to_name]
       end
 
       def to_class_name
-        if self['type']
-          self['type'].camelize
+        definition.to_name.camelize
+      end
+
+      def definition
+        if self['type'].present? && !self['type'].start_with?('xs:')
+          find_type(self['type'])
         else
-          to_name.camelize
+          self
         end
-      end
-
-      def to_file_name
-        to_class_name.underscore
-      end
-
-      def to_require
-        if parent_type?
-          to_class_name.underscore
-        elsif list_type?
-          if list_element
-            list_element.to_class_name.underscore
-          end
-        end
-      end
-
-      def to_method_name
-        to_name.underscore
-      end
-
-      def to_location
-        to_name
-      end
-
-      def custom_type?
-        self['type'].present? && !xs_type?
-      end
-
-      def type_def
-        find_type(self['type'])
       end
 
       def list_element
-        eles = xpath('xs:complexType/xs:sequence/xs:element')
-
-        if eles.size == 1
-          eles.first
-        end
+        xpath('xs:complexType/xs:sequence/xs:element').first
       end
 
       def extension
         elem = at_xpath('xs:complexType/xs:complexContent/xs:extension')
 
-        if elem
-          find_type(elem['base'])
-        end
+        elem ? find_type(elem['base']) : BlankExtension.new
       end
 
       def xs_type?
-        self['type'].present? && self['type'].start_with?('xs:')
+        definition['type'].present? && definition['type'].start_with?('xs:')
+      end
+
+      def complex_type?
+        definition.name == 'complexType'
+      end
+
+      def complex_types
+        definition.xpath('xs:complexType')
+      end
+
+      def no_type?
+        definition['type'].blank?
+      end
+
+      def to_name
+        self['name'] || at_xpath('..')['name']
       end
 
       private
 
-      def to_name
-        if self['name']
-          self['name']
-        else
-          at_xpath('..')['name']
-        end
-      end
-
-      def complex_types
-        xpath('xs:complexType')
-      end
-
-      def no_type?
-        self['type'].blank?
-      end
-
-      def complex_type?
-        name == 'complexType'
-      end
-
-      def simple_type?
-        name == 'simpleType'
+      def attribute_elements
+        xpath('xs:sequence/xs:element|xs:sequence/xs:sequence/xs:element|xs:sequence/xs:choice/xs:sequence/xs:element|xs:sequence/xs:choice/xs:element|xs:complexType/xs:sequence/xs:element')
       end
 
       def find_type(name)
-        doc = includes.find do |doc|
-          doc.at_xpath("//*[@name='#{name}']").present?
+        if element = document.at_xpath("//*[@name='#{name}']")
+          return element
+        else
+          collect_includes.find do |doc|
+            doc.at_xpath("//*[@name='#{name}']").present?
+          end.at_xpath("//*[@name='#{name}']")
         end
-
-        if doc.blank?
-          fail "Cant find element definition for '#{name}'. Might be not enough includes?"
-        end
-
-        doc.at_xpath("//*[@name='#{name}']")
       end
 
-      def includes
-        collect_includes([], [], self) + [self]
-      end
-
-      def collect_includes(collection, names, doc)
+      def collect_includes(doc = self, collection = [], names = [])
         new_names = doc.xpath('//xs:include').map { |incl| incl['schemaLocation'] }
 
         (new_names - names).each do |name|
-          if names.include? name
-            next
-          else
-            include_path = (['./'] + [name]).join('/')
+          new_doc = Nokogiri::XML(File.open(name))
 
-            new_doc = Nokogiri::XML(File.open(include_path))
+          collection << new_doc
+          names << name
 
-            collection << new_doc
-            names << name
-
-            collect_includes(collection, names, new_doc)
-          end
+          collect_includes(new_doc, collection, names)
         end
 
         collection
@@ -200,11 +126,11 @@ module ScaffoldParser
     end
 
     module Document
-      def parent_nodes
+      def submodel_nodes
         xpath('xs:schema/xs:complexType|xs:schema/xs:element')
       end
 
-      def list_nodes
+      def array_nodes
         []
       end
     end

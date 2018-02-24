@@ -22,22 +22,15 @@ module ScaffoldParser
         unscaffolded_subelements.each do |subelement|
           @already_scaffolded_subelements << subelement.to_class_name
 
-          type_def =
-            if subelement.custom_type?
-              subelement.type_def
-            else
-              subelement
-            end
-
-          Parser.call(type_def, @options)
-          self.class.call(type_def, @options, @already_scaffolded_subelements)
+          Parser.call(subelement.definition, @options)
+          self.class.call(subelement.definition, @options, @already_scaffolded_subelements)
         end
       end
 
       private
 
       def unscaffolded_subelements
-        all = @doc.parent_nodes.to_a + @doc.list_nodes.map(&:list_element)
+        all = @doc.submodel_nodes.to_a + @doc.array_nodes.map(&:list_element)
 
         all
           .reject(&:xs_type?)
