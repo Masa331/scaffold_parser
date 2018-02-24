@@ -1,3 +1,6 @@
+# All these tests should be rewritten to something actually readable from here.
+# Could be useful: https://github.com/zverok/saharspec `eq_multiline(text)`
+#
 RSpec.describe ScaffoldParser do
   it 'generates parser skeleton from given xsd' do
     ENV['XSD_PATH'] = './spec/fixtures/xsd/'
