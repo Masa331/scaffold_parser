@@ -1,14 +1,19 @@
 require 'base_element'
 
-class NesklPolozka
+class Order
   include BaseElement
 
-  def zkrat
-    at :Zkrat
+  def title
+    at :title
+  end
+
+  def title2
+    at :title2
   end
 
   def to_h
-    { zkrat: zkrat
+    { title: title,
+      title2: title2
     }.delete_if { |k, v| v.nil? || v.empty? }
   end
 end

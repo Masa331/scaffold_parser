@@ -1,14 +1,14 @@
 require 'base_element'
 
-class DalsiSazba
+class CustomerType
   include BaseElement
 
-  def popis
-    at :Popis
+  def name
+    at :name
   end
 
   def to_h
-    { popis: popis
+    { name: name
     }.delete_if { |k, v| v.nil? || v.empty? }
   end
 end

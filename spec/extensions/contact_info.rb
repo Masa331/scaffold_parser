@@ -1,14 +1,19 @@
 require 'base_element'
 
-class PolFakturyType
+class ContactInfo
   include BaseElement
 
-  def popis
-    at :Popis
+  def email
+    at :email
+  end
+
+  def phone
+    at :phone
   end
 
   def to_h
-    { popis: popis
+    { email: email,
+      phone: phone
     }.delete_if { |k, v| v.nil? || v.empty? }
   end
 end
