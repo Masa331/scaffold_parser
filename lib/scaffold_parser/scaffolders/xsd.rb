@@ -1,4 +1,5 @@
 require 'scaffold_parser/scaffolders/xsd/parser'
+require 'scaffold_parser/scaffolders/xsd/builder'
 
 module ScaffoldParser
   module Scaffolders
@@ -19,10 +20,16 @@ module ScaffoldParser
           puts './tmp/ directory created'
         end
 
+        unless Dir.exists?('./tmp/builders')
+          Dir.mkdir('./tmp/builders')
+          puts './tmp/builders directory created'
+        end
+
         unscaffolded_subelements.each do |subelement|
           @already_scaffolded_subelements << subelement.to_class_name
 
           Parser.call(subelement.definition, @options)
+          Builder.call(subelement.definition, @options)
           self.class.call(subelement.definition, @options, @already_scaffolded_subelements)
         end
       end
