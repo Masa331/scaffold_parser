@@ -4,14 +4,13 @@ require 'scaffold_parser/scaffolders/xsd/builder'
 module ScaffoldParser
   module Scaffolders
     class XSD
-      def self.call(doc, options, already_scaffolded_subelements = [])
-        self.new(doc, options, already_scaffolded_subelements).call
+      def self.call(doc, options)
+        self.new(doc, options).call
       end
 
-      def initialize(doc, options, already_scaffolded_subelements)
+      def initialize(doc, options)
         @doc = doc
         @options = options
-        @already_scaffolded_subelements = already_scaffolded_subelements
       end
 
       def call
@@ -25,23 +24,29 @@ module ScaffoldParser
           puts './tmp/builders directory created'
         end
 
-        unscaffolded_subelements.each do |subelement|
-          @already_scaffolded_subelements << subelement.to_class_name
+        unscaffolded_elements = @doc.submodel_nodes + collect_unscaffolded_subelements(@doc)
 
-          Parser.call(subelement.definition, @options)
-          Builder.call(subelement.definition, @options)
-          self.class.call(subelement.definition, @options, @already_scaffolded_subelements)
+        unscaffolded_elements.each do |element|
+          Parser.call(element.definition, @options)
+          Builder.call(element.definition, @options)
         end
       end
 
       private
 
-      def unscaffolded_subelements
-        all = @doc.submodel_nodes.to_a + @doc.array_nodes.map(&:list_element)
-
-        all
+      def collect_unscaffolded_subelements(node, collected = [])
+        subelements = node.submodel_nodes.to_a + node.array_nodes.map(&:list_element)
           .reject(&:xs_type?)
-          .reject { |node| @already_scaffolded_subelements.include?(node.to_class_name) }
+          .reject { |node| collected.include?(node.to_class_name) }
+
+        subelements.each do |element|
+          if collected.none? { |c| c.to_class_name == element.to_class_name }
+            collected << element
+            collect_unscaffolded_subelements(element, collected)
+          end
+        end
+
+        collected
       end
     end
   end
