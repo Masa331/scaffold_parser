@@ -184,6 +184,10 @@ module ScaffoldParser
       def array_nodes
         []
       end
+
+      def definition
+        self
+      end
     end
   end
 end

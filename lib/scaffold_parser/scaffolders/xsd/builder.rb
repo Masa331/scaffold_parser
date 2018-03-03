@@ -20,6 +20,8 @@ module ScaffoldParser
             f.indent = true if @options[:namespace]
 
             f.puts "require '#{namespaced('base_builder')}'"
+            requires = node.submodel_nodes.map { |n| n.to_class_name.underscore }.uniq
+            requires.each { |r| f.putsi "require '#{namespaced(r)}'" }
             f.puts
 
             f.puts "module #{@options[:namespace]}" if @options[:namespace]
@@ -29,12 +31,12 @@ module ScaffoldParser
             f.puts
 
             accessors = node.value_nodes.map { |n| ":#{n.to_name.underscore}" }
+            accessors += node.submodel_nodes.map { |n| ":#{n.to_name.underscore}" }
 
             f.putsi "    attr_accessor #{accessors.join(', ')}"
             f.puts
 
             f.putsi "    def builder"
-            f.putsi "      doc = Ox::Document.new"
             f.putsi "      root = Ox::Element.new('#{node.to_name}')"
             f.puts
 
@@ -42,8 +44,12 @@ module ScaffoldParser
               f.putsi "      root << Ox::Element.new('#{node.to_name}') << #{node.to_name.underscore} if #{node.to_name.underscore}"
             end
 
+            node.submodel_nodes.each do |node|
+              f.putsi "      root << #{node.to_class_name}.new(#{node.to_name.underscore}).builder if #{node.to_name.underscore}"
+            end
+
             f.puts
-            f.putsi "      doc"
+            f.putsi "      root"
             f.putsi "    end"
 
 

@@ -37,7 +37,7 @@ module ScaffoldParser
       private
 
       def collect_unscaffolded_subelements(node, collected = [])
-        subelements = node.submodel_nodes.to_a + node.array_nodes.map(&:list_element)
+        subelements = node.definition.submodel_nodes.to_a + node.definition.array_nodes.map(&:list_element)
           .reject(&:xs_type?)
           .reject { |node| collected.include?(node.to_class_name) }
 
@@ -118,7 +118,10 @@ module ScaffoldParser
               end
 
               def to_xml
-                Ox.dump(builder)
+                doc = Ox::Document.new
+                doc << builder
+
+                Ox.dump(doc, with_xml: true)
               end
             end
           end
