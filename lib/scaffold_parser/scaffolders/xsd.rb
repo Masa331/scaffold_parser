@@ -24,7 +24,7 @@ module ScaffoldParser
           puts './tmp/builders directory created'
         end
 
-        unscaffolded_elements = @doc.submodel_nodes + collect_unscaffolded_subelements(@doc)
+        unscaffolded_elements = collect_unscaffolded_subelements(@doc) + @doc.submodel_nodes
 
         unscaffolded_elements.each do |element|
           Parser.call(element.definition, @options)
