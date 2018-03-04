@@ -14,24 +14,14 @@ module ScaffoldParser
       end
 
       def call
-        unless Dir.exists?('./tmp/')
-          Dir.mkdir('./tmp/')
-          puts './tmp/ directory created'
-        end
-        File.open('./tmp/base_element.rb', 'wb') { |f| f.write base_element_template }
-
-        unless Dir.exists?('./tmp/builders')
-          Dir.mkdir('./tmp/builders')
-          puts './tmp/builders directory created'
-        end
-        File.open('./tmp/builders/base_builder.rb', 'wb') { |f| f.write base_builder_template }
-
         unscaffolded_elements = collect_unscaffolded_subelements(@doc) + @doc.submodel_nodes
 
-        unscaffolded_elements.each do |element|
-          Parser.call(element.definition, @options)
-          Builder.call(element.definition, @options)
+        code = unscaffolded_elements.flat_map do |element|
+          [Parser.call(element.definition, @options), Builder.call(element.definition, @options)]
         end
+
+        code.push ['./tmp/base_element.rb', base_element_template]
+        code.push ['./tmp/builders directory created', base_builder_template]
       end
 
       private
