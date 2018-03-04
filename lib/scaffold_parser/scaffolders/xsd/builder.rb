@@ -55,7 +55,7 @@ module ScaffoldParser
           f.putsi "end"
           f.puts "end" if @options[:namespace]
 
-          ["./tmp/builders/#{node.to_class_name.underscore}.rb", f.string]
+          ["builders/#{node.to_class_name.underscore}.rb", f.string]
         end
 
         private

@@ -20,8 +20,8 @@ module ScaffoldParser
           [Parser.call(element.definition, @options), Builder.call(element.definition, @options)]
         end
 
-        code.push ['./tmp/base_element.rb', base_element_template]
-        code.push ['./tmp/builders directory created', base_builder_template]
+        code.push ['base_element.rb', base_element_template]
+        code.push ['builders directory created', base_builder_template]
       end
 
       private

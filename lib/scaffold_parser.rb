@@ -21,7 +21,7 @@ module ScaffoldParser
     end
 
     scaffold_to_string(path, options).each do |path, content|
-      File.open(path, 'wb') { |f| f.write content }
+      File.open(path.prepend('./tmp/'), 'wb') { |f| f.write content }
     end
   end
 

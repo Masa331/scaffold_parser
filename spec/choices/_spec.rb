@@ -1,6 +1,6 @@
 RSpec.describe 'choices' do
   it 'parser scaffolder matches template' do
-    parser_code = parser_for('./spec/choices/schema.xsd', './tmp/order.rb')
+    parser_code = parser_for('./spec/choices/schema.xsd', 'order.rb')
 
     expect(parser_code).to eq_multiline(%{
        |require 'base_element'
@@ -25,7 +25,7 @@ RSpec.describe 'choices' do
   end
 
   it 'builder scaffolder matches template' do
-    builder_code = builder_for('./spec/choices/schema.xsd', './tmp/builders/order.rb')
+    builder_code = builder_for('./spec/choices/schema.xsd', 'builders/order.rb')
 
     expect(builder_code).to eq_multiline(%{
       |require 'base_builder'
