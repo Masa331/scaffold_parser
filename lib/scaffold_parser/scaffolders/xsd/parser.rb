@@ -103,7 +103,7 @@ module ScaffoldParser
           f.putsi "end"
           f.puts "end" if @options[:namespace]
 
-          ["#{node.to_class_name.underscore}.rb", f.string]
+          ["#{node.to_class_name.underscore}.rb", f.string.strip]
         end
 
         private

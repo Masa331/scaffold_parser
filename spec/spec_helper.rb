@@ -3,13 +3,14 @@ require 'scaffold_parser'
 require 'saharspec'
 
 module Helpers
-  def parser_for(schema_path, parser_name)
-    Hash[ScaffoldParser.scaffold_to_string(schema_path)][parser_name].strip
+  def scaffold_schema(schema_path, options = {})
+    Hash[ScaffoldParser.scaffold_to_string(schema_path, options)]
   end
 
-  def builder_for(schema_path, builder_name)
-    Hash[ScaffoldParser.scaffold_to_string(schema_path)][builder_name].strip
+  def parser_for(schema_path, parser_name, options = {})
+    scaffold_schema(schema_path, options)[parser_name]
   end
+  alias_method :builder_for, :parser_for
 end
 
 RSpec.configure do |config|
