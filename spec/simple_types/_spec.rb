@@ -42,7 +42,7 @@ RSpec.describe 'simple types' do
       |    attr_accessor :name, :title, :total
       |
       |    def builder
-      |      root = Ox::Element.new('order')
+      |      root = Ox::Element.new(element_name)
       |
       |      root << Ox::Element.new('name') << name if name
       |      root << Ox::Element.new('title') << title if title

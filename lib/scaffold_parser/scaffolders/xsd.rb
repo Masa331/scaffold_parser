@@ -100,7 +100,11 @@ module ScaffoldParser
         <<~TEMPLATE
           module Builders
             module BaseBuilder
-              def initialize(attributes = {})
+              attr_accessor :element_name
+
+              def initialize(attributes = {}, element_name)
+                @element_name = element_name
+
                 attributes ||= {}
                 attributes.each do |key, value|
                   send("\#{key}=", value)

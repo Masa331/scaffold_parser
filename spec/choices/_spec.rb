@@ -37,7 +37,7 @@ RSpec.describe 'choices' do
       |    attr_accessor :name, :company_name
       |
       |    def builder
-      |      root = Ox::Element.new('order')
+      |      root = Ox::Element.new(element_name)
       |
       |      root << Ox::Element.new('name') << name if name
       |      root << Ox::Element.new('company_name') << company_name if company_name

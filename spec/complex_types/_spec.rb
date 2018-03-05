@@ -82,11 +82,11 @@ RSpec.describe 'complex types' do
       |    attr_accessor :currency, :customer, :customer2
       |
       |    def builder
-      |      root = Ox::Element.new('order')
+      |      root = Ox::Element.new(element_name)
       |
-      |      root << Currency.new(currency).builder if currency
-      |      root << CustomerType.new(customer).builder if customer
-      |      root << CustomerType.new(customer2).builder if customer2
+      |      root << Currency.new(currency, 'currency').builder if currency
+      |      root << CustomerType.new(customer, 'customer').builder if customer
+      |      root << CustomerType.new(customer2, 'customer2').builder if customer2
       |
       |      root
       |    end
@@ -104,7 +104,7 @@ RSpec.describe 'complex types' do
       |    attr_accessor :currency_id
       |
       |    def builder
-      |      root = Ox::Element.new('currency')
+      |      root = Ox::Element.new(element_name)
       |
       |      root << Ox::Element.new('currencyId') << currency_id if currency_id
       |
@@ -124,7 +124,7 @@ RSpec.describe 'complex types' do
       |    attr_accessor :name
       |
       |    def builder
-      |      root = Ox::Element.new('customerType')
+      |      root = Ox::Element.new(element_name)
       |
       |      root << Ox::Element.new('name') << name if name
       |
