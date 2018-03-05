@@ -117,4 +117,48 @@ RSpec.describe 'arrays' do
       |  end
       |end })
   end
+
+  it 'builder scaffolder matches template' do
+    codes = scaffold_schema('./spec/arrays/schema.xsd')
+
+    order_parser = codes['builders/order.rb']
+    expect(order_parser).to eq_multiline(%{
+      |require 'base_builder'
+      |require 'payment_type'
+      |require 'messages'
+      |require 'item_type'
+      |
+      |module Builders
+      |  class Order
+      |    include BaseBuilder
+      |
+      |    attr_accessor :payments, :messages, :items, :documents, :id
+      |
+      |    def builder
+      |      root = Ox::Element.new('order')
+      |
+      |      root << PaymentType.new(payments).builder if payments
+      |      root << Messages.new(messages).builder if messages
+      |
+      |      if items
+      |        element = Ox::Element.new('items')
+      |        items.each { |i| element << ItemType.new(i).builder }
+      |        root << element
+      |      end
+      |
+      |      if documents
+      |        element = Ox::Element.new('documents')
+      |        documents.map { |i| Ox::Element.new('document') << i }.each { |i| element << i }
+      |        root << element
+      |      end
+      |
+      |      if id
+      |        id.map { |i| Ox::Element.new('ID') << i }.each { |i| root << i }
+      |      end
+      |
+      |      root
+      |    end
+      |  end
+      |end })
+  end
 end

@@ -57,7 +57,8 @@ module ScaffoldParser
       end
 
       def named_list?
-        definition.list_element.present? && definition.list_element.max_occurs > 1
+        # definition.list_element.present? && definition.list_element.max_occurs > 1
+        !simple_list? && definition.list_element.present? && definition.list_element.max_occurs > 1
       end
 
       def list_element
