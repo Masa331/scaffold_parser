@@ -23,8 +23,9 @@ module ScaffoldParser
           f.puts
 
           f.puts "module #{@options[:namespace]}" if @options[:namespace]
-          f.putsi "class #{node.to_class_name}"
-          f.putsi "  include BaseParser"
+          f.putsi "module Parsers"
+          f.putsi "  class #{node.to_class_name}"
+          f.putsi "    include BaseParser"
 
           node.value_nodes.each do |method|
             f.puts
@@ -32,9 +33,9 @@ module ScaffoldParser
             method_name = method.to_name.underscore
             at = method.to_name
 
-            f.putsi "  def #{method_name}"
-            f.putsi "    at :#{at}"
-            f.putsi "  end"
+            f.putsi "    def #{method_name}"
+            f.putsi "      at :#{at}"
+            f.putsi "    end"
           end
 
           node.submodel_nodes.each do |method|
@@ -44,9 +45,9 @@ module ScaffoldParser
             method_name = method.to_name.underscore
             at = method.to_name
 
-            f.putsi "  def #{method_name}"
-            f.putsi "    submodel_at(#{klass}, :#{at})"
-            f.putsi "  end"
+            f.putsi "    def #{method_name}"
+            f.putsi "      submodel_at(#{klass}, :#{at})"
+            f.putsi "    end"
           end
 
           node.array_nodes.reject { |l| l.list_element.xs_type? }.each do |method|
@@ -56,9 +57,9 @@ module ScaffoldParser
             method_name = method.to_name.underscore
             list_element_at = method.list_element_at.map { |e| ":#{e}" }.join(', ')
 
-            f.putsi "  def #{method_name}"
-            f.putsi "    array_of_at(#{list_element_klass}, [#{list_element_at}])"
-            f.putsi "  end"
+            f.putsi "    def #{method_name}"
+            f.putsi "      array_of_at(#{list_element_klass}, [#{list_element_at}])"
+            f.putsi "    end"
           end
 
           node.array_nodes.select { |l| l.list_element.xs_type? }.each do |method|
@@ -68,9 +69,9 @@ module ScaffoldParser
             method_name = method.to_name.underscore
             list_element_at = method.list_element_at.map { |e| ":#{e}" }.join(', ')
 
-            f.putsi "  def #{method_name}"
-            f.putsi "    array_of_at(String, [#{list_element_at}])"
-            f.putsi "  end"
+            f.putsi "    def #{method_name}"
+            f.putsi "      array_of_at(String, [#{list_element_at}])"
+            f.putsi "    end"
           end
 
           ### to_h method
@@ -92,14 +93,15 @@ module ScaffoldParser
             lines.last.chop!
             first_line = lines.shift
 
-            f.putsi "  def to_h"
-            f.putsi "    { #{first_line}"
+            f.putsi "    def to_h"
+            f.putsi "      { #{first_line}"
             lines.each do |line|
-              f.putsi "      #{line}"
+              f.putsi "        #{line}"
             end
-            f.putsi "    }.delete_if { |k, v| v.nil? || v.empty? }"
-            f.putsi "  end"
+            f.putsi "      }.delete_if { |k, v| v.nil? || v.empty? }"
+            f.putsi "    end"
           end
+          f.putsi "  end"
           f.putsi "end"
           f.puts "end" if @options[:namespace]
 

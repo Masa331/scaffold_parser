@@ -9,36 +9,38 @@ RSpec.describe 'arrays' do
       |require 'messages'
       |require 'item_type'
       |
-      |class Order
-      |  include BaseParser
+      |module Parsers
+      |  class Order
+      |    include BaseParser
       |
-      |  def payments
-      |    submodel_at(PaymentType, :payments)
-      |  end
+      |    def payments
+      |      submodel_at(PaymentType, :payments)
+      |    end
       |
-      |  def messages
-      |    submodel_at(Messages, :messages)
-      |  end
+      |    def messages
+      |      submodel_at(Messages, :messages)
+      |    end
       |
-      |  def items
-      |    array_of_at(ItemType, [:items, :Item])
-      |  end
+      |    def items
+      |      array_of_at(ItemType, [:items, :Item])
+      |    end
       |
-      |  def documents
-      |    array_of_at(String, [:documents, :document])
-      |  end
+      |    def documents
+      |      array_of_at(String, [:documents, :document])
+      |    end
       |
-      |  def id
-      |    array_of_at(String, [:ID])
-      |  end
+      |    def id
+      |      array_of_at(String, [:ID])
+      |    end
       |
-      |  def to_h
-      |    { payments: payments.to_h,
-      |      messages: messages.to_h,
-      |      items: items.map(&:to_h),
-      |      documents: documents,
-      |      id: id
-      |    }.delete_if { |k, v| v.nil? || v.empty? }
+      |    def to_h
+      |      { payments: payments.to_h,
+      |        messages: messages.to_h,
+      |        items: items.map(&:to_h),
+      |        documents: documents,
+      |        id: id
+      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |    end
       |  end
       |end })
 
@@ -47,16 +49,18 @@ RSpec.describe 'arrays' do
       |require 'base_parser'
       |require 'payment'
       |
-      |class PaymentType
-      |  include BaseParser
+      |module Parsers
+      |  class PaymentType
+      |    include BaseParser
       |
-      |  def payments_list
-      |    array_of_at(Payment, [:payments_list, :payment])
-      |  end
+      |    def payments_list
+      |      array_of_at(Payment, [:payments_list, :payment])
+      |    end
       |
-      |  def to_h
-      |    { payments_list: payments_list.map(&:to_h)
-      |    }.delete_if { |k, v| v.nil? || v.empty? }
+      |    def to_h
+      |      { payments_list: payments_list.map(&:to_h)
+      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |    end
       |  end
       |end })
 
@@ -64,16 +68,18 @@ RSpec.describe 'arrays' do
     expect(payment_parser).to eq_multiline(%{
       |require 'base_parser'
       |
-      |class Payment
-      |  include BaseParser
+      |module Parsers
+      |  class Payment
+      |    include BaseParser
       |
-      |  def amount
-      |    at :amount
-      |  end
+      |    def amount
+      |      at :amount
+      |    end
       |
-      |  def to_h
-      |    { amount: amount
-      |    }.delete_if { |k, v| v.nil? || v.empty? }
+      |    def to_h
+      |      { amount: amount
+      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |    end
       |  end
       |end })
 
@@ -82,21 +88,23 @@ RSpec.describe 'arrays' do
       |require 'base_parser'
       |require 'recipient_type'
       |
-      |class Messages
-      |  include BaseParser
+      |module Parsers
+      |  class Messages
+      |    include BaseParser
       |
-      |  def recipient
-      |    array_of_at(RecipientType, [:recipient])
-      |  end
+      |    def recipient
+      |      array_of_at(RecipientType, [:recipient])
+      |    end
       |
-      |  def error
-      |    array_of_at(String, [:error])
-      |  end
+      |    def error
+      |      array_of_at(String, [:error])
+      |    end
       |
-      |  def to_h
-      |    { recipient: recipient.map(&:to_h),
-      |      error: error
-      |    }.delete_if { |k, v| v.nil? || v.empty? }
+      |    def to_h
+      |      { recipient: recipient.map(&:to_h),
+      |        error: error
+      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |    end
       |  end
       |end })
 
@@ -104,16 +112,18 @@ RSpec.describe 'arrays' do
     expect(recipient_type_parser).to eq_multiline(%{
       |require 'base_parser'
       |
-      |class RecipientType
-      |  include BaseParser
+      |module Parsers
+      |  class RecipientType
+      |    include BaseParser
       |
-      |  def name
-      |    at :name
-      |  end
+      |    def name
+      |      at :name
+      |    end
       |
-      |  def to_h
-      |    { name: name
-      |    }.delete_if { |k, v| v.nil? || v.empty? }
+      |    def to_h
+      |      { name: name
+      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |    end
       |  end
       |end })
   end

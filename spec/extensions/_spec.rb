@@ -9,26 +9,28 @@ RSpec.describe ScaffoldParser do
       |require 'seller'
       |require 'reference_type'
       |
-      |class Order
-      |  include BaseParser
+      |module Parsers
+      |  class Order
+      |    include BaseParser
       |
-      |  def customer
-      |    submodel_at(Customer, :customer)
-      |  end
+      |    def customer
+      |      submodel_at(Customer, :customer)
+      |    end
       |
-      |  def seller
-      |    submodel_at(Seller, :seller)
-      |  end
+      |    def seller
+      |      submodel_at(Seller, :seller)
+      |    end
       |
-      |  def invoice
-      |    submodel_at(ReferenceType, :invoice)
-      |  end
+      |    def invoice
+      |      submodel_at(ReferenceType, :invoice)
+      |    end
       |
-      |  def to_h
-      |    { customer: customer.to_h,
-      |      seller: seller.to_h,
-      |      invoice: invoice.to_h
-      |    }.delete_if { |k, v| v.nil? || v.empty? }
+      |    def to_h
+      |      { customer: customer.to_h,
+      |        seller: seller.to_h,
+      |        invoice: invoice.to_h
+      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |    end
       |  end
       |end })
 
@@ -36,21 +38,23 @@ RSpec.describe ScaffoldParser do
     expect(customer_parser).to eq_multiline(%{
       |require 'base_parser'
       |
-      |class Customer
-      |  include BaseParser
+      |module Parsers
+      |  class Customer
+      |    include BaseParser
       |
-      |  def id
-      |    at :id
-      |  end
+      |    def id
+      |      at :id
+      |    end
       |
-      |  def title
-      |    at :title
-      |  end
+      |    def title
+      |      at :title
+      |    end
       |
-      |  def to_h
-      |    { id: id,
-      |      title: title
-      |    }.delete_if { |k, v| v.nil? || v.empty? }
+      |    def to_h
+      |      { id: id,
+      |        title: title
+      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |    end
       |  end
       |end })
 
@@ -59,21 +63,23 @@ RSpec.describe ScaffoldParser do
       |require 'base_parser'
       |require 'contact_info'
       |
-      |class Seller
-      |  include BaseParser
+      |module Parsers
+      |  class Seller
+      |    include BaseParser
       |
-      |  def title
-      |    at :title
-      |  end
+      |    def title
+      |      at :title
+      |    end
       |
-      |  def contact_info
-      |    submodel_at(ContactInfo, :contactInfo)
-      |  end
+      |    def contact_info
+      |      submodel_at(ContactInfo, :contactInfo)
+      |    end
       |
-      |  def to_h
-      |    { title: title,
-      |      contact_info: contact_info.to_h
-      |    }.delete_if { |k, v| v.nil? || v.empty? }
+      |    def to_h
+      |      { title: title,
+      |        contact_info: contact_info.to_h
+      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |    end
       |  end
       |end })
 
@@ -81,16 +87,18 @@ RSpec.describe ScaffoldParser do
     expect(reference_type_parser).to eq_multiline(%{
       |require 'base_parser'
       |
-      |class ReferenceType
-      |  include BaseParser
+      |module Parsers
+      |  class ReferenceType
+      |    include BaseParser
       |
-      |  def id
-      |    at :ID
-      |  end
+      |    def id
+      |      at :ID
+      |    end
       |
-      |  def to_h
-      |    { id: id
-      |    }.delete_if { |k, v| v.nil? || v.empty? }
+      |    def to_h
+      |      { id: id
+      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |    end
       |  end
       |end })
 
@@ -98,21 +106,23 @@ RSpec.describe ScaffoldParser do
     expect(contact_info_parser).to eq_multiline(%{
       |require 'base_parser'
       |
-      |class ContactInfo
-      |  include BaseParser
+      |module Parsers
+      |  class ContactInfo
+      |    include BaseParser
       |
-      |  def email
-      |    at :email
-      |  end
+      |    def email
+      |      at :email
+      |    end
       |
-      |  def phone
-      |    at :phone
-      |  end
+      |    def phone
+      |      at :phone
+      |    end
       |
-      |  def to_h
-      |    { email: email,
-      |      phone: phone
-      |    }.delete_if { |k, v| v.nil? || v.empty? }
+      |    def to_h
+      |      { email: email,
+      |        phone: phone
+      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |    end
       |  end
       |end })
   end

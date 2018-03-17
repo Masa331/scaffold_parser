@@ -5,26 +5,28 @@ RSpec.describe 'simple types' do
     expect(parser_code).to eq_multiline(%{
       |require 'base_parser'
       |
-      |class Order
-      |  include BaseParser
+      |module Parsers
+      |  class Order
+      |    include BaseParser
       |
-      |  def name
-      |    at :name
-      |  end
+      |    def name
+      |      at :name
+      |    end
       |
-      |  def title
-      |    at :title
-      |  end
+      |    def title
+      |      at :title
+      |    end
       |
-      |  def total
-      |    at :Total
-      |  end
+      |    def total
+      |      at :Total
+      |    end
       |
-      |  def to_h
-      |    { name: name,
-      |      title: title,
-      |      total: total
-      |    }.delete_if { |k, v| v.nil? || v.empty? }
+      |    def to_h
+      |      { name: name,
+      |        title: title,
+      |        total: total
+      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |    end
       |  end
       |end })
   end

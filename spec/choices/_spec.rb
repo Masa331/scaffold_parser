@@ -3,25 +3,27 @@ RSpec.describe 'choices' do
     parser_code = parser_for('./spec/choices/schema.xsd', 'parsers/order.rb')
 
     expect(parser_code).to eq_multiline(%{
-       |require 'base_parser'
-       |
-       |class Order
-       |  include BaseParser
-       |
-       |  def name
-       |    at :name
-       |  end
-       |
-       |  def company_name
-       |    at :company_name
-       |  end
-       |
-       |  def to_h
-       |    { name: name,
-       |      company_name: company_name
-       |    }.delete_if { |k, v| v.nil? || v.empty? }
-       |  end
-       |end })
+      |require 'base_parser'
+      |
+      |module Parsers
+      |  class Order
+      |    include BaseParser
+      |
+      |    def name
+      |      at :name
+      |    end
+      |
+      |    def company_name
+      |      at :company_name
+      |    end
+      |
+      |    def to_h
+      |      { name: name,
+      |        company_name: company_name
+      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |    end
+      |  end
+      |end })
   end
 
   it 'builder scaffolder matches template' do
