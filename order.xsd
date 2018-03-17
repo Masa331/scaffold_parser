@@ -9,6 +9,20 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
+
+      <xs:element name="customer" type="customerType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="customerType">
+    <xs:sequence>
+      <xs:element name="name">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="4"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

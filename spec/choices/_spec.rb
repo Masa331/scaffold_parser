@@ -3,7 +3,7 @@ RSpec.describe 'choices' do
     parser_code = parser_for('./spec/choices/schema.xsd', 'parsers/order.rb')
 
     expect(parser_code).to eq_multiline(%{
-      |require 'base_parser'
+      |require 'parsers/base_parser'
       |
       |module Parsers
       |  class Order
@@ -30,7 +30,7 @@ RSpec.describe 'choices' do
     builder_code = builder_for('./spec/choices/schema.xsd', 'builders/order.rb')
 
     expect(builder_code).to eq_multiline(%{
-      |require 'base_builder'
+      |require 'builders/base_builder'
       |
       |module Builders
       |  class Order

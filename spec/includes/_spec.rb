@@ -3,7 +3,7 @@ RSpec.describe ScaffoldParser do
     parser_code = parser_for('./spec/includes/schema.xsd', 'parsers/order.rb')
 
     expect(parser_code).to eq_multiline(%{
-      |require 'base_parser'
+      |require 'parsers/base_parser'
       |
       |module Parsers
       |  class Order
@@ -31,7 +31,7 @@ RSpec.describe ScaffoldParser do
 
     order_builder = codes['builders/order.rb']
     expect(order_builder).to eq_multiline(%{
-      |require 'base_builder'
+      |require 'builders/base_builder'
       |
       |module Builders
       |  class Order

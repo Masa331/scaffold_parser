@@ -19,9 +19,9 @@ module ScaffoldParser
           f = StringIO.new
           f.indent = true if @options[:namespace]
 
-          f.puts "require '#{namespaced('base_parser')}'"
-          node.submodel_nodes.map { |n| namespaced(n.to_class_name.underscore) }.uniq.each { |n| f.puts "require '#{n}'" }
-          node.array_nodes.reject { |l| l.list_element.xs_type? }.each { |n| f.puts "require '#{namespaced(n.list_element.to_class_name.underscore)}'" }
+          f.puts "require '#{namespaced('parsers/base_parser')}'"
+          node.submodel_nodes.map { |n| namespaced(n.to_class_name.underscore.prepend('parsers/')) }.uniq.each { |n| f.puts "require '#{n}'" }
+          node.array_nodes.reject { |l| l.list_element.xs_type? }.each { |n| f.puts "require '#{namespaced(n.list_element.to_class_name.underscore.prepend('parsers/'))}'" }
           f.puts
 
           f.puts "module #{@options[:namespace]}" if @options[:namespace]

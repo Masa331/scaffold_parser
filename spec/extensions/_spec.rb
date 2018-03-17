@@ -4,10 +4,10 @@ RSpec.describe ScaffoldParser do
 
     order_parser = codes['parsers/order.rb']
     expect(order_parser).to eq_multiline(%{
-      |require 'base_parser'
-      |require 'customer'
-      |require 'seller'
-      |require 'reference_type'
+      |require 'parsers/base_parser'
+      |require 'parsers/customer'
+      |require 'parsers/seller'
+      |require 'parsers/reference_type'
       |
       |module Parsers
       |  class Order
@@ -36,7 +36,7 @@ RSpec.describe ScaffoldParser do
 
     customer_parser = codes['parsers/customer.rb']
     expect(customer_parser).to eq_multiline(%{
-      |require 'base_parser'
+      |require 'parsers/base_parser'
       |
       |module Parsers
       |  class Customer
@@ -60,8 +60,8 @@ RSpec.describe ScaffoldParser do
 
     seller_parser = codes['parsers/seller.rb']
     expect(seller_parser).to eq_multiline(%{
-      |require 'base_parser'
-      |require 'contact_info'
+      |require 'parsers/base_parser'
+      |require 'parsers/contact_info'
       |
       |module Parsers
       |  class Seller
@@ -85,7 +85,7 @@ RSpec.describe ScaffoldParser do
 
     reference_type_parser = codes['parsers/reference_type.rb']
     expect(reference_type_parser).to eq_multiline(%{
-      |require 'base_parser'
+      |require 'parsers/base_parser'
       |
       |module Parsers
       |  class ReferenceType
@@ -104,7 +104,7 @@ RSpec.describe ScaffoldParser do
 
     contact_info_parser = codes['parsers/contact_info.rb']
     expect(contact_info_parser).to eq_multiline(%{
-      |require 'base_parser'
+      |require 'parsers/base_parser'
       |
       |module Parsers
       |  class ContactInfo
@@ -132,10 +132,10 @@ RSpec.describe ScaffoldParser do
 
     order_builder = codes['builders/order.rb']
     expect(order_builder).to eq_multiline(%{
-      |require 'base_builder'
-      |require 'customer'
-      |require 'seller'
-      |require 'reference_type'
+      |require 'builders/base_builder'
+      |require 'builders/customer'
+      |require 'builders/seller'
+      |require 'builders/reference_type'
       |
       |module Builders
       |  class Order
@@ -157,7 +157,7 @@ RSpec.describe ScaffoldParser do
 
     customer_builder = codes['builders/customer.rb']
     expect(customer_builder).to eq_multiline(%{
-      |require 'base_builder'
+      |require 'builders/base_builder'
       |
       |module Builders
       |  class Customer
@@ -178,8 +178,8 @@ RSpec.describe ScaffoldParser do
 
     seller_builder = codes['builders/seller.rb']
     expect(seller_builder).to eq_multiline(%{
-      |require 'base_builder'
-      |require 'contact_info'
+      |require 'builders/base_builder'
+      |require 'builders/contact_info'
       |
       |module Builders
       |  class Seller
@@ -200,7 +200,7 @@ RSpec.describe ScaffoldParser do
 
     contact_info_builder = codes['builders/contact_info.rb']
     expect(contact_info_builder).to eq_multiline(%{
-      |require 'base_builder'
+      |require 'builders/base_builder'
       |
       |module Builders
       |  class ContactInfo
@@ -221,7 +221,7 @@ RSpec.describe ScaffoldParser do
 
     reference_type_builder = codes['builders/reference_type.rb']
     expect(reference_type_builder).to eq_multiline(%{
-      |require 'base_builder'
+      |require 'builders/base_builder'
       |
       |module Builders
       |  class ReferenceType

@@ -4,10 +4,10 @@ RSpec.describe 'arrays' do
 
     order_parser = codes['parsers/order.rb']
     expect(order_parser).to eq_multiline(%{
-      |require 'base_parser'
-      |require 'payment_type'
-      |require 'messages'
-      |require 'item_type'
+      |require 'parsers/base_parser'
+      |require 'parsers/payment_type'
+      |require 'parsers/messages'
+      |require 'parsers/item_type'
       |
       |module Parsers
       |  class Order
@@ -46,8 +46,8 @@ RSpec.describe 'arrays' do
 
     payment_type_parser = codes['parsers/payment_type.rb']
     expect(payment_type_parser).to eq_multiline(%{
-      |require 'base_parser'
-      |require 'payment'
+      |require 'parsers/base_parser'
+      |require 'parsers/payment'
       |
       |module Parsers
       |  class PaymentType
@@ -66,7 +66,7 @@ RSpec.describe 'arrays' do
 
     payment_parser = codes['parsers/payment.rb']
     expect(payment_parser).to eq_multiline(%{
-      |require 'base_parser'
+      |require 'parsers/base_parser'
       |
       |module Parsers
       |  class Payment
@@ -85,8 +85,8 @@ RSpec.describe 'arrays' do
 
     messages_parser = codes['parsers/messages.rb']
     expect(messages_parser).to eq_multiline(%{
-      |require 'base_parser'
-      |require 'recipient_type'
+      |require 'parsers/base_parser'
+      |require 'parsers/recipient_type'
       |
       |module Parsers
       |  class Messages
@@ -110,7 +110,7 @@ RSpec.describe 'arrays' do
 
     recipient_type_parser = codes['parsers/recipient_type.rb']
     expect(recipient_type_parser).to eq_multiline(%{
-      |require 'base_parser'
+      |require 'parsers/base_parser'
       |
       |module Parsers
       |  class RecipientType
@@ -133,10 +133,10 @@ RSpec.describe 'arrays' do
 
     order_parser = codes['builders/order.rb']
     expect(order_parser).to eq_multiline(%{
-      |require 'base_builder'
-      |require 'payment_type'
-      |require 'messages'
-      |require 'item_type'
+      |require 'builders/base_builder'
+      |require 'builders/payment_type'
+      |require 'builders/messages'
+      |require 'builders/item_type'
       |
       |module Builders
       |  class Order
@@ -173,8 +173,8 @@ RSpec.describe 'arrays' do
 
     payment_type_parser = codes['builders/payment_type.rb']
     expect(payment_type_parser).to eq_multiline(%{
-      |require 'base_builder'
-      |require 'payment'
+      |require 'builders/base_builder'
+      |require 'builders/payment'
       |
       |module Builders
       |  class PaymentType
@@ -198,7 +198,7 @@ RSpec.describe 'arrays' do
 
     payment_parser = codes['builders/payment.rb']
     expect(payment_parser).to eq_multiline(%{
-      |require 'base_builder'
+      |require 'builders/base_builder'
       |
       |module Builders
       |  class Payment
@@ -218,8 +218,8 @@ RSpec.describe 'arrays' do
 
     messages_parser = codes['builders/messages.rb']
     expect(messages_parser).to eq_multiline(%{
-      |require 'base_builder'
-      |require 'recipient_type'
+      |require 'builders/base_builder'
+      |require 'builders/recipient_type'
       |
       |module Builders
       |  class Messages
@@ -245,7 +245,7 @@ RSpec.describe 'arrays' do
 
     recipient_type_parser = codes['builders/recipient_type.rb']
     expect(recipient_type_parser).to eq_multiline(%{
-      |require 'base_builder'
+      |require 'builders/base_builder'
       |
       |module Builders
       |  class RecipientType

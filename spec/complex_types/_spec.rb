@@ -4,9 +4,9 @@ RSpec.describe 'complex types' do
 
     order_parser = codes['parsers/order.rb']
     expect(order_parser).to eq_multiline(%{
-      |require 'base_parser'
-      |require 'currency'
-      |require 'customer_type'
+      |require 'parsers/base_parser'
+      |require 'parsers/currency'
+      |require 'parsers/customer_type'
       |
       |module Parsers
       |  class Order
@@ -35,7 +35,7 @@ RSpec.describe 'complex types' do
 
     currency_parser = codes['parsers/currency.rb']
     expect(currency_parser).to eq_multiline(%{
-      |require 'base_parser'
+      |require 'parsers/base_parser'
       |
       |module Parsers
       |  class Currency
@@ -54,7 +54,7 @@ RSpec.describe 'complex types' do
 
     customer_type_parser = codes['parsers/customer_type.rb']
     expect(customer_type_parser).to eq_multiline(%{
-      |require 'base_parser'
+      |require 'parsers/base_parser'
       |
       |module Parsers
       |  class CustomerType
@@ -77,9 +77,9 @@ RSpec.describe 'complex types' do
 
     order_builder = codes['builders/order.rb']
     expect(order_builder).to eq_multiline(%{
-      |require 'base_builder'
-      |require 'currency'
-      |require 'customer_type'
+      |require 'builders/base_builder'
+      |require 'builders/currency'
+      |require 'builders/customer_type'
       |
       |module Builders
       |  class Order
@@ -101,7 +101,7 @@ RSpec.describe 'complex types' do
 
     currency_builder = codes['builders/currency.rb']
     expect(currency_builder).to eq_multiline(%{
-      |require 'base_builder'
+      |require 'builders/base_builder'
       |
       |module Builders
       |  class Currency
@@ -121,7 +121,7 @@ RSpec.describe 'complex types' do
 
     customer_type_builder = codes['builders/customer_type.rb']
     expect(customer_type_builder).to eq_multiline(%{
-      |require 'base_builder'
+      |require 'builders/base_builder'
       |
       |module Builders
       |  class CustomerType

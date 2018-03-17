@@ -19,11 +19,11 @@ module ScaffoldParser
           f = StringIO.new
           f.indent = true if @options[:namespace]
 
-          f.puts "require '#{namespaced('base_builder')}'"
+          f.puts "require '#{namespaced('builders/base_builder')}'"
           requires = node.submodel_nodes.map { |n| n.to_class_name.underscore }.uniq
-          requires.each { |r| f.putsi "require '#{namespaced(r)}'" }
+          requires.each { |r| f.puts "require '#{namespaced(r.prepend('builders/'))}'" }
           requires = node.array_nodes.reject { |l| l.list_element.xs_type? }.uniq
-          requires.each { |n| f.puts "require '#{namespaced(n.list_element.to_class_name.underscore)}'" }
+          requires.each { |n| f.puts "require '#{namespaced(n.list_element.to_class_name.underscore.prepend('builders/'))}'" }
           f.puts
 
           f.puts "module #{@options[:namespace]}" if @options[:namespace]
