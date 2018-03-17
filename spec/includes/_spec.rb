@@ -1,12 +1,12 @@
 RSpec.describe ScaffoldParser do
   it 'includes are parsed correctly' do
-    parser_code = parser_for('./spec/includes/schema.xsd', 'order.rb')
+    parser_code = parser_for('./spec/includes/schema.xsd', 'parsers/order.rb')
 
     expect(parser_code).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |
       |class Order
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def title
       |    at :title

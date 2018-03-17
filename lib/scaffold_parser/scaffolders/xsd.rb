@@ -20,8 +20,8 @@ module ScaffoldParser
           [Parser.call(element.definition, @options), Builder.call(element.definition, @options)]
         end
 
-        code.push ['base_element.rb', base_element_template]
-        code.push ['builders directory created', base_builder_template]
+        code.push ['parsers/base_parser.rb', base_element_template]
+        code.push ['builders/base_builder.rb', base_builder_template]
       end
 
       private
@@ -43,7 +43,7 @@ module ScaffoldParser
 
       def base_element_template
         <<~TEMPLATE
-          module BaseElement
+          module BaseParser
             EMPTY_ARRAY = []
 
             attr_accessor :raw
@@ -112,7 +112,7 @@ module ScaffoldParser
               end
 
               def to_xml
-                doc = Ox::Document.new
+                doc = Ox::Document.new(version: '1.0')
                 doc << builder
 
                 Ox.dump(doc, with_xml: true)

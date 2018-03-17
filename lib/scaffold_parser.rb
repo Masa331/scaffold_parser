@@ -20,6 +20,11 @@ module ScaffoldParser
       puts './tmp/builders directory created'
     end
 
+    unless Dir.exists?('./tmp/parsers')
+      Dir.mkdir('./tmp/parsers')
+      puts './tmp/parsers directory created'
+    end
+
     scaffold_to_string(path, options).each do |path, content|
       File.open(path.prepend('./tmp/'), 'wb') { |f| f.write content }
     end

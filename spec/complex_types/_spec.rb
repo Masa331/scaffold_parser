@@ -2,14 +2,14 @@ RSpec.describe 'complex types' do
   it 'parser scaffolder output matches template' do
     codes = scaffold_schema('./spec/complex_types/schema.xsd')
 
-    order_parser = codes['order.rb']
+    order_parser = codes['parsers/order.rb']
     expect(order_parser).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |require 'currency'
       |require 'customer_type'
       |
       |class Order
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def currency
       |    submodel_at(Currency, :currency)
@@ -31,12 +31,12 @@ RSpec.describe 'complex types' do
       |  end
       |end })
 
-    currency_parser = codes['currency.rb']
+    currency_parser = codes['parsers/currency.rb']
     expect(currency_parser).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |
       |class Currency
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def currency_id
       |    at :currencyId
@@ -48,12 +48,12 @@ RSpec.describe 'complex types' do
       |  end
       |end })
 
-    customer_type_parser = codes['customer_type.rb']
+    customer_type_parser = codes['parsers/customer_type.rb']
     expect(customer_type_parser).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |
       |class CustomerType
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def name
       |    at :name
@@ -106,7 +106,7 @@ RSpec.describe 'complex types' do
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << Ox::Element.new('currencyId') << currency_id if currency_id
+      |      root << (Ox::Element.new('currencyId') << currency_id) if currency_id
       |
       |      root
       |    end
@@ -126,7 +126,7 @@ RSpec.describe 'complex types' do
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << Ox::Element.new('name') << name if name
+      |      root << (Ox::Element.new('name') << name) if name
       |
       |      root
       |    end

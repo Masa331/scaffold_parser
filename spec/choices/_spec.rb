@@ -1,12 +1,12 @@
 RSpec.describe 'choices' do
   it 'parser scaffolder matches template' do
-    parser_code = parser_for('./spec/choices/schema.xsd', 'order.rb')
+    parser_code = parser_for('./spec/choices/schema.xsd', 'parsers/order.rb')
 
     expect(parser_code).to eq_multiline(%{
-       |require 'base_element'
+       |require 'base_parser'
        |
        |class Order
-       |  include BaseElement
+       |  include BaseParser
        |
        |  def name
        |    at :name
@@ -39,8 +39,8 @@ RSpec.describe 'choices' do
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << Ox::Element.new('name') << name if name
-      |      root << Ox::Element.new('company_name') << company_name if company_name
+      |      root << (Ox::Element.new('name') << name) if name
+      |      root << (Ox::Element.new('company_name') << company_name) if company_name
       |
       |      root
       |    end

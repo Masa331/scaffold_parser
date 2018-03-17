@@ -1,13 +1,13 @@
 RSpec.describe ScaffoldParser do
   it 'outputs class in module if given' do
-    parser_code = parser_for('./order.xsd', 'order.rb', namespace: 'Something')
+    parser_code = parser_for('./order.xsd', 'parsers/order.rb', namespace: 'Something')
 
     expect(parser_code).to eq_multiline(%{
-      |require 'something/base_element'
+      |require 'something/base_parser'
       |
       |module Something
       |  class Order
-      |    include BaseElement
+      |    include BaseParser
       |
       |    def name
       |      at :name

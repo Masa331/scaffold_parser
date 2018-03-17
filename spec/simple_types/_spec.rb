@@ -1,12 +1,12 @@
 RSpec.describe 'simple types' do
   it 'parser scaffolder output matches template' do
-    parser_code = parser_for('./spec/simple_types/schema.xsd', 'order.rb')
+    parser_code = parser_for('./spec/simple_types/schema.xsd', 'parsers/order.rb')
 
     expect(parser_code).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |
       |class Order
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def name
       |    at :name
@@ -44,9 +44,9 @@ RSpec.describe 'simple types' do
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << Ox::Element.new('name') << name if name
-      |      root << Ox::Element.new('title') << title if title
-      |      root << Ox::Element.new('Total') << total if total
+      |      root << (Ox::Element.new('name') << name) if name
+      |      root << (Ox::Element.new('title') << title) if title
+      |      root << (Ox::Element.new('Total') << total) if total
       |
       |      root
       |    end

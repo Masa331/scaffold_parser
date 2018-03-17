@@ -2,15 +2,15 @@ RSpec.describe 'arrays' do
   it 'parser scaffolder matches template' do
     codes = scaffold_schema('./spec/arrays/schema.xsd')
 
-    order_parser = codes['order.rb']
+    order_parser = codes['parsers/order.rb']
     expect(order_parser).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |require 'payment_type'
       |require 'messages'
       |require 'item_type'
       |
       |class Order
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def payments
       |    submodel_at(PaymentType, :payments)
@@ -42,13 +42,13 @@ RSpec.describe 'arrays' do
       |  end
       |end })
 
-    payment_type_parser = codes['payment_type.rb']
+    payment_type_parser = codes['parsers/payment_type.rb']
     expect(payment_type_parser).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |require 'payment'
       |
       |class PaymentType
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def payments_list
       |    array_of_at(Payment, [:payments_list, :payment])
@@ -60,12 +60,12 @@ RSpec.describe 'arrays' do
       |  end
       |end })
 
-    payment_parser = codes['payment.rb']
+    payment_parser = codes['parsers/payment.rb']
     expect(payment_parser).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |
       |class Payment
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def amount
       |    at :amount
@@ -77,13 +77,13 @@ RSpec.describe 'arrays' do
       |  end
       |end })
 
-    messages_parser = codes['messages.rb']
+    messages_parser = codes['parsers/messages.rb']
     expect(messages_parser).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |require 'recipient_type'
       |
       |class Messages
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def recipient
       |    array_of_at(RecipientType, [:recipient])
@@ -100,12 +100,12 @@ RSpec.describe 'arrays' do
       |  end
       |end })
 
-    recipient_type_parser = codes['recipient_type.rb']
+    recipient_type_parser = codes['parsers/recipient_type.rb']
     expect(recipient_type_parser).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |
       |class RecipientType
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def name
       |    at :name
@@ -199,7 +199,7 @@ RSpec.describe 'arrays' do
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << Ox::Element.new('amount') << amount if amount
+      |      root << (Ox::Element.new('amount') << amount) if amount
       |
       |      root
       |    end
@@ -246,7 +246,7 @@ RSpec.describe 'arrays' do
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << Ox::Element.new('name') << name if name
+      |      root << (Ox::Element.new('name') << name) if name
       |
       |      root
       |    end

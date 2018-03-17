@@ -2,15 +2,15 @@ RSpec.describe ScaffoldParser do
   it 'extensions are parsed correctly' do
     codes = scaffold_schema('./spec/extensions/schema.xsd')
 
-    order_parser = codes['order.rb']
+    order_parser = codes['parsers/order.rb']
     expect(order_parser).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |require 'customer'
       |require 'seller'
       |require 'reference_type'
       |
       |class Order
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def customer
       |    submodel_at(Customer, :customer)
@@ -32,12 +32,12 @@ RSpec.describe ScaffoldParser do
       |  end
       |end })
 
-    customer_parser = codes['customer.rb']
+    customer_parser = codes['parsers/customer.rb']
     expect(customer_parser).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |
       |class Customer
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def id
       |    at :id
@@ -54,13 +54,13 @@ RSpec.describe ScaffoldParser do
       |  end
       |end })
 
-    seller_parser = codes['seller.rb']
+    seller_parser = codes['parsers/seller.rb']
     expect(seller_parser).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |require 'contact_info'
       |
       |class Seller
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def title
       |    at :title
@@ -77,12 +77,12 @@ RSpec.describe ScaffoldParser do
       |  end
       |end })
 
-    reference_type_parser = codes['reference_type.rb']
+    reference_type_parser = codes['parsers/reference_type.rb']
     expect(reference_type_parser).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |
       |class ReferenceType
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def id
       |    at :ID
@@ -94,12 +94,12 @@ RSpec.describe ScaffoldParser do
       |  end
       |end })
 
-    contact_info_parser = codes['contact_info.rb']
+    contact_info_parser = codes['parsers/contact_info.rb']
     expect(contact_info_parser).to eq_multiline(%{
-      |require 'base_element'
+      |require 'base_parser'
       |
       |class ContactInfo
-      |  include BaseElement
+      |  include BaseParser
       |
       |  def email
       |    at :email

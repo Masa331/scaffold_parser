@@ -17,14 +17,14 @@ module ScaffoldParser
           f = StringIO.new
           f.indent = true if @options[:namespace]
 
-          f.puts "require '#{namespaced('base_element')}'"
+          f.puts "require '#{namespaced('base_parser')}'"
           node.submodel_nodes.map { |n| namespaced(n.to_class_name.underscore) }.uniq.each { |n| f.puts "require '#{n}'" }
           node.array_nodes.reject { |l| l.list_element.xs_type? }.each { |n| f.puts "require '#{namespaced(n.list_element.to_class_name.underscore)}'" }
           f.puts
 
           f.puts "module #{@options[:namespace]}" if @options[:namespace]
           f.putsi "class #{node.to_class_name}"
-          f.putsi "  include BaseElement"
+          f.putsi "  include BaseParser"
 
           node.value_nodes.each do |method|
             f.puts
@@ -103,7 +103,7 @@ module ScaffoldParser
           f.putsi "end"
           f.puts "end" if @options[:namespace]
 
-          ["#{node.to_class_name.underscore}.rb", f.string.strip]
+          ["parsers/#{node.to_class_name.underscore}.rb", f.string.strip]
         end
 
         private

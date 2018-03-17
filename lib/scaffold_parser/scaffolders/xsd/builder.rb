@@ -41,7 +41,7 @@ module ScaffoldParser
 
           f.puts if node.value_nodes.any? || node.submodel_nodes.any?
           node.value_nodes.each do |node|
-            f.putsi "      root << Ox::Element.new('#{node.to_name}') << #{node.to_name.underscore} if #{node.to_name.underscore}"
+            f.putsi "      root << (Ox::Element.new('#{node.to_name}') << #{node.to_name.underscore}) if #{node.to_name.underscore}"
           end
 
           node.submodel_nodes.each do |node|
