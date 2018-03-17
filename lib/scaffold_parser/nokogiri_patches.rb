@@ -18,15 +18,15 @@ module ScaffoldParser
       end
 
       def submodel_nodes
-        attribute_elements.select(&:parent_type?) + extension.submodel_nodes
+        @submodel_nodes ||= attribute_elements.select(&:parent_type?) + extension.submodel_nodes
       end
 
       def value_nodes
-        attribute_elements.select(&:end_type?) + extension.value_nodes
+        @value_nodes ||= attribute_elements.select(&:end_type?) + extension.value_nodes
       end
 
       def array_nodes
-        attribute_elements.select(&:list_type?) + extension.array_nodes
+        @array_nodes ||= attribute_elements.select(&:list_type?) + extension.array_nodes
       end
 
       def end_type?
@@ -57,7 +57,6 @@ module ScaffoldParser
       end
 
       def named_list?
-        # definition.list_element.present? && definition.list_element.max_occurs > 1
         !simple_list? && definition.list_element.present? && definition.list_element.max_occurs > 1
       end
 
@@ -90,11 +89,12 @@ module ScaffoldParser
       end
 
       def definition
-        if self['type'].present? && !self['type'].start_with?('xs:')
-          find_type(self['type'])
-        else
-          self
-        end
+        @definition ||=
+          if self['type'].present? && !self['type'].start_with?('xs:')
+            find_type(self['type'])
+          else
+            self
+          end
       end
 
       def extension
