@@ -14,6 +14,8 @@ module ScaffoldParser
         end
 
         def call
+          puts "Scaffolding parser for #{node.to_name}" if @options[:verbose]
+
           f = StringIO.new
           f.indent = true if @options[:namespace]
 

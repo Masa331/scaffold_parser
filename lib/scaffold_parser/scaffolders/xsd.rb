@@ -14,7 +14,11 @@ module ScaffoldParser
       end
 
       def call
+        puts "Starting collectiong elements to scaffold" if @options[:verbose]
+
         unscaffolded_elements = collect_unscaffolded_subelements(@doc) + @doc.submodel_nodes
+
+        puts "Collected #{unscaffolded_elements.size} elements to scaffold" if @options[:verbose]
 
         code = unscaffolded_elements.flat_map do |element|
           [Parser.call(element.definition, @options), Builder.call(element.definition, @options)]
@@ -34,6 +38,9 @@ module ScaffoldParser
         subelements.each do |element|
           if collected.none? { |c| c.to_class_name == element.to_class_name }
             collected << element
+
+            puts "Collected #{element.to_name} element" if @options[:verbose]
+
             collect_unscaffolded_subelements(element, collected)
           end
         end

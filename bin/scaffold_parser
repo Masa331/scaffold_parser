@@ -10,8 +10,12 @@ abort 'Path to schema file as a first argument is required' unless path
 OptionParser.new do |opts|
   opts.banner = 'Usage: scaffold_parser <path_to_schema> [options]'
 
-  opts.on("-nNAMESPACE", "--namespace=NAMESPACE") do |v|
+  opts.on('-nNAMESPACE', '--namespace=NAMESPACE', 'Output all classes in given namespace') do |v|
     options[:namespace] = v
+  end
+
+  opts.on('-v', '--verbose', 'Run verbosely') do |v|
+    options[:verbose] = v
   end
 end.parse!
 
