@@ -116,4 +116,117 @@ RSpec.describe ScaffoldParser do
       |  end
       |end })
   end
+
+  it 'builder scaffolder output matches template' do
+    codes = scaffold_schema('./spec/extensions/schema.xsd')
+
+    order_builder = codes['builders/order.rb']
+    expect(order_builder).to eq_multiline(%{
+      |require 'base_builder'
+      |require 'customer'
+      |require 'seller'
+      |require 'reference_type'
+      |
+      |module Builders
+      |  class Order
+      |    include BaseBuilder
+      |
+      |    attr_accessor :customer, :seller, :invoice
+      |
+      |    def builder
+      |      root = Ox::Element.new(element_name)
+      |
+      |      root << Customer.new(customer, 'customer').builder if customer
+      |      root << Seller.new(seller, 'seller').builder if seller
+      |      root << ReferenceType.new(invoice, 'invoice').builder if invoice
+      |
+      |      root
+      |    end
+      |  end
+      |end })
+
+    customer_builder = codes['builders/customer.rb']
+    expect(customer_builder).to eq_multiline(%{
+      |require 'base_builder'
+      |
+      |module Builders
+      |  class Customer
+      |    include BaseBuilder
+      |
+      |    attr_accessor :id, :title
+      |
+      |    def builder
+      |      root = Ox::Element.new(element_name)
+      |
+      |      root << (Ox::Element.new('id') << id) if id
+      |      root << (Ox::Element.new('title') << title) if title
+      |
+      |      root
+      |    end
+      |  end
+      |end })
+
+    seller_builder = codes['builders/seller.rb']
+    expect(seller_builder).to eq_multiline(%{
+      |require 'base_builder'
+      |require 'contact_info'
+      |
+      |module Builders
+      |  class Seller
+      |    include BaseBuilder
+      |
+      |    attr_accessor :title, :contact_info
+      |
+      |    def builder
+      |      root = Ox::Element.new(element_name)
+      |
+      |      root << (Ox::Element.new('title') << title) if title
+      |      root << ContactInfo.new(contact_info, 'contactInfo').builder if contact_info
+      |
+      |      root
+      |    end
+      |  end
+      |end })
+
+    contact_info_builder = codes['builders/contact_info.rb']
+    expect(contact_info_builder).to eq_multiline(%{
+      |require 'base_builder'
+      |
+      |module Builders
+      |  class ContactInfo
+      |    include BaseBuilder
+      |
+      |    attr_accessor :email, :phone
+      |
+      |    def builder
+      |      root = Ox::Element.new(element_name)
+      |
+      |      root << (Ox::Element.new('email') << email) if email
+      |      root << (Ox::Element.new('phone') << phone) if phone
+      |
+      |      root
+      |    end
+      |  end
+      |end })
+
+    reference_type_builder = codes['builders/reference_type.rb']
+    expect(reference_type_builder).to eq_multiline(%{
+      |require 'base_builder'
+      |
+      |module Builders
+      |  class ReferenceType
+      |    include BaseBuilder
+      |
+      |    attr_accessor :id
+      |
+      |    def builder
+      |      root = Ox::Element.new(element_name)
+      |
+      |      root << (Ox::Element.new('ID') << id) if id
+      |
+      |      root
+      |    end
+      |  end
+      |end })
+  end
 end

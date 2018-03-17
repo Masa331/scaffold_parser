@@ -23,4 +23,29 @@ RSpec.describe ScaffoldParser do
       |  end
       |end })
   end
+
+  it 'builder scaffolder output matches template' do
+    codes = scaffold_schema('./spec/includes/schema.xsd')
+
+    order_builder = codes['builders/order.rb']
+    expect(order_builder).to eq_multiline(%{
+      |require 'base_builder'
+      |
+      |module Builders
+      |  class Order
+      |    include BaseBuilder
+      |
+      |    attr_accessor :title, :title2
+      |
+      |    def builder
+      |      root = Ox::Element.new(element_name)
+      |
+      |      root << (Ox::Element.new('title') << title) if title
+      |      root << (Ox::Element.new('title2') << title2) if title2
+      |
+      |      root
+      |    end
+      |  end
+      |end })
+  end
 end
