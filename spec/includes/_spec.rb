@@ -18,9 +18,12 @@ RSpec.describe ScaffoldParser do
       |    end
       |
       |    def to_h
-      |      { title: title,
-      |        title2: title2
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:title] = title if raw.key? :title
+      |      hash[:title2] = title2 if raw.key? :title2
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -37,13 +40,20 @@ RSpec.describe ScaffoldParser do
       |  class Order
       |    include BaseBuilder
       |
-      |    attr_accessor :title, :title2
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << (Ox::Element.new('title') << title) if title
-      |      root << (Ox::Element.new('title2') << title2) if title2
+      |      if attributes.key? :title
+      |        element = Ox::Element.new('title')
+      |        element << attributes[:title] if attributes[:title]
+      |        root << element
+      |      end
+      |
+      |      if attributes.key? :title2
+      |        element = Ox::Element.new('title2')
+      |        element << attributes[:title2] if attributes[:title2]
+      |        root << element
+      |      end
       |
       |      root
       |    end

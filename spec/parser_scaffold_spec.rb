@@ -20,9 +20,12 @@ RSpec.describe ScaffoldParser do
       |      end
       |
       |      def to_h
-      |        { name: name,
-      |          customer: customer.to_h
-      |        }.delete_if { |k, v| v.nil? || v.empty? }
+      |        hash = {}
+      |
+      |        hash[:name] = name if raw.key? :name
+      |        hash[:customer] = customer.to_h if raw.key? :customer
+      |
+      |        hash
       |      end
       |    end
       |  end
@@ -41,13 +44,18 @@ RSpec.describe ScaffoldParser do
       |    class Order
       |      include BaseBuilder
       |
-      |      attr_accessor :name, :customer
-      |
       |      def builder
       |        root = Ox::Element.new(element_name)
       |
-      |        root << (Ox::Element.new('name') << name) if name
-      |        root << CustomerType.new(customer, 'customer').builder if customer
+      |        if attributes.key? :name
+      |          element = Ox::Element.new('name')
+      |          element << attributes[:name] if attributes[:name]
+      |          root << element
+      |        end
+      |
+      |        if attributes.key? :customer
+      |          root << CustomerType.new(attributes[:customer], 'customer').builder
+      |        end
       |
       |        root
       |      end

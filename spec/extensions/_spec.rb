@@ -26,10 +26,13 @@ RSpec.describe ScaffoldParser do
       |    end
       |
       |    def to_h
-      |      { customer: customer.to_h,
-      |        seller: seller.to_h,
-      |        invoice: invoice.to_h
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:customer] = customer.to_h if raw.key? :customer
+      |      hash[:seller] = seller.to_h if raw.key? :seller
+      |      hash[:invoice] = invoice.to_h if raw.key? :invoice
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -51,9 +54,12 @@ RSpec.describe ScaffoldParser do
       |    end
       |
       |    def to_h
-      |      { id: id,
-      |        title: title
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:id] = id if raw.key? :id
+      |      hash[:title] = title if raw.key? :title
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -76,9 +82,12 @@ RSpec.describe ScaffoldParser do
       |    end
       |
       |    def to_h
-      |      { title: title,
-      |        contact_info: contact_info.to_h
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:title] = title if raw.key? :title
+      |      hash[:contact_info] = contact_info.to_h if raw.key? :contactInfo
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -96,8 +105,11 @@ RSpec.describe ScaffoldParser do
       |    end
       |
       |    def to_h
-      |      { id: id
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:id] = id if raw.key? :ID
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -119,9 +131,12 @@ RSpec.describe ScaffoldParser do
       |    end
       |
       |    def to_h
-      |      { email: email,
-      |        phone: phone
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:email] = email if raw.key? :email
+      |      hash[:phone] = phone if raw.key? :phone
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -141,14 +156,20 @@ RSpec.describe ScaffoldParser do
       |  class Order
       |    include BaseBuilder
       |
-      |    attr_accessor :customer, :seller, :invoice
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << Customer.new(customer, 'customer').builder if customer
-      |      root << Seller.new(seller, 'seller').builder if seller
-      |      root << ReferenceType.new(invoice, 'invoice').builder if invoice
+      |      if attributes.key? :customer
+      |        root << Customer.new(attributes[:customer], 'customer').builder
+      |      end
+      |
+      |      if attributes.key? :seller
+      |        root << Seller.new(attributes[:seller], 'seller').builder
+      |      end
+      |
+      |      if attributes.key? :invoice
+      |        root << ReferenceType.new(attributes[:invoice], 'invoice').builder
+      |      end
       |
       |      root
       |    end
@@ -163,13 +184,20 @@ RSpec.describe ScaffoldParser do
       |  class Customer
       |    include BaseBuilder
       |
-      |    attr_accessor :id, :title
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << (Ox::Element.new('id') << id) if id
-      |      root << (Ox::Element.new('title') << title) if title
+      |      if attributes.key? :id
+      |        element = Ox::Element.new('id')
+      |        element << attributes[:id] if attributes[:id]
+      |        root << element
+      |      end
+      |
+      |      if attributes.key? :title
+      |        element = Ox::Element.new('title')
+      |        element << attributes[:title] if attributes[:title]
+      |        root << element
+      |      end
       |
       |      root
       |    end
@@ -185,13 +213,18 @@ RSpec.describe ScaffoldParser do
       |  class Seller
       |    include BaseBuilder
       |
-      |    attr_accessor :title, :contact_info
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << (Ox::Element.new('title') << title) if title
-      |      root << ContactInfo.new(contact_info, 'contactInfo').builder if contact_info
+      |      if attributes.key? :title
+      |        element = Ox::Element.new('title')
+      |        element << attributes[:title] if attributes[:title]
+      |        root << element
+      |      end
+      |
+      |      if attributes.key? :contact_info
+      |        root << ContactInfo.new(attributes[:contact_info], 'contactInfo').builder
+      |      end
       |
       |      root
       |    end
@@ -206,13 +239,20 @@ RSpec.describe ScaffoldParser do
       |  class ContactInfo
       |    include BaseBuilder
       |
-      |    attr_accessor :email, :phone
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << (Ox::Element.new('email') << email) if email
-      |      root << (Ox::Element.new('phone') << phone) if phone
+      |      if attributes.key? :email
+      |        element = Ox::Element.new('email')
+      |        element << attributes[:email] if attributes[:email]
+      |        root << element
+      |      end
+      |
+      |      if attributes.key? :phone
+      |        element = Ox::Element.new('phone')
+      |        element << attributes[:phone] if attributes[:phone]
+      |        root << element
+      |      end
       |
       |      root
       |    end
@@ -227,12 +267,14 @@ RSpec.describe ScaffoldParser do
       |  class ReferenceType
       |    include BaseBuilder
       |
-      |    attr_accessor :id
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << (Ox::Element.new('ID') << id) if id
+      |      if attributes.key? :id
+      |        element = Ox::Element.new('ID')
+      |        element << attributes[:id] if attributes[:id]
+      |        root << element
+      |      end
       |
       |      root
       |    end

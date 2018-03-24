@@ -32,36 +32,37 @@ module ScaffoldParser
           f.putsi "    include BaseBuilder"
           f.puts
 
-          accessors = node.value_nodes.map { |n| ":#{n.to_name.underscore}" }
-          accessors += node.submodel_nodes.map { |n| ":#{n.to_name.underscore}" }
-          accessors += node.array_nodes.map { |n| ":#{n.to_name.underscore}" }
-          f.putsi "    attr_accessor #{accessors.join(', ')}"
-          f.puts
-
           f.putsi "    def builder"
           f.putsi "      root = Ox::Element.new(element_name)"
 
-          f.puts if node.value_nodes.any? || node.submodel_nodes.any?
           node.value_nodes.each do |node|
-            f.putsi "      root << (Ox::Element.new('#{node.to_name}') << #{node.to_name.underscore}) if #{node.to_name.underscore}"
+            f.puts
+            f.putsi "      if attributes.key? :#{node.to_name.underscore}"
+            f.putsi "        element = Ox::Element.new('#{node.to_name}')"
+            f.putsi "        element << attributes[:#{node.to_name.underscore}] if attributes[:#{node.to_name.underscore}]"
+            f.putsi "        root << element"
+            f.putsi "      end"
           end
 
           node.submodel_nodes.each do |node|
-            f.putsi "      root << #{node.to_class_name}.new(#{node.to_name.underscore}, '#{node.to_name}').builder if #{node.to_name.underscore}"
+            f.puts
+            f.putsi "      if attributes.key? :#{node.to_name.underscore}"
+            f.putsi "        root << #{node.to_class_name}.new(attributes[:#{node.to_name.underscore}], '#{node.to_name}').builder"
+            f.putsi "      end"
           end
 
           node.array_nodes.reject { |l| l.list_element.xs_type? }.each do |node|
             if node.named_list?
               f.puts
-              f.putsi "      if #{node.to_name.underscore}"
+              f.putsi "      if attributes.key? :#{node.to_name.underscore}"
               f.putsi "        element = Ox::Element.new('#{node.to_name}')"
-              f.putsi "        #{node.to_name.underscore}.each { |i| element << #{node.list_element.to_class_name}.new(i, '#{node.list_element.to_name}').builder }"
+              f.putsi "        attributes[:#{node.to_name.underscore}].each { |i| element << #{node.list_element.to_class_name}.new(i, '#{node.list_element.to_name}').builder }"
               f.putsi "        root << element"
               f.putsi "      end"
             else # simple_list
               f.puts
-              f.putsi "      if #{node.to_name.underscore}"
-              f.putsi "        #{node.to_name.underscore}.each { |i| root << #{node.list_element.to_class_name}.new(i, '#{node.list_element.to_name}').builder }"
+              f.putsi "      if attributes.key? :#{node.to_name.underscore}"
+              f.putsi "        attributes[:#{node.to_name.underscore}].each { |i| root << #{node.list_element.to_class_name}.new(i, '#{node.list_element.to_name}').builder }"
               f.putsi "      end"
             end
           end
@@ -70,14 +71,14 @@ module ScaffoldParser
             f.puts
 
             if node.named_list?
-              f.putsi "      if #{node.to_name.underscore}"
+              f.putsi "      if attributes.key? :#{node.to_name.underscore}"
               f.putsi "        element = Ox::Element.new('#{node.to_name}')"
-              f.putsi "        #{node.to_name.underscore}.map { |i| Ox::Element.new('#{node.list_element.to_name}') << i }.each { |i| element << i }"
+              f.putsi "        attributes[:#{node.to_name.underscore}].map { |i| Ox::Element.new('#{node.list_element.to_name}') << i }.each { |i| element << i }"
               f.putsi "        root << element"
               f.putsi "      end"
             else #simple_list
-              f.putsi "      if #{node.to_name.underscore}"
-              f.putsi "        #{node.to_name.underscore}.map { |i| Ox::Element.new('#{node.to_name}') << i }.each { |i| root << i }"
+              f.putsi "      if attributes.key? :#{node.to_name.underscore}"
+              f.putsi "        attributes[:#{node.to_name.underscore}].map { |i| Ox::Element.new('#{node.to_name}') << i }.each { |i| root << i }"
               f.putsi "      end"
             end
           end

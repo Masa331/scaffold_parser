@@ -109,15 +109,11 @@ module ScaffoldParser
         <<~TEMPLATE
           module Builders
             module BaseBuilder
-              attr_accessor :element_name
+              attr_accessor :attributes, :element_name
 
               def initialize(attributes = {}, element_name)
                 @element_name = element_name
-
-                attributes ||= {}
-                attributes.each do |key, value|
-                  send("\#{key}=", value)
-                end
+                @attributes = attributes || {}
               end
 
               def to_xml

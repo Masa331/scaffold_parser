@@ -18,9 +18,12 @@ RSpec.describe 'choices' do
       |    end
       |
       |    def to_h
-      |      { name: name,
-      |        company_name: company_name
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:name] = name if raw.key? :name
+      |      hash[:company_name] = company_name if raw.key? :company_name
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -36,13 +39,20 @@ RSpec.describe 'choices' do
       |  class Order
       |    include BaseBuilder
       |
-      |    attr_accessor :name, :company_name
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << (Ox::Element.new('name') << name) if name
-      |      root << (Ox::Element.new('company_name') << company_name) if company_name
+      |      if attributes.key? :name
+      |        element = Ox::Element.new('name')
+      |        element << attributes[:name] if attributes[:name]
+      |        root << element
+      |      end
+      |
+      |      if attributes.key? :company_name
+      |        element = Ox::Element.new('company_name')
+      |        element << attributes[:company_name] if attributes[:company_name]
+      |        root << element
+      |      end
       |
       |      root
       |    end

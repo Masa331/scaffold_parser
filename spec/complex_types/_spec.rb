@@ -25,10 +25,13 @@ RSpec.describe 'complex types' do
       |    end
       |
       |    def to_h
-      |      { currency: currency.to_h,
-      |        customer: customer.to_h,
-      |        customer2: customer2.to_h
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:currency] = currency.to_h if raw.key? :currency
+      |      hash[:customer] = customer.to_h if raw.key? :customer
+      |      hash[:customer2] = customer2.to_h if raw.key? :customer2
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -46,8 +49,11 @@ RSpec.describe 'complex types' do
       |    end
       |
       |    def to_h
-      |      { currency_id: currency_id
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:currency_id] = currency_id if raw.key? :currencyId
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -65,8 +71,11 @@ RSpec.describe 'complex types' do
       |    end
       |
       |    def to_h
-      |      { name: name
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:name] = name if raw.key? :name
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -85,14 +94,20 @@ RSpec.describe 'complex types' do
       |  class Order
       |    include BaseBuilder
       |
-      |    attr_accessor :currency, :customer, :customer2
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << Currency.new(currency, 'currency').builder if currency
-      |      root << CustomerType.new(customer, 'customer').builder if customer
-      |      root << CustomerType.new(customer2, 'customer2').builder if customer2
+      |      if attributes.key? :currency
+      |        root << Currency.new(attributes[:currency], 'currency').builder
+      |      end
+      |
+      |      if attributes.key? :customer
+      |        root << CustomerType.new(attributes[:customer], 'customer').builder
+      |      end
+      |
+      |      if attributes.key? :customer2
+      |        root << CustomerType.new(attributes[:customer2], 'customer2').builder
+      |      end
       |
       |      root
       |    end
@@ -107,12 +122,14 @@ RSpec.describe 'complex types' do
       |  class Currency
       |    include BaseBuilder
       |
-      |    attr_accessor :currency_id
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << (Ox::Element.new('currencyId') << currency_id) if currency_id
+      |      if attributes.key? :currency_id
+      |        element = Ox::Element.new('currencyId')
+      |        element << attributes[:currency_id] if attributes[:currency_id]
+      |        root << element
+      |      end
       |
       |      root
       |    end
@@ -127,12 +144,14 @@ RSpec.describe 'complex types' do
       |  class CustomerType
       |    include BaseBuilder
       |
-      |    attr_accessor :name
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << (Ox::Element.new('name') << name) if name
+      |      if attributes.key? :name
+      |        element = Ox::Element.new('name')
+      |        element << attributes[:name] if attributes[:name]
+      |        root << element
+      |      end
       |
       |      root
       |    end

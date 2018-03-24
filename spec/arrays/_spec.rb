@@ -34,12 +34,15 @@ RSpec.describe 'arrays' do
       |    end
       |
       |    def to_h
-      |      { payments: payments.to_h,
-      |        messages: messages.to_h,
-      |        items: items.map(&:to_h),
-      |        documents: documents,
-      |        id: id
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:payments] = payments.to_h if raw.key? :payments
+      |      hash[:messages] = messages.to_h if raw.key? :messages
+      |      hash[:items] = items.map(&:to_h) if raw.key? :items
+      |      hash[:documents] = documents if raw.key? :documents
+      |      hash[:id] = id if raw.key? :ID
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -58,8 +61,11 @@ RSpec.describe 'arrays' do
       |    end
       |
       |    def to_h
-      |      { payments_list: payments_list.map(&:to_h)
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:payments_list] = payments_list.map(&:to_h) if raw.key? :payments_list
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -77,8 +83,11 @@ RSpec.describe 'arrays' do
       |    end
       |
       |    def to_h
-      |      { amount: amount
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:amount] = amount if raw.key? :amount
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -101,9 +110,12 @@ RSpec.describe 'arrays' do
       |    end
       |
       |    def to_h
-      |      { recipient: recipient.map(&:to_h),
-      |        error: error
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:recipient] = recipient.map(&:to_h) if raw.key? :recipient
+      |      hash[:error] = error if raw.key? :error
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -121,8 +133,11 @@ RSpec.describe 'arrays' do
       |    end
       |
       |    def to_h
-      |      { name: name
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:name] = name if raw.key? :name
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -142,28 +157,31 @@ RSpec.describe 'arrays' do
       |  class Order
       |    include BaseBuilder
       |
-      |    attr_accessor :payments, :messages, :items, :documents, :id
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << PaymentType.new(payments, 'payments').builder if payments
-      |      root << Messages.new(messages, 'messages').builder if messages
+      |      if attributes.key? :payments
+      |        root << PaymentType.new(attributes[:payments], 'payments').builder
+      |      end
       |
-      |      if items
+      |      if attributes.key? :messages
+      |        root << Messages.new(attributes[:messages], 'messages').builder
+      |      end
+      |
+      |      if attributes.key? :items
       |        element = Ox::Element.new('items')
-      |        items.each { |i| element << ItemType.new(i, 'Item').builder }
+      |        attributes[:items].each { |i| element << ItemType.new(i, 'Item').builder }
       |        root << element
       |      end
       |
-      |      if documents
+      |      if attributes.key? :documents
       |        element = Ox::Element.new('documents')
-      |        documents.map { |i| Ox::Element.new('document') << i }.each { |i| element << i }
+      |        attributes[:documents].map { |i| Ox::Element.new('document') << i }.each { |i| element << i }
       |        root << element
       |      end
       |
-      |      if id
-      |        id.map { |i| Ox::Element.new('ID') << i }.each { |i| root << i }
+      |      if attributes.key? :id
+      |        attributes[:id].map { |i| Ox::Element.new('ID') << i }.each { |i| root << i }
       |      end
       |
       |      root
@@ -180,14 +198,12 @@ RSpec.describe 'arrays' do
       |  class PaymentType
       |    include BaseBuilder
       |
-      |    attr_accessor :payments_list
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      if payments_list
+      |      if attributes.key? :payments_list
       |        element = Ox::Element.new('payments_list')
-      |        payments_list.each { |i| element << Payment.new(i, 'payment').builder }
+      |        attributes[:payments_list].each { |i| element << Payment.new(i, 'payment').builder }
       |        root << element
       |      end
       |
@@ -204,12 +220,14 @@ RSpec.describe 'arrays' do
       |  class Payment
       |    include BaseBuilder
       |
-      |    attr_accessor :amount
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << (Ox::Element.new('amount') << amount) if amount
+      |      if attributes.key? :amount
+      |        element = Ox::Element.new('amount')
+      |        element << attributes[:amount] if attributes[:amount]
+      |        root << element
+      |      end
       |
       |      root
       |    end
@@ -225,17 +243,15 @@ RSpec.describe 'arrays' do
       |  class Messages
       |    include BaseBuilder
       |
-      |    attr_accessor :recipient, :error
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      if recipient
-      |        recipient.each { |i| root << RecipientType.new(i, 'recipient').builder }
+      |      if attributes.key? :recipient
+      |        attributes[:recipient].each { |i| root << RecipientType.new(i, 'recipient').builder }
       |      end
       |
-      |      if error
-      |        error.map { |i| Ox::Element.new('error') << i }.each { |i| root << i }
+      |      if attributes.key? :error
+      |        attributes[:error].map { |i| Ox::Element.new('error') << i }.each { |i| root << i }
       |      end
       |
       |      root
@@ -251,12 +267,14 @@ RSpec.describe 'arrays' do
       |  class RecipientType
       |    include BaseBuilder
       |
-      |    attr_accessor :name
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << (Ox::Element.new('name') << name) if name
+      |      if attributes.key? :name
+      |        element = Ox::Element.new('name')
+      |        element << attributes[:name] if attributes[:name]
+      |        root << element
+      |      end
       |
       |      root
       |    end
