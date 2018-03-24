@@ -79,28 +79,33 @@ module ScaffoldParser
           ### to_h method
           lines = []
           node.value_nodes.each do |node|
-            lines << "#{node.to_name.underscore}: #{node.to_name.underscore},"
+            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore} if raw.key? :#{node.to_name}"
           end
+
           node.submodel_nodes.each do |node|
-            lines << "#{node.to_name.underscore}: #{node.to_name.underscore}.to_h,"
+            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.to_h if raw.key? :#{node.to_name}"
           end
           node.array_nodes.reject { |l| l.list_element.xs_type? }.each do |node|
-            lines << "#{node.to_name.underscore}: #{node.to_name.underscore}.map(&:to_h),"
+            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.map(&:to_h) if raw.key? :#{node.to_name}"
           end
           node.array_nodes.select { |l| l.list_element.xs_type? }.each do |node|
-            lines << "#{node.to_name.underscore}: #{node.to_name.underscore},"
+            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore} if raw.key? :#{node.to_name}"
           end
           if lines.any?
             f.puts
-            lines.last.chop!
-            first_line = lines.shift
+            # lines.last.chop!
+            # first_line = lines.shift
 
             f.putsi "    def to_h"
-            f.putsi "      { #{first_line}"
+            f.putsi "      hash = {}"
+            f.puts
+
             lines.each do |line|
-              f.putsi "        #{line}"
+              f.putsi "      #{line}"
             end
-            f.putsi "      }.delete_if { |k, v| v.nil? || v.empty? }"
+            f.puts
+
+            f.putsi "      hash"
             f.putsi "    end"
           end
           f.putsi "  end"

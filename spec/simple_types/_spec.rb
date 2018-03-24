@@ -22,10 +22,13 @@ RSpec.describe 'simple types' do
       |    end
       |
       |    def to_h
-      |      { name: name,
-      |        title: title,
-      |        total: total
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:name] = name if raw.key? :name
+      |      hash[:title] = title if raw.key? :title
+      |      hash[:total] = total if raw.key? :Total
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -41,14 +44,26 @@ RSpec.describe 'simple types' do
       |  class Order
       |    include BaseBuilder
       |
-      |    attr_accessor :name, :title, :total
-      |
       |    def builder
       |      root = Ox::Element.new(element_name)
       |
-      |      root << (Ox::Element.new('name') << name) if name
-      |      root << (Ox::Element.new('title') << title) if title
-      |      root << (Ox::Element.new('Total') << total) if total
+      |      if attributes.key? :name
+      |        element = Ox::Element.new('name')
+      |        element << attributes[:name] if attributes[:name]
+      |        root << element
+      |      end
+      |
+      |      if attributes.key? :title
+      |        element = Ox::Element.new('title')
+      |        element << attributes[:title] if attributes[:title]
+      |        root << element
+      |      end
+      |
+      |      if attributes.key? :total
+      |        element = Ox::Element.new('Total')
+      |        element << attributes[:total] if attributes[:total]
+      |        root << element
+      |      end
       |
       |      root
       |    end

@@ -34,12 +34,15 @@ RSpec.describe 'arrays' do
       |    end
       |
       |    def to_h
-      |      { payments: payments.to_h,
-      |        messages: messages.to_h,
-      |        items: items.map(&:to_h),
-      |        documents: documents,
-      |        id: id
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:payments] = payments.to_h if raw.key? :payments
+      |      hash[:messages] = messages.to_h if raw.key? :messages
+      |      hash[:items] = items.map(&:to_h) if raw.key? :items
+      |      hash[:documents] = documents if raw.key? :documents
+      |      hash[:id] = id if raw.key? :ID
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -58,8 +61,11 @@ RSpec.describe 'arrays' do
       |    end
       |
       |    def to_h
-      |      { payments_list: payments_list.map(&:to_h)
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:payments_list] = payments_list.map(&:to_h) if raw.key? :payments_list
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -77,8 +83,11 @@ RSpec.describe 'arrays' do
       |    end
       |
       |    def to_h
-      |      { amount: amount
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:amount] = amount if raw.key? :amount
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -101,9 +110,12 @@ RSpec.describe 'arrays' do
       |    end
       |
       |    def to_h
-      |      { recipient: recipient.map(&:to_h),
-      |        error: error
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:recipient] = recipient.map(&:to_h) if raw.key? :recipient
+      |      hash[:error] = error if raw.key? :error
+      |
+      |      hash
       |    end
       |  end
       |end })
@@ -121,8 +133,11 @@ RSpec.describe 'arrays' do
       |    end
       |
       |    def to_h
-      |      { name: name
-      |      }.delete_if { |k, v| v.nil? || v.empty? }
+      |      hash = {}
+      |
+      |      hash[:name] = name if raw.key? :name
+      |
+      |      hash
       |    end
       |  end
       |end })
