@@ -10,23 +10,24 @@ RSpec.describe 'simple types' do
       |    include BaseParser
       |
       |    def name
-      |      at :name
+      |      at 'name'
       |    end
       |
       |    def title
-      |      at :title
+      |      at 'title'
       |    end
       |
       |    def total
-      |      at :Total
+      |      at 'Total'
       |    end
       |
       |    def to_h
-      |      hash = {}
+      |      hash = WithAttributes.new({})
+      |      hash.attributes = attributes
       |
-      |      hash[:name] = name if raw.key? :name
-      |      hash[:title] = title if raw.key? :title
-      |      hash[:total] = total if raw.key? :Total
+      |      hash[:name] = name if has? 'name'
+      |      hash[:title] = title if has? 'title'
+      |      hash[:total] = total if has? 'Total'
       |
       |      hash
       |    end
@@ -45,25 +46,14 @@ RSpec.describe 'simple types' do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :name
-      |        element = Ox::Element.new('name')
-      |        element << attributes[:name] if attributes[:name]
-      |        root << element
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
       |
-      |      if attributes.key? :title
-      |        element = Ox::Element.new('title')
-      |        element << attributes[:title] if attributes[:title]
-      |        root << element
-      |      end
-      |
-      |      if attributes.key? :total
-      |        element = Ox::Element.new('Total')
-      |        element << attributes[:total] if attributes[:total]
-      |        root << element
-      |      end
+      |      root << build_element('name', data[:name]) if data.key? :name
+      |      root << build_element('title', data[:title]) if data.key? :title
+      |      root << build_element('Total', data[:total]) if data.key? :total
       |
       |      root
       |    end

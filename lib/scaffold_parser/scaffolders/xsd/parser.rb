@@ -36,7 +36,7 @@ module ScaffoldParser
             at = method.to_name
 
             f.putsi "    def #{method_name}"
-            f.putsi "      at :#{at}"
+            f.putsi "      at '#{at}'"
             f.putsi "    end"
           end
 
@@ -48,7 +48,7 @@ module ScaffoldParser
             at = method.to_name
 
             f.putsi "    def #{method_name}"
-            f.putsi "      submodel_at(#{klass}, :#{at})"
+            f.putsi "      submodel_at(#{klass}, '#{at}')"
             f.putsi "    end"
           end
 
@@ -57,7 +57,7 @@ module ScaffoldParser
 
             list_element_klass = method.list_element_klass
             method_name = method.to_name.underscore
-            list_element_at = method.list_element_at.map { |e| ":#{e}" }.join(', ')
+            list_element_at = method.list_element_at.map { |e| "'#{e}'" }.join(', ')
 
             f.putsi "    def #{method_name}"
             f.putsi "      array_of_at(#{list_element_klass}, [#{list_element_at}])"
@@ -69,7 +69,7 @@ module ScaffoldParser
 
             list_element_klass = method.list_element_klass
             method_name = method.to_name.underscore
-            list_element_at = method.list_element_at.map { |e| ":#{e}" }.join(', ')
+            list_element_at = method.list_element_at.map { |e| "'#{e}'" }.join(', ')
 
             f.putsi "    def #{method_name}"
             f.putsi "      array_of_at(String, [#{list_element_at}])"
@@ -79,25 +79,24 @@ module ScaffoldParser
           ### to_h method
           lines = []
           node.value_nodes.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore} if raw.key? :#{node.to_name}"
+            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore} if has? '#{node.to_name}'"
           end
 
           node.submodel_nodes.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.to_h if raw.key? :#{node.to_name}"
+            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.to_h if has? '#{node.to_name}'"
           end
           node.array_nodes.reject { |l| l.list_element.xs_type? }.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.map(&:to_h) if raw.key? :#{node.to_name}"
+            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.map(&:to_h) if has? '#{node.to_name}'"
           end
           node.array_nodes.select { |l| l.list_element.xs_type? }.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore} if raw.key? :#{node.to_name}"
+            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore} if has? '#{node.to_name}'"
           end
           if lines.any?
             f.puts
-            # lines.last.chop!
-            # first_line = lines.shift
 
             f.putsi "    def to_h"
-            f.putsi "      hash = {}"
+            f.putsi "      hash = WithAttributes.new({})"
+            f.putsi "      hash.attributes = attributes"
             f.puts
 
             lines.each do |line|
