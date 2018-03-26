@@ -10,18 +10,18 @@ RSpec.describe 'choices' do
       |    include BaseParser
       |
       |    def name
-      |      at :name
+      |      at 'name'
       |    end
       |
       |    def company_name
-      |      at :company_name
+      |      at 'company_name'
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:name] = name if raw.key? :name
-      |      hash[:company_name] = company_name if raw.key? :company_name
+      |      hash[:name] = name if has? 'name'
+      |      hash[:company_name] = company_name if has? 'company_name'
       |
       |      hash
       |    end
@@ -40,19 +40,13 @@ RSpec.describe 'choices' do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :name
-      |        element = Ox::Element.new('name')
-      |        element << attributes[:name] if attributes[:name]
-      |        root << element
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
       |
-      |      if attributes.key? :company_name
-      |        element = Ox::Element.new('company_name')
-      |        element << attributes[:company_name] if attributes[:company_name]
-      |        root << element
-      |      end
+      |      root << build_element('name', data[:name]) if data.key? :name
+      |      root << build_element('company_name', data[:company_name]) if data.key? :company_name
       |
       |      root
       |    end

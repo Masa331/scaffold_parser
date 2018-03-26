@@ -24,7 +24,7 @@ module ScaffoldParser
           [Parser.call(element.definition, @options), Builder.call(element.definition, @options)]
         end
 
-        code.push ['parsers/base_parser.rb', base_element_template]
+        code.push ['parsers/base_parser.rb', base_parser_template]
         code.push ['builders/base_builder.rb', base_builder_template]
       end
 
@@ -48,7 +48,7 @@ module ScaffoldParser
         collected
       end
 
-      def base_element_template
+      def base_parser_template
         <<~TEMPLATE
           module Parsers
             module BaseParser
@@ -72,9 +72,7 @@ module ScaffoldParser
                 element = raw.locate(locator.to_s).first
 
                 if element
-                  text = WithAttributes.new(element.text)
-                  text.attributes = element.attributes
-                  text
+                  StringWithAttributes.new(element.text, element.attributes)
                 end
               end
 

@@ -14,33 +14,33 @@ RSpec.describe 'arrays' do
       |    include BaseParser
       |
       |    def payments
-      |      submodel_at(PaymentType, :payments)
+      |      submodel_at(PaymentType, 'payments')
       |    end
       |
       |    def messages
-      |      submodel_at(Messages, :messages)
+      |      submodel_at(Messages, 'messages')
       |    end
       |
       |    def items
-      |      array_of_at(ItemType, [:items, :Item])
+      |      array_of_at(ItemType, ['items', 'Item'])
       |    end
       |
       |    def documents
-      |      array_of_at(String, [:documents, :document])
+      |      array_of_at(String, ['documents', 'document'])
       |    end
       |
       |    def id
-      |      array_of_at(String, [:ID])
+      |      array_of_at(String, ['ID'])
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:payments] = payments.to_h if raw.key? :payments
-      |      hash[:messages] = messages.to_h if raw.key? :messages
-      |      hash[:items] = items.map(&:to_h) if raw.key? :items
-      |      hash[:documents] = documents if raw.key? :documents
-      |      hash[:id] = id if raw.key? :ID
+      |      hash[:payments] = payments.to_h_with_attrs if has? 'payments'
+      |      hash[:messages] = messages.to_h_with_attrs if has? 'messages'
+      |      hash[:items] = items.map(&:to_h_with_attrs) if has? 'items'
+      |      hash[:documents] = documents if has? 'documents'
+      |      hash[:id] = id if has? 'ID'
       |
       |      hash
       |    end
@@ -57,13 +57,13 @@ RSpec.describe 'arrays' do
       |    include BaseParser
       |
       |    def payments_list
-      |      array_of_at(Payment, [:payments_list, :payment])
+      |      array_of_at(Payment, ['payments_list', 'payment'])
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:payments_list] = payments_list.map(&:to_h) if raw.key? :payments_list
+      |      hash[:payments_list] = payments_list.map(&:to_h_with_attrs) if has? 'payments_list'
       |
       |      hash
       |    end
@@ -79,13 +79,13 @@ RSpec.describe 'arrays' do
       |    include BaseParser
       |
       |    def amount
-      |      at :amount
+      |      at 'amount'
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:amount] = amount if raw.key? :amount
+      |      hash[:amount] = amount if has? 'amount'
       |
       |      hash
       |    end
@@ -102,18 +102,18 @@ RSpec.describe 'arrays' do
       |    include BaseParser
       |
       |    def recipient
-      |      array_of_at(RecipientType, [:recipient])
+      |      array_of_at(RecipientType, ['recipient'])
       |    end
       |
       |    def error
-      |      array_of_at(String, [:error])
+      |      array_of_at(String, ['error'])
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:recipient] = recipient.map(&:to_h) if raw.key? :recipient
-      |      hash[:error] = error if raw.key? :error
+      |      hash[:recipient] = recipient.map(&:to_h_with_attrs) if has? 'recipient'
+      |      hash[:error] = error if has? 'error'
       |
       |      hash
       |    end
@@ -129,13 +129,13 @@ RSpec.describe 'arrays' do
       |    include BaseParser
       |
       |    def name
-      |      at :name
+      |      at 'name'
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:name] = name if raw.key? :name
+      |      hash[:name] = name if has? 'name'
       |
       |      hash
       |    end
@@ -158,30 +158,33 @@ RSpec.describe 'arrays' do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :payments
-      |        root << PaymentType.new(attributes[:payments], 'payments').builder
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
       |
-      |      if attributes.key? :messages
-      |        root << Messages.new(attributes[:messages], 'messages').builder
+      |      if data.key? :payments
+      |        root << PaymentType.new('payments', data[:payments]).builder
       |      end
       |
-      |      if attributes.key? :items
+      |      if data.key? :messages
+      |        root << Messages.new('messages', data[:messages]).builder
+      |      end
+      |
+      |      if data.key? :items
       |        element = Ox::Element.new('items')
-      |        attributes[:items].each { |i| element << ItemType.new(i, 'Item').builder }
+      |        data[:items].each { |i| element << ItemType.new('Item', i).builder }
       |        root << element
       |      end
       |
-      |      if attributes.key? :documents
+      |      if data.key? :documents
       |        element = Ox::Element.new('documents')
-      |        attributes[:documents].map { |i| Ox::Element.new('document') << i }.each { |i| element << i }
+      |        data[:documents].map { |i| Ox::Element.new('document') << i }.each { |i| element << i }
       |        root << element
       |      end
       |
-      |      if attributes.key? :id
-      |        attributes[:id].map { |i| Ox::Element.new('ID') << i }.each { |i| root << i }
+      |      if data.key? :id
+      |        data[:id].map { |i| Ox::Element.new('ID') << i }.each { |i| root << i }
       |      end
       |
       |      root
@@ -199,11 +202,14 @@ RSpec.describe 'arrays' do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
+      |      end
       |
-      |      if attributes.key? :payments_list
+      |      if data.key? :payments_list
       |        element = Ox::Element.new('payments_list')
-      |        attributes[:payments_list].each { |i| element << Payment.new(i, 'payment').builder }
+      |        data[:payments_list].each { |i| element << Payment.new('payment', i).builder }
       |        root << element
       |      end
       |
@@ -221,13 +227,12 @@ RSpec.describe 'arrays' do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :amount
-      |        element = Ox::Element.new('amount')
-      |        element << attributes[:amount] if attributes[:amount]
-      |        root << element
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
+      |
+      |      root << build_element('amount', data[:amount]) if data.key? :amount
       |
       |      root
       |    end
@@ -244,14 +249,17 @@ RSpec.describe 'arrays' do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :recipient
-      |        attributes[:recipient].each { |i| root << RecipientType.new(i, 'recipient').builder }
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
       |
-      |      if attributes.key? :error
-      |        attributes[:error].map { |i| Ox::Element.new('error') << i }.each { |i| root << i }
+      |      if data.key? :recipient
+      |        data[:recipient].each { |i| root << RecipientType.new('recipient', i).builder }
+      |      end
+      |
+      |      if data.key? :error
+      |        data[:error].map { |i| Ox::Element.new('error') << i }.each { |i| root << i }
       |      end
       |
       |      root
@@ -268,13 +276,12 @@ RSpec.describe 'arrays' do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :name
-      |        element = Ox::Element.new('name')
-      |        element << attributes[:name] if attributes[:name]
-      |        root << element
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
+      |
+      |      root << build_element('name', data[:name]) if data.key? :name
       |
       |      root
       |    end

@@ -83,10 +83,10 @@ module ScaffoldParser
           end
 
           node.submodel_nodes.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.to_h if has? '#{node.to_name}'"
+            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.to_h_with_attrs if has? '#{node.to_name}'"
           end
           node.array_nodes.reject { |l| l.list_element.xs_type? }.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.map(&:to_h) if has? '#{node.to_name}'"
+            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.map(&:to_h_with_attrs) if has? '#{node.to_name}'"
           end
           node.array_nodes.select { |l| l.list_element.xs_type? }.each do |node|
             lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore} if has? '#{node.to_name}'"
@@ -94,9 +94,8 @@ module ScaffoldParser
           if lines.any?
             f.puts
 
-            f.putsi "    def to_h"
-            f.putsi "      hash = WithAttributes.new({})"
-            f.putsi "      hash.attributes = attributes"
+            f.putsi "    def to_h_with_attrs"
+            f.putsi "      hash = HashWithAttributes.new({}, attributes)"
             f.puts
 
             lines.each do |line|

@@ -14,23 +14,23 @@ RSpec.describe ScaffoldParser do
       |    include BaseParser
       |
       |    def customer
-      |      submodel_at(Customer, :customer)
+      |      submodel_at(Customer, 'customer')
       |    end
       |
       |    def seller
-      |      submodel_at(Seller, :seller)
+      |      submodel_at(Seller, 'seller')
       |    end
       |
       |    def invoice
-      |      submodel_at(ReferenceType, :invoice)
+      |      submodel_at(ReferenceType, 'invoice')
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:customer] = customer.to_h if raw.key? :customer
-      |      hash[:seller] = seller.to_h if raw.key? :seller
-      |      hash[:invoice] = invoice.to_h if raw.key? :invoice
+      |      hash[:customer] = customer.to_h_with_attrs if has? 'customer'
+      |      hash[:seller] = seller.to_h_with_attrs if has? 'seller'
+      |      hash[:invoice] = invoice.to_h_with_attrs if has? 'invoice'
       |
       |      hash
       |    end
@@ -46,18 +46,18 @@ RSpec.describe ScaffoldParser do
       |    include BaseParser
       |
       |    def id
-      |      at :id
+      |      at 'id'
       |    end
       |
       |    def title
-      |      at :title
+      |      at 'title'
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:id] = id if raw.key? :id
-      |      hash[:title] = title if raw.key? :title
+      |      hash[:id] = id if has? 'id'
+      |      hash[:title] = title if has? 'title'
       |
       |      hash
       |    end
@@ -74,18 +74,18 @@ RSpec.describe ScaffoldParser do
       |    include BaseParser
       |
       |    def title
-      |      at :title
+      |      at 'title'
       |    end
       |
       |    def contact_info
-      |      submodel_at(ContactInfo, :contactInfo)
+      |      submodel_at(ContactInfo, 'contactInfo')
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:title] = title if raw.key? :title
-      |      hash[:contact_info] = contact_info.to_h if raw.key? :contactInfo
+      |      hash[:title] = title if has? 'title'
+      |      hash[:contact_info] = contact_info.to_h_with_attrs if has? 'contactInfo'
       |
       |      hash
       |    end
@@ -101,13 +101,13 @@ RSpec.describe ScaffoldParser do
       |    include BaseParser
       |
       |    def id
-      |      at :ID
+      |      at 'ID'
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:id] = id if raw.key? :ID
+      |      hash[:id] = id if has? 'ID'
       |
       |      hash
       |    end
@@ -123,18 +123,18 @@ RSpec.describe ScaffoldParser do
       |    include BaseParser
       |
       |    def email
-      |      at :email
+      |      at 'email'
       |    end
       |
       |    def phone
-      |      at :phone
+      |      at 'phone'
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:email] = email if raw.key? :email
-      |      hash[:phone] = phone if raw.key? :phone
+      |      hash[:email] = email if has? 'email'
+      |      hash[:phone] = phone if has? 'phone'
       |
       |      hash
       |    end
@@ -157,18 +157,21 @@ RSpec.describe ScaffoldParser do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :customer
-      |        root << Customer.new(attributes[:customer], 'customer').builder
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
       |
-      |      if attributes.key? :seller
-      |        root << Seller.new(attributes[:seller], 'seller').builder
+      |      if data.key? :customer
+      |        root << Customer.new('customer', data[:customer]).builder
       |      end
       |
-      |      if attributes.key? :invoice
-      |        root << ReferenceType.new(attributes[:invoice], 'invoice').builder
+      |      if data.key? :seller
+      |        root << Seller.new('seller', data[:seller]).builder
+      |      end
+      |
+      |      if data.key? :invoice
+      |        root << ReferenceType.new('invoice', data[:invoice]).builder
       |      end
       |
       |      root
@@ -185,19 +188,13 @@ RSpec.describe ScaffoldParser do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :id
-      |        element = Ox::Element.new('id')
-      |        element << attributes[:id] if attributes[:id]
-      |        root << element
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
       |
-      |      if attributes.key? :title
-      |        element = Ox::Element.new('title')
-      |        element << attributes[:title] if attributes[:title]
-      |        root << element
-      |      end
+      |      root << build_element('id', data[:id]) if data.key? :id
+      |      root << build_element('title', data[:title]) if data.key? :title
       |
       |      root
       |    end
@@ -214,16 +211,15 @@ RSpec.describe ScaffoldParser do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :title
-      |        element = Ox::Element.new('title')
-      |        element << attributes[:title] if attributes[:title]
-      |        root << element
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
       |
-      |      if attributes.key? :contact_info
-      |        root << ContactInfo.new(attributes[:contact_info], 'contactInfo').builder
+      |      root << build_element('title', data[:title]) if data.key? :title
+      |
+      |      if data.key? :contact_info
+      |        root << ContactInfo.new('contactInfo', data[:contact_info]).builder
       |      end
       |
       |      root
@@ -240,19 +236,13 @@ RSpec.describe ScaffoldParser do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :email
-      |        element = Ox::Element.new('email')
-      |        element << attributes[:email] if attributes[:email]
-      |        root << element
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
       |
-      |      if attributes.key? :phone
-      |        element = Ox::Element.new('phone')
-      |        element << attributes[:phone] if attributes[:phone]
-      |        root << element
-      |      end
+      |      root << build_element('email', data[:email]) if data.key? :email
+      |      root << build_element('phone', data[:phone]) if data.key? :phone
       |
       |      root
       |    end
@@ -268,13 +258,12 @@ RSpec.describe ScaffoldParser do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :id
-      |        element = Ox::Element.new('ID')
-      |        element << attributes[:id] if attributes[:id]
-      |        root << element
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
+      |
+      |      root << build_element('ID', data[:id]) if data.key? :id
       |
       |      root
       |    end

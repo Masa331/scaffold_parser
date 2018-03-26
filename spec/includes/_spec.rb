@@ -10,18 +10,18 @@ RSpec.describe ScaffoldParser do
       |    include BaseParser
       |
       |    def title
-      |      at :title
+      |      at 'title'
       |    end
       |
       |    def title2
-      |      at :title2
+      |      at 'title2'
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:title] = title if raw.key? :title
-      |      hash[:title2] = title2 if raw.key? :title2
+      |      hash[:title] = title if has? 'title'
+      |      hash[:title2] = title2 if has? 'title2'
       |
       |      hash
       |    end
@@ -41,19 +41,13 @@ RSpec.describe ScaffoldParser do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :title
-      |        element = Ox::Element.new('title')
-      |        element << attributes[:title] if attributes[:title]
-      |        root << element
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
       |
-      |      if attributes.key? :title2
-      |        element = Ox::Element.new('title2')
-      |        element << attributes[:title2] if attributes[:title2]
-      |        root << element
-      |      end
+      |      root << build_element('title', data[:title]) if data.key? :title
+      |      root << build_element('title2', data[:title2]) if data.key? :title2
       |
       |      root
       |    end

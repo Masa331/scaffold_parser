@@ -12,18 +12,18 @@ RSpec.describe ScaffoldParser do
       |      include BaseParser
       |
       |      def name
-      |        at :name
+      |        at 'name'
       |      end
       |
       |      def customer
-      |        submodel_at(CustomerType, :customer)
+      |        submodel_at(CustomerType, 'customer')
       |      end
       |
-      |      def to_h
-      |        hash = {}
+      |      def to_h_with_attrs
+      |        hash = HashWithAttributes.new({}, attributes)
       |
-      |        hash[:name] = name if raw.key? :name
-      |        hash[:customer] = customer.to_h if raw.key? :customer
+      |        hash[:name] = name if has? 'name'
+      |        hash[:customer] = customer.to_h_with_attrs if has? 'customer'
       |
       |        hash
       |      end
@@ -45,16 +45,15 @@ RSpec.describe ScaffoldParser do
       |      include BaseBuilder
       |
       |      def builder
-      |        root = Ox::Element.new(element_name)
-      |
-      |        if attributes.key? :name
-      |          element = Ox::Element.new('name')
-      |          element << attributes[:name] if attributes[:name]
-      |          root << element
+      |        root = Ox::Element.new(name)
+      |        if data.respond_to? :attributes
+      |          data.attributes.each { |k, v| root[k] = v }
       |        end
       |
-      |        if attributes.key? :customer
-      |          root << CustomerType.new(attributes[:customer], 'customer').builder
+      |        root << build_element('name', data[:name]) if data.key? :name
+      |
+      |        if data.key? :customer
+      |          root << CustomerType.new('customer', data[:customer]).builder
       |        end
       |
       |        root

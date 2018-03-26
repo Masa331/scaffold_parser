@@ -13,23 +13,23 @@ RSpec.describe 'complex types' do
       |    include BaseParser
       |
       |    def currency
-      |      submodel_at(Currency, :currency)
+      |      submodel_at(Currency, 'currency')
       |    end
       |
       |    def customer
-      |      submodel_at(CustomerType, :customer)
+      |      submodel_at(CustomerType, 'customer')
       |    end
       |
       |    def customer2
-      |      submodel_at(CustomerType, :customer2)
+      |      submodel_at(CustomerType, 'customer2')
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:currency] = currency.to_h if raw.key? :currency
-      |      hash[:customer] = customer.to_h if raw.key? :customer
-      |      hash[:customer2] = customer2.to_h if raw.key? :customer2
+      |      hash[:currency] = currency.to_h_with_attrs if has? 'currency'
+      |      hash[:customer] = customer.to_h_with_attrs if has? 'customer'
+      |      hash[:customer2] = customer2.to_h_with_attrs if has? 'customer2'
       |
       |      hash
       |    end
@@ -45,13 +45,13 @@ RSpec.describe 'complex types' do
       |    include BaseParser
       |
       |    def currency_id
-      |      at :currencyId
+      |      at 'currencyId'
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:currency_id] = currency_id if raw.key? :currencyId
+      |      hash[:currency_id] = currency_id if has? 'currencyId'
       |
       |      hash
       |    end
@@ -67,13 +67,13 @@ RSpec.describe 'complex types' do
       |    include BaseParser
       |
       |    def name
-      |      at :name
+      |      at 'name'
       |    end
       |
-      |    def to_h
-      |      hash = {}
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:name] = name if raw.key? :name
+      |      hash[:name] = name if has? 'name'
       |
       |      hash
       |    end
@@ -95,18 +95,21 @@ RSpec.describe 'complex types' do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :currency
-      |        root << Currency.new(attributes[:currency], 'currency').builder
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
       |
-      |      if attributes.key? :customer
-      |        root << CustomerType.new(attributes[:customer], 'customer').builder
+      |      if data.key? :currency
+      |        root << Currency.new('currency', data[:currency]).builder
       |      end
       |
-      |      if attributes.key? :customer2
-      |        root << CustomerType.new(attributes[:customer2], 'customer2').builder
+      |      if data.key? :customer
+      |        root << CustomerType.new('customer', data[:customer]).builder
+      |      end
+      |
+      |      if data.key? :customer2
+      |        root << CustomerType.new('customer2', data[:customer2]).builder
       |      end
       |
       |      root
@@ -123,13 +126,12 @@ RSpec.describe 'complex types' do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :currency_id
-      |        element = Ox::Element.new('currencyId')
-      |        element << attributes[:currency_id] if attributes[:currency_id]
-      |        root << element
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
+      |
+      |      root << build_element('currencyId', data[:currency_id]) if data.key? :currency_id
       |
       |      root
       |    end
@@ -145,13 +147,12 @@ RSpec.describe 'complex types' do
       |    include BaseBuilder
       |
       |    def builder
-      |      root = Ox::Element.new(element_name)
-      |
-      |      if attributes.key? :name
-      |        element = Ox::Element.new('name')
-      |        element << attributes[:name] if attributes[:name]
-      |        root << element
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
       |      end
+      |
+      |      root << build_element('name', data[:name]) if data.key? :name
       |
       |      root
       |    end
