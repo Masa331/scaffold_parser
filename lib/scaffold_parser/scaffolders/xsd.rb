@@ -14,14 +14,11 @@ module ScaffoldParser
       end
 
       def call
-        puts "Starting collectiong elements to scaffold" if @options[:verbose]
+        elements = collect_elements(@doc)
 
-        unscaffolded_elements = collect_unscaffolded_subelements(@doc) + @doc.submodel_nodes
-
-        puts "Collected #{unscaffolded_elements.size} elements to scaffold" if @options[:verbose]
-
-        code = unscaffolded_elements.flat_map do |element|
-          [Parser.call(element.definition, @options), Builder.call(element.definition, @options)]
+        code = elements.each do |element|
+          code.push Parser.call(element, @options)
+          code.push Builder.call(element, @options)
         end
 
         code.push ['parsers/base_parser.rb', base_parser_template]
@@ -30,22 +27,8 @@ module ScaffoldParser
 
       private
 
-      def collect_unscaffolded_subelements(node, collected = [])
-        subelements = node.definition.submodel_nodes.to_a + node.definition.array_nodes.map(&:list_element)
-          .reject(&:xs_type?)
-          .reject { |node| collected.include?(node.to_class_name) }
-
-        subelements.each do |element|
-          if collected.none? { |c| c.to_class_name == element.to_class_name }
-            collected << element
-
-            puts "Collected #{element.to_name} element" if @options[:verbose]
-
-            collect_unscaffolded_subelements(element, collected)
-          end
-        end
-
-        collected
+      def collect_elements(doc)
+        doc.children
       end
 
       def base_parser_template

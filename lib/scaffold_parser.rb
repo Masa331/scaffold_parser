@@ -1,11 +1,9 @@
-require 'nokogiri'
+require 'xsd_model'
+
 require 'active_support/all'
-require 'scaffold_parser/nokogiri_patches'
 require 'scaffold_parser/file_patches'
 require 'scaffold_parser/scaffolders/xsd'
 
-Nokogiri::XML::Element.include ScaffoldParser::NokogiriPatches::Element
-Nokogiri::XML::Document.include ScaffoldParser::NokogiriPatches::Document
 StringIO.include ScaffoldParser::FilePatches
 
 module ScaffoldParser
@@ -35,7 +33,11 @@ module ScaffoldParser
   end
 
   def self.scaffold_to_string(path, options = {})
-    doc = Nokogiri::XML(File.open(path))
+    # doc = XsdModel.parse(File.read(path))
+    options = { collect_only: [:complex_type, :schema, :document, :element],
+                skip_through: [:sequence, :schema] }
+    doc = XsdModel.parse(File.read(path), options)
+    # require 'pry'; binding.pry
 
     Scaffolders::XSD.call(doc, options)
   end
