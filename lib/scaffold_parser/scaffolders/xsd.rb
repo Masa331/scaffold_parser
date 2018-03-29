@@ -1,139 +1,288 @@
 require 'scaffold_parser/scaffolders/xsd/parser'
-require 'scaffold_parser/scaffolders/xsd/builder'
+require 'scaffold_parser/scaffolders/xsd/parser/templates/utils'
 
 module ScaffoldParser
   module Scaffolders
     class XSD
-      def self.call(doc, options)
-        self.new(doc, options).call
+      include Parser::Templates::Utils
+
+      def self.call(doc, options, parse_options = {})
+        self.new(doc, options, parse_options).call
       end
 
-      def initialize(doc, options)
+      def initialize(doc, options, parse_options = {})
         @doc = doc
         @options = options
+        @parse_options = parse_options
       end
 
       def call
-        puts "Starting collectiong elements to scaffold" if @options[:verbose]
+        all = [@doc.schema] + @doc.schema.collect_included_schemas(@parse_options) + @doc.schema.collect_imported_schemas(@parse_options)
 
-        unscaffolded_elements = collect_unscaffolded_subelements(@doc) + @doc.submodel_nodes
+        all_classes = Parser.call(all, @options)
 
-        puts "Collected #{unscaffolded_elements.size} elements to scaffold" if @options[:verbose]
-
-        code = unscaffolded_elements.flat_map do |element|
-          [Parser.call(element.definition, @options), Builder.call(element.definition, @options)]
+        simple_types, classes = all_classes.partition do |klass|
+          klass.is_a? Parser::Templates::SimpleTypeKlass
         end
 
-        code.push ['parsers/base_parser.rb', base_parser_template]
-        code.push ['builders/base_builder.rb', base_builder_template]
+        #TODO: get rid of this. SimpleType elements handling
+        classes.each do |klass|
+          klass.methods = klass.methods.map do |meth|
+            if meth.is_a?(Parser::Templates::SubmodelMethod) && simple_types.map(&:name).include?(meth.submodel_class)
+              meth.to_at_method
+            else
+              meth
+            end
+          end
+        end
+
+        classes.each do |klass|
+          klass.namespace = @options.fetch(:namespace, nil)
+        end
+
+        same_classes = classes.group_by(&:name).select { |k, v| v.size > 1}
+        if same_classes.any?
+          fail 'multiple classes with same name'
+        end
+
+        classes.flat_map do |class_template|
+          [["parsers/#{class_template.name.underscore}.rb", class_template.to_s],
+           ["builders/#{class_template.name.underscore}.rb", class_template.to_builder_s],
+           ["parsers/base_parser.rb", base_parser_template],
+           ["builders/base_builder.rb", base_builder_template],
+           ["requires.rb", create_requires_template(classes)],
+           ["hash_with_attrs.rb", hash_with_attrs_template],
+           ["mega.rb", mega_template]
+          ]
+        end
       end
 
       private
 
-      def collect_unscaffolded_subelements(node, collected = [])
-        subelements = node.definition.submodel_nodes.to_a + node.definition.array_nodes.map(&:list_element)
-          .reject(&:xs_type?)
-          .reject { |node| collected.include?(node.to_class_name) }
-
-        subelements.each do |element|
-          if collected.none? { |c| c.to_class_name == element.to_class_name }
-            collected << element
-
-            puts "Collected #{element.to_name} element" if @options[:verbose]
-
-            collect_unscaffolded_subelements(element, collected)
-          end
-        end
-
-        collected
-      end
-
       def base_parser_template
-        <<~TEMPLATE
-          module Parsers
-            module BaseParser
-              EMPTY_ARRAY = []
+        template =
+          <<~TEMPLATE
+            module Parsers
+              module BaseParser
+                include Mega
+                EMPTY_ARRAY = []
 
-              attr_accessor :raw
+                attr_accessor :raw
 
-              def initialize(raw)
-                @raw = raw
-              end
-
-              def attributes
-                raw.attributes
-              end
-
-              private
-
-              def at(locator)
-                return nil if raw.nil?
-
-                element = raw.locate(locator.to_s).first
-
-                if element
-                  StringWithAttributes.new(element.text, element.attributes)
+                def initialize(raw)
+                  @raw = raw
                 end
-              end
 
-              def has?(locator)
-                raw.locate(locator).any?
-              end
+                def attributes
+                  raw.attributes
+                end
 
-              def submodel_at(klass, locator)
-                element_xml = raw.locate(locator).first
+                private
 
-                klass.new(element_xml) if element_xml
-              end
+                def at(locator)
+                  return nil if raw.nil?
 
-              def array_of_at(klass, locator)
-                return EMPTY_ARRAY if raw.nil?
+                  element = raw.locate(locator.to_s).first
 
-                elements = raw.locate([*locator].join('/'))
+                  if element
+                    StringWithAttributes.new(element.text, element.attributes)
+                  end
+                end
 
-                elements.map do |element|
-                  klass.new(element)
+                def has?(locator)
+                  raw.locate(locator).any?
+                end
+
+                def submodel_at(klass, locator)
+                  element_xml = raw.locate(locator).first
+
+                  klass.new(element_xml) if element_xml
+                end
+
+                def array_of_at(klass, locator)
+                  return EMPTY_ARRAY if raw.nil?
+
+                  elements = raw.locate([*locator].join('/'))
+
+                  elements.map do |element|
+                    klass.new(element)
+                  end
+                end
+
+                def to_h_with_attrs
+                  hash = HashWithAttributes.new({}, attributes)
+
+                  hash
                 end
               end
             end
-          end
-        TEMPLATE
+          TEMPLATE
+
+        if @options.fetch(:namespace, nil)
+          wrap_in_namespace(template, @options[:namespace])
+        else
+          template
+        end
       end
 
       def base_builder_template
-        <<~TEMPLATE
-          module Builders
-            module BaseBuilder
-              attr_accessor :name, :data
+        template =
+          <<~TEMPLATE
+            module Builders
+              module BaseBuilder
+                attr_accessor :name, :data, :options
 
-              def initialize(name, data = {})
-                @name = name
-                @data = data || {}
-              end
-
-              def to_xml
-                doc = Ox::Document.new(version: '1.0')
-                doc << builder
-
-                Ox.dump(doc, with_xml: true)
-              end
-
-              def build_element(name, content)
-                element = Ox::Element.new(name)
-                if content.respond_to? :attributes
-                  content.attributes.each { |k, v| element[k] = v }
+                def initialize(name, data = {}, options = {})
+                  @name = name
+                  @data = data || {}
+                  @options = options || {}
                 end
 
-                if content.respond_to? :value
-                  element << content.value if content.value
-                else
-                  element << content if content
+                def to_xml
+                  encoding = options[:encoding]
+
+                  doc_options = { version: '1.0' }
+                  doc_options[:encoding] = encoding if encoding
+                  doc = Ox::Document.new(doc_options)
+                  doc << builder
+
+                  dump_options = { with_xml: true }
+                  dump_options[:encoding] = encoding if encoding
+                  Ox.dump(doc, dump_options)
                 end
-                element
+
+                def build_element(name, content)
+                  element = Ox::Element.new(name)
+                  if content.respond_to? :attributes
+                    content.attributes.each { |k, v| element[k] = v }
+                  end
+
+                  if content.respond_to? :value
+                    element << content.value if content.value
+                  else
+                    element << content if content
+                  end
+                  element
+                end
               end
             end
-          end
-        TEMPLATE
+          TEMPLATE
+
+        if @options.fetch(:namespace, nil)
+          wrap_in_namespace(template, @options[:namespace])
+        else
+          template
+        end
+      end
+
+      def hash_with_attrs_template
+        template =
+          <<~TEMPLATE
+            class HashWithAttributes
+              def initialize(hash, attributes = nil)
+                @hash = hash
+                @attributes = attributes if attributes
+              end
+
+              def value
+                @hash
+              end
+
+              def attributes
+                @attributes ||= {}
+              end
+
+              def attributes=(attributes)
+                @attributes = attributes
+              end
+
+              def ==(other)
+                if other.respond_to?(:value) && other.respond_to?(:attributes)
+                  value == other.value && other.attributes == attributes
+                else
+                  value == other
+                end
+              end
+
+              def merge(other)
+                merged_hash = value.merge other.value
+                merged_attrs = attributes.merge other.attributes
+
+                self.class.new(merged_hash, merged_attrs)
+              end
+
+              def key?(key)
+                value.key? key
+              end
+
+              def [](key)
+                value[key]
+              end
+
+              def []=(key, key_value)
+                value[key] = key_value
+              end
+
+              def dig(*attrs)
+                value.dig(*attrs)
+              end
+            end
+          TEMPLATE
+
+        if @options.fetch(:namespace, nil)
+          wrap_in_namespace(template, @options[:namespace])
+        else
+          template
+        end
+      end
+
+      def mega_template
+        template =
+          <<~TEMPLATE
+            module Mega
+              def mega
+                called_from = caller_locations[0].label
+                included_modules = (self.class.included_modules - Class.included_modules - [Mega])
+                included_modules.map { |m| m.instance_method(called_from).bind(self).call }
+              end
+            end
+          TEMPLATE
+
+        if @options.fetch(:namespace, nil)
+          wrap_in_namespace(template, @options[:namespace])
+        else
+          template
+        end
+      end
+
+      def create_requires_template(classes)
+        modules = classes.select { |cl| cl.is_a? Parser::Templates::Module }
+        classes = classes.reject { |cl| cl.is_a? Parser::Templates::Module }
+        with_inheritance, others = classes.partition { |klass| klass.inherit_from }
+
+        requires = []
+        modules.each do |klass|
+          requires << "parsers/#{klass.name.underscore}"
+          requires << "builders/#{klass.name.underscore}"
+        end
+        others.each do |klass|
+          requires << "parsers/#{klass.name.underscore}"
+          requires << "builders/#{klass.name.underscore}"
+        end
+        with_inheritance.each do |klass|
+          requires << "parsers/#{klass.name.underscore}"
+          requires << "builders/#{klass.name.underscore}"
+        end
+        requires.unshift('parsers/base_parser')
+        requires.unshift('builders/base_builder')
+
+        if @options[:namespace]
+          requires = requires.map { |r| r.prepend("#{@options[:namespace].underscore}/") }
+        end
+
+        requires = requires.map { |r| "require '#{r}'" }
+
+        requires.join("\n")
       end
     end
   end

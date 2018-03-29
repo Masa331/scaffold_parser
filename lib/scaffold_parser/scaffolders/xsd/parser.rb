@@ -1,122 +1,85 @@
+require 'scaffold_parser/scaffolders/xsd/parser/stack'
+
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/base'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/blank'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/choice'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/complex_content'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/complex_type'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/element'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/elements'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/extension'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/max_length'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/restriction'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/schema'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/sequence'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/simple_content'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/simple_type'
+
+require 'scaffold_parser/scaffolders/xsd/parser/templates/all'
+
 module ScaffoldParser
   module Scaffolders
     class XSD
       class Parser
-        attr_reader :node
 
-        def self.call(node, options)
-          self.new(node, options).call
+        attr_reader :xsds
+
+        def self.call(xsds, options)
+          self.new(xsds, options).call
         end
 
-        def initialize(node, options)
-          @node = node
+        def initialize(xsds, options)
+          @xsds = xsds
           @options = options
         end
 
+        STACK = Stack.instance
+
         def call
-          puts "Scaffolding parser for #{node.to_name}" if @options[:verbose]
+          STACK.clear
 
-          f = StringIO.new
-          f.indent = true if @options[:namespace]
+          classes =
+            xsds.map do |xsd|
+              if @options[:verbose]
+                puts "\n\nScaffolding schema which defines:"
+                puts "#{xsd.children.map { |c| c.name }.compact}"
+                puts
+              end
 
-          f.puts "require '#{namespaced('parsers/base_parser')}'"
-          node.submodel_nodes.map { |n| namespaced(n.to_class_name.underscore.prepend('parsers/')) }.uniq.each { |n| f.puts "require '#{n}'" }
-          node.array_nodes.reject { |l| l.list_element.xs_type? }.each { |n| f.puts "require '#{namespaced(n.list_element.to_class_name.underscore.prepend('parsers/'))}'" }
-          f.puts
+              xsd.reverse_traverse do |element, children_result|
+                handler =
+                  if children_result.empty?
+                    Handlers::Blank.new
+                  elsif children_result.one?
+                    children_result.first
+                  else
+                    #TODO: refactor. This is because of possible sequence inside of sequence
+                    children = children_result.map do |child|
+                      if child.is_a? Handlers::Elements
+                        child.elements
+                      else
+                        child
+                      end
+                    end.flatten
 
-          f.puts "module #{@options[:namespace]}" if @options[:namespace]
-          f.putsi "module Parsers"
-          f.putsi "  class #{node.to_class_name}"
-          f.putsi "    include BaseParser"
+                    #TODO: refactor. This shouldn't happen in fact. This is here only because of simple types right now
+                    children.reject! { |child| child.is_a? Handlers::Blank }
 
-          node.value_nodes.each do |method|
-            f.puts
 
-            method_name = method.to_name.underscore
-            at = method.to_name
+                    Handlers::Elements.new(children)
+                  end
 
-            f.putsi "    def #{method_name}"
-            f.putsi "      at '#{at}'"
-            f.putsi "    end"
-          end
+                if @options[:verbose]
+                  current_handler = handler.class.to_s.demodulize
+                  childrens = children_result.map { |child| child.class.to_s.demodulize }
+                  puts "#{current_handler}##{element.element_name} with #{element.attributes}, childrens are #{childrens}"
+                end
 
-          node.submodel_nodes.each do |method|
-            f.puts
-
-            klass = method.to_class_name
-            method_name = method.to_name.underscore
-            at = method.to_name
-
-            f.putsi "    def #{method_name}"
-            f.putsi "      submodel_at(#{klass}, '#{at}')"
-            f.putsi "    end"
-          end
-
-          node.array_nodes.reject { |l| l.list_element.xs_type? }.each do |method|
-            f.puts
-
-            list_element_klass = method.list_element_klass
-            method_name = method.to_name.underscore
-            list_element_at = method.list_element_at.map { |e| "'#{e}'" }.join(', ')
-
-            f.putsi "    def #{method_name}"
-            f.putsi "      array_of_at(#{list_element_klass}, [#{list_element_at}])"
-            f.putsi "    end"
-          end
-
-          node.array_nodes.select { |l| l.list_element.xs_type? }.each do |method|
-            f.puts
-
-            list_element_klass = method.list_element_klass
-            method_name = method.to_name.underscore
-            list_element_at = method.list_element_at.map { |e| "'#{e}'" }.join(', ')
-
-            f.putsi "    def #{method_name}"
-            f.putsi "      array_of_at(String, [#{list_element_at}])"
-            f.putsi "    end"
-          end
-
-          ### to_h method
-          lines = []
-          node.value_nodes.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore} if has? '#{node.to_name}'"
-          end
-
-          node.submodel_nodes.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.to_h_with_attrs if has? '#{node.to_name}'"
-          end
-          node.array_nodes.reject { |l| l.list_element.xs_type? }.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.map(&:to_h_with_attrs) if has? '#{node.to_name}'"
-          end
-          node.array_nodes.select { |l| l.list_element.xs_type? }.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore} if has? '#{node.to_name}'"
-          end
-          if lines.any?
-            f.puts
-
-            f.putsi "    def to_h_with_attrs"
-            f.putsi "      hash = HashWithAttributes.new({}, attributes)"
-            f.puts
-
-            lines.each do |line|
-              f.putsi "      #{line}"
+                handler.send(element.element_name, element)
+              end
             end
-            f.puts
 
-            f.putsi "      hash"
-            f.putsi "    end"
-          end
-          f.putsi "  end"
-          f.putsi "end"
-          f.puts "end" if @options[:namespace]
-
-          ["parsers/#{node.to_class_name.underscore}.rb", f.string.strip]
-        end
-
-        private
-
-        def namespaced(path)
-          [@options[:namespace]&.underscore, path].compact.join('/')
+          classes = STACK.to_a
         end
       end
     end

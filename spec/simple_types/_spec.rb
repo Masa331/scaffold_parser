@@ -1,10 +1,8 @@
 RSpec.describe 'simple types' do
-  it 'parser scaffolder output matches template' do
-    parser_code = parser_for('./spec/simple_types/schema.xsd', 'parsers/order.rb')
+  let(:scaffolds) { scaffold_schema('./spec/simple_types/schema.xsd') }
 
-    expect(parser_code).to eq_multiline(%{
-      |require 'parsers/base_parser'
-      |
+  it 'scaffolds parser for type including only basic elements' do
+    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Parsers
       |  class Order
       |    include BaseParser
@@ -34,12 +32,8 @@ RSpec.describe 'simple types' do
       |end })
   end
 
-  it 'builder scaffolder output matches template' do
-    builder_code = builder_for('./spec/simple_types/schema.xsd', 'builders/order.rb')
-
-    expect(builder_code).to eq_multiline(%{
-      |require 'builders/base_builder'
-      |
+  it 'scaffolds builder for type including only basic elements' do
+    expect(scaffolds['builders/order.rb']).to eq_multiline(%{
       |module Builders
       |  class Order
       |    include BaseBuilder

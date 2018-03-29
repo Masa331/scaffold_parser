@@ -1,10 +1,8 @@
 RSpec.describe 'choices' do
-  it 'parser scaffolder matches template' do
-    parser_code = parser_for('./spec/choices/schema.xsd', 'parsers/order.rb')
+  let(:scaffolds) { scaffold_schema('./spec/choices/schema.xsd') }
 
-    expect(parser_code).to eq_multiline(%{
-      |require 'parsers/base_parser'
-      |
+  it 'scaffolds parser for type which includes choice' do
+    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Parsers
       |  class Order
       |    include BaseParser
@@ -29,12 +27,8 @@ RSpec.describe 'choices' do
       |end })
   end
 
-  it 'builder scaffolder matches template' do
-    builder_code = builder_for('./spec/choices/schema.xsd', 'builders/order.rb')
-
-    expect(builder_code).to eq_multiline(%{
-      |require 'builders/base_builder'
-      |
+  it 'scaffolds builder for type which includes choice' do
+    expect(scaffolds['builders/order.rb']).to eq_multiline(%{
       |module Builders
       |  class Order
       |    include BaseBuilder

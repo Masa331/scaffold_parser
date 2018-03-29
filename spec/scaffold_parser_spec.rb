@@ -1,11 +1,8 @@
 RSpec.describe ScaffoldParser do
-  it 'outputs class in module if given' do
-    parser_code = parser_for('./order.xsd', 'parsers/order.rb', namespace: 'Something')
+  let(:scaffolds) { scaffold_schema('./order.xsd', namespace: 'Something') }
 
-    expect(parser_code).to eq_multiline(%{
-      |require 'something/parsers/base_parser'
-      |require 'something/parsers/customer_type'
-      |
+  it 'scaffolds parser with given namespace' do
+    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Something
       |  module Parsers
       |    class Order
@@ -32,13 +29,8 @@ RSpec.describe ScaffoldParser do
       |end })
   end
 
-  it 'builder scaffolder matches template' do
-    builder_code = builder_for('./order.xsd', 'builders/order.rb', namespace: 'Something')
-
-    expect(builder_code).to eq_multiline(%{
-      |require 'something/builders/base_builder'
-      |require 'something/builders/customer_type'
-      |
+  it 'scaffolds builder with given namespace' do
+    expect(scaffolds['builders/order.rb']).to eq_multiline(%{
       |module Something
       |  module Builders
       |    class Order
@@ -51,7 +43,6 @@ RSpec.describe ScaffoldParser do
       |        end
       |
       |        root << build_element('name', data[:name]) if data.key? :name
-      |
       |        if data.key? :customer
       |          root << CustomerType.new('customer', data[:customer]).builder
       |        end

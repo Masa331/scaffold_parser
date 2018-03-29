@@ -4,7 +4,8 @@ require 'saharspec'
 
 module Helpers
   def scaffold_schema(schema_path, options = {})
-    Hash[ScaffoldParser.scaffold_to_string(schema_path, options)]
+    schema = File.read(schema_path)
+    Hash[ScaffoldParser.scaffold_to_string(schema, options)]
   end
 
   def parser_for(schema_path, parser_name, options = {})
@@ -15,6 +16,7 @@ end
 
 RSpec.configure do |config|
   config.include Helpers
+  config.include Saharspec::Util
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = '.rspec_status'
 
