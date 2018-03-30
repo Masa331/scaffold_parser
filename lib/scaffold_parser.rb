@@ -1,10 +1,13 @@
 require 'xsd_model'
 
 require 'active_support/all'
-require 'scaffold_parser/file_patches'
-require 'scaffold_parser/scaffolders/xsd'
 
-StringIO.include ScaffoldParser::FilePatches
+require 'scaffold_parser/template_utils'
+require 'scaffold_parser/class_template'
+require 'scaffold_parser/method_template'
+require 'scaffold_parser/method_factory'
+
+require 'scaffold_parser/scaffolders/xsd'
 
 module ScaffoldParser
   def self.scaffold(path, options = {})
@@ -33,11 +36,9 @@ module ScaffoldParser
   end
 
   def self.scaffold_to_string(path, options = {})
-    # doc = XsdModel.parse(File.read(path))
-    options = { collect_only: [:complex_type, :schema, :document, :element],
-                skip_through: [:sequence, :schema] }
-    doc = XsdModel.parse(File.read(path), options)
-    # require 'pry'; binding.pry
+    collect_only = -> (e) { ['schema', 'document', 'element', 'extension', 'complexType'].include?(e.name) }
+    ignore = -> (e) { e.name == 'complexType' && e['name'].nil? }
+    doc = XsdModel.parse(File.read(path), { collect_only: collect_only, ignore: ignore })
 
     Scaffolders::XSD.call(doc, options)
   end

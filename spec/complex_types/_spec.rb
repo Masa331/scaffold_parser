@@ -5,8 +5,6 @@ RSpec.describe 'complex types' do
     order_parser = codes['parsers/order.rb']
     expect(order_parser).to eq_multiline(%{
       |require 'parsers/base_parser'
-      |require 'parsers/currency'
-      |require 'parsers/customer_type'
       |
       |module Parsers
       |  class Order
@@ -87,8 +85,6 @@ RSpec.describe 'complex types' do
     order_builder = codes['builders/order.rb']
     expect(order_builder).to eq_multiline(%{
       |require 'builders/base_builder'
-      |require 'builders/currency'
-      |require 'builders/customer_type'
       |
       |module Builders
       |  class Order

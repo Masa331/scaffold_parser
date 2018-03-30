@@ -16,9 +16,23 @@ module ScaffoldParser
       def call
         elements = collect_elements(@doc)
 
-        code = elements.each do |element|
-          code.push Parser.call(element, @options)
-          code.push Builder.call(element, @options)
+        code = []
+
+        elements.each do |element|
+          if element.is_a? XsdModel::Elements::ComplexType
+            name = element.name.camelize
+            node = element
+            extension = nil
+            options = @options
+          elsif element.is_a? XsdModel::Elements::Element
+            name = element.name.camelize
+            node = element
+            extension = nil
+            options = @options
+          end
+
+          code.push Parser.call(name, node, extension, options)
+          # code.push Builder.call(element, @options)
         end
 
         code.push ['parsers/base_parser.rb', base_parser_template]
@@ -28,7 +42,10 @@ module ScaffoldParser
       private
 
       def collect_elements(doc)
-        doc.children
+        doc.traverse.select do |child|
+          (child.is_a?(XsdModel::Elements::ComplexType) && child.name) ||
+            (child.is_a?(XsdModel::Elements::Element) && child.children.last.is_a?(XsdModel::Elements::Element))
+        end
       end
 
       def base_parser_template

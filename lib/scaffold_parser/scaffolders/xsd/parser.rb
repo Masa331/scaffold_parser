@@ -1,122 +1,126 @@
+module XsdModel
+  module Elements
+    module BaseElement
+      XSD_URI = 'http://www.w3.org/2001/XMLSchema'
+
+      def xsd_prefix
+        namespaces.invert[XSD_URI].gsub('xmlns:', '')
+      end
+    end
+
+    class ComplexType
+      def name
+        attributes['name']&.value
+      end
+
+      def elements
+        children.select { |child| child.is_a? Elements::Element }
+      end
+    end
+
+    class Element
+      def type
+        attributes['type']&.value
+      end
+
+      def name
+        attributes['name'].value
+      end
+
+      def max_occurs
+        value = attributes['maxOccurs']&.value
+
+        # if value
+        #   attr.value.to_i
+        # else
+        case value
+        when 'unbounded'
+          then Float::INFINITY
+        when String
+          then value.to_i
+        when nil
+          then 1
+        end
+      end
+
+      def multiple?
+        max_occurs > 1
+      end
+
+      def basic_xsd_type?
+        type && type.start_with?("#{xsd_prefix}:")
+      end
+
+      def custom_type?
+        type && !type.start_with?("#{xsd_prefix}:")
+      end
+
+      # TODO: tohle nedavat do xsd_modelu ale nechat tady
+      # def anonymous_type?
+      #   # type.nil? && children.last.is_a?(Elements::ComplexType)
+      #   type.nil? && children.any?
+      # end
+      # TODO: tohle nedavat do xsd_modelu ale nechat tady
+      def end_node?
+        (type.nil? || basic_xsd_type?) && children.empty?
+      end
+      # TODO: tohle nedavat do xsd_modelu ale nechat tady
+      def submodel_node?
+        custom_type?
+      end
+      # TODO: tohle nedavat do xsd_modelu ale nechat tady
+      def elements
+        children.select { |child| child.is_a? Elements::Element }
+      end
+    end
+  end
+end
+
 module ScaffoldParser
   module Scaffolders
     class XSD
       class Parser
-        attr_reader :node
+        attr_reader :name, :node, :extension, :options
 
-        def self.call(node, options)
-          self.new(node, options).call
+        def self.call(name, node, extension, options)
+          self.new(name, node, extension, options).call
         end
 
-        def initialize(node, options)
+        def initialize(name, node, extension, options)
+          @name = name
           @node = node
+          @extension = extension
           @options = options
         end
 
         def call
-          puts "Scaffolding parser for #{node.to_name}" if @options[:verbose]
+          template = ClassTemplate.new(name) do |template|
+            template.requires = ['parsers/base_parser']
 
-          f = StringIO.new
-          f.indent = true if @options[:namespace]
+            methods = node.elements.map { |element| MethodFactory.call(element) }
 
-          f.puts "require '#{namespaced('parsers/base_parser')}'"
-          node.submodel_nodes.map { |n| namespaced(n.to_class_name.underscore.prepend('parsers/')) }.uniq.each { |n| f.puts "require '#{n}'" }
-          node.array_nodes.reject { |l| l.list_element.xs_type? }.each { |n| f.puts "require '#{namespaced(n.list_element.to_class_name.underscore.prepend('parsers/'))}'" }
-          f.puts
+            methods << MethodTemplate.new('to_h_with_attrs') do |template|
+              body = "hash = HashWithAttributes.new({}, attributes)\n\n"
 
-          f.puts "module #{@options[:namespace]}" if @options[:namespace]
-          f.putsi "module Parsers"
-          f.putsi "  class #{node.to_class_name}"
-          f.putsi "    include BaseParser"
+              node.elements.each do |element|
+                if element.end_node?
+                  body << "hash[:#{element.name.underscore}] = #{element.name.underscore} if has? '#{element.name}'"
+                elsif element.submodel_node?
+                  body << "hash[:#{element.name.underscore}] = #{element.name.underscore}.to_h_with_attrs if has? '#{element.name}'"
+                end
+                body << "\n"
+              end
 
-          node.value_nodes.each do |method|
-            f.puts
+              body << "\n"
+              body << 'hash'
 
-            method_name = method.to_name.underscore
-            at = method.to_name
+              template.body = body
+            end.to_s
 
-            f.putsi "    def #{method_name}"
-            f.putsi "      at '#{at}'"
-            f.putsi "    end"
-          end
+            template.methods = methods
+          end.to_s
 
-          node.submodel_nodes.each do |method|
-            f.puts
-
-            klass = method.to_class_name
-            method_name = method.to_name.underscore
-            at = method.to_name
-
-            f.putsi "    def #{method_name}"
-            f.putsi "      submodel_at(#{klass}, '#{at}')"
-            f.putsi "    end"
-          end
-
-          node.array_nodes.reject { |l| l.list_element.xs_type? }.each do |method|
-            f.puts
-
-            list_element_klass = method.list_element_klass
-            method_name = method.to_name.underscore
-            list_element_at = method.list_element_at.map { |e| "'#{e}'" }.join(', ')
-
-            f.putsi "    def #{method_name}"
-            f.putsi "      array_of_at(#{list_element_klass}, [#{list_element_at}])"
-            f.putsi "    end"
-          end
-
-          node.array_nodes.select { |l| l.list_element.xs_type? }.each do |method|
-            f.puts
-
-            list_element_klass = method.list_element_klass
-            method_name = method.to_name.underscore
-            list_element_at = method.list_element_at.map { |e| "'#{e}'" }.join(', ')
-
-            f.putsi "    def #{method_name}"
-            f.putsi "      array_of_at(String, [#{list_element_at}])"
-            f.putsi "    end"
-          end
-
-          ### to_h method
-          lines = []
-          node.value_nodes.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore} if has? '#{node.to_name}'"
-          end
-
-          node.submodel_nodes.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.to_h_with_attrs if has? '#{node.to_name}'"
-          end
-          node.array_nodes.reject { |l| l.list_element.xs_type? }.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore}.map(&:to_h_with_attrs) if has? '#{node.to_name}'"
-          end
-          node.array_nodes.select { |l| l.list_element.xs_type? }.each do |node|
-            lines << "hash[:#{node.to_name.underscore}] = #{node.to_name.underscore} if has? '#{node.to_name}'"
-          end
-          if lines.any?
-            f.puts
-
-            f.putsi "    def to_h_with_attrs"
-            f.putsi "      hash = HashWithAttributes.new({}, attributes)"
-            f.puts
-
-            lines.each do |line|
-              f.putsi "      #{line}"
-            end
-            f.puts
-
-            f.putsi "      hash"
-            f.putsi "    end"
-          end
-          f.putsi "  end"
-          f.putsi "end"
-          f.puts "end" if @options[:namespace]
-
-          ["parsers/#{node.to_class_name.underscore}.rb", f.string.strip]
-        end
-
-        private
-
-        def namespaced(path)
-          [@options[:namespace]&.underscore, path].compact.join('/')
+          ["parsers/#{name.underscore}.rb", template.to_s]
         end
       end
     end
