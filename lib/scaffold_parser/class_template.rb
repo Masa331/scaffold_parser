@@ -2,12 +2,11 @@ module ScaffoldParser
   class ClassTemplate
     include TemplateUtils
 
-    attr_accessor :name, :module, :methods, :requires
+    attr_accessor :name, :module, :methods, :inherit_from
 
     def initialize(name = nil)
       @name = name
       @methods = []
-      @requires = []
 
       yield self if block_given?
     end
@@ -19,26 +18,33 @@ module ScaffoldParser
       f.puts "  include BaseParser"
       f.puts
 
-      f.puts methods.map { |method| indent(method.lines).join  }.join("\n\n")
+      f.puts methods.map { |method| indent(method.to_s.lines).join  }.join("\n\n")
+      f.puts
+      f.puts "  def to_h_with_attrs"
+      f.puts "    hash = HashWithAttributes.new({}, attributes)"
+      f.puts
+      methods.each do |method|
+        if method.is_a? AtMethodTemplate
+          f.puts "    hash[:#{method.method_name}] = #{method.method_name} if has? '#{method.source.name}'"
+        elsif method.is_a? SubmodelMethodTemplate
+          f.puts "    hash[:#{method.method_name}] = #{method.method_name}.to_h_with_attrs if has? '#{method.source.name}'"
+        elsif method.is_a? ListMethodTemplate
+          f.puts "    hash[:#{method.method_name}] = #{method.method_name}.map(&:to_h_with_attrs) if has? '#{method.source.name}'"
+        elsif method.is_a? StringListMethodTemplate
+          f.puts "    hash[:#{method.method_name}] = #{method.method_name} if has? '#{method.source.name}'"
+        end
+      end
+      f.puts
+      f.puts "    hash"
+      f.puts "  end"
 
       f.puts "end"
 
       string = f.string.strip
 
       wrapped = wrap_in_module(string, 'Parsers')
-      with_requires = prepend_requires(wrapped, requires)
 
-      with_requires
-    end
-
-
-    def prepend_requires(string, requires)
-      lines = string.lines
-
-      require_strings = requires.map { |r| "require '#{r}'\n" }
-
-      result = require_strings + ["\n"] + lines
-      result.join
+      wrapped
     end
 
     def wrap_in_module(klass, module_name)

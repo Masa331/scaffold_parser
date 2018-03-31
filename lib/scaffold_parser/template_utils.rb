@@ -11,5 +11,9 @@ module ScaffoldParser
     def indent_string(string)
       string == "\n" ? string : string.prepend('  ')
     end
+
+    def single_quote(string)
+      string.to_s.gsub('"', '\'')
+    end
   end
 end

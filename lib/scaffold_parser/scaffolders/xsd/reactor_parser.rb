@@ -10,19 +10,6 @@ handlers.each do |h|
   require h
 end
 
-
-module XsdModel
-  module Elements
-    module BaseElement
-      XSD_URI = 'http://www.w3.org/2001/XMLSchema'
-
-      def xsd_prefix
-        namespaces.invert[XSD_URI].gsub('xmlns:', '')
-      end
-    end
-  end
-end
-
 module ScaffoldParser
   module Scaffolders
     class XSD
@@ -43,11 +30,11 @@ module ScaffoldParser
           after_children_hook = Proc.new { @current_handler = current_handler.complete }
 
           xsd.traverse(after_children_hook) do |child|
-            @current_handler = current_handler.send child.element_name
+            @current_handler = current_handler.handle child
           end
 
-          current_handler.complete.map do |class_template|
-            ['parsers/order.rb', class_template]
+          current_handler.products.map do |class_template|
+            ["parsers/#{class_template.name.underscore}.rb", class_template.to_s]
           end
         end
       end

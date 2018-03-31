@@ -6,12 +6,17 @@ module ScaffoldParser
           class Schema
             include Handlers::BaseHandler
 
-            def complex_type
-              ComplexType.new(self)
+            def complex_type(child)
+              ComplexType.new(self, child)
             end
 
-            def product
-              products
+            def push(product)
+              @products.push product
+              self
+            end
+
+            def complete
+              parent_handler.push products
             end
           end
         end

@@ -6,16 +6,16 @@ module ScaffoldParser
           class Document
             include Handlers::BaseHandler
 
-            def schema
+            def schema(_)
               Schema.new(self)
-            end
-
-            def product
-              products
             end
 
             def push(product)
               @products = product
+              self
+            end
+
+            def complete
               self
             end
           end

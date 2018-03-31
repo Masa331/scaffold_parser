@@ -4,7 +4,11 @@ require 'active_support/all'
 
 require 'scaffold_parser/template_utils'
 require 'scaffold_parser/class_template'
-require 'scaffold_parser/method_template'
+require 'scaffold_parser/base_method_template'
+require 'scaffold_parser/at_method_template'
+require 'scaffold_parser/submodel_method_template'
+require 'scaffold_parser/list_method_template'
+require 'scaffold_parser/string_list_method_template'
 require 'scaffold_parser/method_factory'
 
 require 'scaffold_parser/scaffolders/xsd'
@@ -20,6 +24,16 @@ module XsdModel
 
       def element_name
         self.class.name.demodulize.underscore
+      end
+    end
+
+    class Extension
+      def extending_basic_xsd_type?
+        base.start_with?("#{xsd_prefix}:")
+      end
+
+      def base
+        attributes['base'].value
       end
     end
 

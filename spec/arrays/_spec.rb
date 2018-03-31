@@ -4,8 +4,6 @@ RSpec.describe 'arrays' do
 
     order_parser = codes['parsers/order.rb']
     expect(order_parser).to eq_multiline(%{
-      |require 'parsers/base_parser'
-      |
       |module Parsers
       |  class Order
       |    include BaseParser
@@ -18,12 +16,12 @@ RSpec.describe 'arrays' do
       |      submodel_at(PaymentType, 'payments')
       |    end
       |
-      |    def messages
-      |      submodel_at(Messages, 'messages')
-      |    end
-      |
       |    def documents
       |      array_of_at(String, ['documents', 'document'])
+      |    end
+      |
+      |    def messages
+      |      submodel_at(Messages, 'messages')
       |    end
       |
       |    def id
@@ -33,123 +31,124 @@ RSpec.describe 'arrays' do
       |    def to_h_with_attrs
       |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:payments] = payments.to_h_with_attrs if has? 'payments'
-      |      hash[:messages] = messages.to_h_with_attrs if has? 'messages'
       |      hash[:items] = items.map(&:to_h_with_attrs) if has? 'items'
+      |      hash[:payments] = payments.to_h_with_attrs if has? 'payments'
       |      hash[:documents] = documents if has? 'documents'
+      |      hash[:messages] = messages.to_h_with_attrs if has? 'messages'
       |      hash[:id] = id if has? 'ID'
       |
       |      hash
       |    end
       |  end
       |end })
-
-    # payment_type_parser = codes['parsers/payment_type.rb']
-    # expect(payment_type_parser).to eq_multiline(%{
-    #   |require 'parsers/base_parser'
-    #   |require 'parsers/payment'
-    #   |
-    #   |module Parsers
-    #   |  class PaymentType
-    #   |    include BaseParser
-    #   |
-    #   |    def payments_list
-    #   |      array_of_at(Payment, ['payments_list', 'payment'])
-    #   |    end
-    #   |
-    #   |    def to_h_with_attrs
-    #   |      hash = HashWithAttributes.new({}, attributes)
-    #   |
-    #   |      hash[:payments_list] = payments_list.map(&:to_h_with_attrs) if has? 'payments_list'
-    #   |
-    #   |      hash
-    #   |    end
-    #   |  end
-    #   |end })
-    #
-    # payment_parser = codes['parsers/payment.rb']
-    # expect(payment_parser).to eq_multiline(%{
-    #   |require 'parsers/base_parser'
-    #   |
-    #   |module Parsers
-    #   |  class Payment
-    #   |    include BaseParser
-    #   |
-    #   |    def amount
-    #   |      at 'amount'
-    #   |    end
-    #   |
-    #   |    def to_h_with_attrs
-    #   |      hash = HashWithAttributes.new({}, attributes)
-    #   |
-    #   |      hash[:amount] = amount if has? 'amount'
-    #   |
-    #   |      hash
-    #   |    end
-    #   |  end
-    #   |end })
-    #
-    # messages_parser = codes['parsers/messages.rb']
-    # expect(messages_parser).to eq_multiline(%{
-    #   |require 'parsers/base_parser'
-    #   |require 'parsers/recipient_type'
-    #   |
-    #   |module Parsers
-    #   |  class Messages
-    #   |    include BaseParser
-    #   |
-    #   |    def recipient
-    #   |      array_of_at(RecipientType, ['recipient'])
-    #   |    end
-    #   |
-    #   |    def error
-    #   |      array_of_at(String, ['error'])
-    #   |    end
-    #   |
-    #   |    def to_h_with_attrs
-    #   |      hash = HashWithAttributes.new({}, attributes)
-    #   |
-    #   |      hash[:recipient] = recipient.map(&:to_h_with_attrs) if has? 'recipient'
-    #   |      hash[:error] = error if has? 'error'
-    #   |
-    #   |      hash
-    #   |    end
-    #   |  end
-    #   |end })
-    #
-    # recipient_type_parser = codes['parsers/recipient_type.rb']
-    # expect(recipient_type_parser).to eq_multiline(%{
-    #   |require 'parsers/base_parser'
-    #   |
-    #   |module Parsers
-    #   |  class RecipientType
-    #   |    include BaseParser
-    #   |
-    #   |    def name
-    #   |      at 'name'
-    #   |    end
-    #   |
-    #   |    def to_h_with_attrs
-    #   |      hash = HashWithAttributes.new({}, attributes)
-    #   |
-    #   |      hash[:name] = name if has? 'name'
-    #   |
-    #   |      hash
-    #   |    end
-    #   |  end
-    #   |end })
   end
 
-  it 'builder scaffolder matches template' do
+  it 'parser scaffolder matches template' do
+    codes = scaffold_schema('./spec/arrays/schema.xsd')
+
+    payment_type_parser = codes['parsers/payment_type.rb']
+    expect(payment_type_parser).to eq_multiline(%{
+      |module Parsers
+      |  class PaymentType
+      |    include BaseParser
+      |
+      |    def payments_list
+      |      array_of_at(Payment, ['payments_list', 'payment'])
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:payments_list] = payments_list.map(&:to_h_with_attrs) if has? 'payments_list'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'parser scaffolder matches template' do
+    codes = scaffold_schema('./spec/arrays/schema.xsd')
+
+    payment_parser = codes['parsers/payment.rb']
+    expect(payment_parser).to eq_multiline(%{
+      |module Parsers
+      |  class Payment
+      |    include BaseParser
+      |
+      |    def amount
+      |      at 'amount'
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:amount] = amount if has? 'amount'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'parser scaffolder matches template' do
+    codes = scaffold_schema('./spec/arrays/schema.xsd')
+
+    messages_parser = codes['parsers/messages.rb']
+    expect(messages_parser).to eq_multiline(%{
+      |module Parsers
+      |  class Messages
+      |    include BaseParser
+      |
+      |    def recipient
+      |      array_of_at(RecipientType, ['recipient'])
+      |    end
+      |
+      |    def error
+      |      array_of_at(String, ['error'])
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:recipient] = recipient.map(&:to_h_with_attrs) if has? 'recipient'
+      |      hash[:error] = error if has? 'error'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'parser scaffolder matches template' do
+    codes = scaffold_schema('./spec/arrays/schema.xsd')
+
+    recipient_type_parser = codes['parsers/recipient_type.rb']
+    expect(recipient_type_parser).to eq_multiline(%{
+      |module Parsers
+      |  class RecipientType
+      |    include BaseParser
+      |
+      |    def name
+      |      at 'name'
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:name] = name if has? 'name'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
+  xit 'builder scaffolder matches template' do
     codes = scaffold_schema('./spec/arrays/schema.xsd')
 
     order_parser = codes['builders/order.rb']
     expect(order_parser).to eq_multiline(%{
-      |require 'builders/base_builder'
-      |require 'builders/payment_type'
-      |require 'builders/messages'
-      |require 'builders/item_type'
-      |
       |module Builders
       |  class Order
       |    include BaseBuilder

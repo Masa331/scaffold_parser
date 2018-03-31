@@ -6,7 +6,7 @@ module ScaffoldParser
           class XSD
             include BaseHandler
 
-            def document
+            def document(_)
               Document.new(self)
             end
 
