@@ -33,7 +33,9 @@ RSpec.describe 'complex types' do
       |    end
       |  end
       |end })
+  end
 
+  it 'parser scaffolder output matches template' do
     currency_parser = codes['parsers/currency.rb']
     expect(currency_parser).to eq_multiline(%{
       |require 'parsers/base_parser'
@@ -55,7 +57,9 @@ RSpec.describe 'complex types' do
       |    end
       |  end
       |end })
+  end
 
+  it 'parser scaffolder output matches template' do
     customer_type_parser = codes['parsers/customer_type.rb']
     expect(customer_type_parser).to eq_multiline(%{
       |require 'parsers/base_parser'
