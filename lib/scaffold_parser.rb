@@ -179,7 +179,7 @@ module ScaffoldParser
   end
 
   def self.scaffold_to_string(path, options = {})
-    collect_only = -> (e) { ['schema', 'document', 'element', 'extension', 'complexType', 'simpleType', 'include'].include?(e.name) }
+    collect_only = -> (e) { ['schema', 'document', 'element', 'extension', 'complexType', 'simpleType', 'include', 'import'].include?(e.name) }
     doc = XsdModel.parse(File.read(path), { collect_only: collect_only })
 
     Scaffolders::XSD.call(doc, options)

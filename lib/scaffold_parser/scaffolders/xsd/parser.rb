@@ -16,7 +16,7 @@ module ScaffoldParser
         def call
           original_complex_types = xsd.schema.complex_types
 
-          collect_only = -> (e) { ['schema', 'document', 'element', 'extension', 'complexType', 'simpleType', 'include'].include?(e.name) }
+          collect_only = -> (e) { ['schema', 'document', 'element', 'extension', 'complexType', 'simpleType', 'include', 'import'].include?(e.name) }
           included_schemas = xsd.schema.collect_included_schemas({ collect_only: collect_only })
           included_complex_types = included_schemas.inject([]) do |memo, schema|
             memo + schema.complex_types + schema.simple_types
@@ -27,13 +27,14 @@ module ScaffoldParser
             memo + schema.complex_types + schema.simple_types
           end
 
-          complex_types = normalize_complex_types(original_complex_types + included_complex_types)
+          complex_types = normalize_complex_types(original_complex_types + included_complex_types + imported_complex_types)
 
           classes = complex_types.map do |complex_type|
             scaffold_class(complex_type)
           end
 
           if classes.group_by(&:name).values.any? { |v| v.size > 1 }
+            require 'pry'; binding.pry
             fail 'multiple classes with same name'
           end
 
