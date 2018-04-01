@@ -32,8 +32,10 @@ module ScaffoldParser
             fail 'multiple classes with same name'
           end
 
-          classes.map do |class_template|
-            ["parsers/#{class_template.name.underscore}.rb", class_template.to_s]
+          classes.flat_map do |class_template|
+            [["parsers/#{class_template.name.underscore}.rb", class_template.to_s],
+             ["builders/#{class_template.name.underscore}.rb", class_template.to_builder_s]
+            ]
           end
         end
 

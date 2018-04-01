@@ -22,5 +22,21 @@ module ScaffoldParser
         "hash[:#{method_name}] = #{method_name}.map(&:to_h_with_attrs) if has? '#{source.name}'"
       end
     end
+
+    def to_builder
+      f = StringIO.new
+
+      f.puts "if data.key? :#{method_name}"
+      f.puts "  element = Ox::Element.new('#{at.first}')"
+      if item_class == 'String'
+        f.puts "  data[:#{method_name}].map { |i| Ox::Element.new('#{at.last}') << i }.each { |i| element << i }"
+      else
+        f.puts "  data[:#{method_name}].each { |i| element << #{item_class}.new('#{at.last}', i).builder }"
+      end
+      f.puts '  root << element'
+      f.puts 'end'
+
+      f.string.strip
+    end
   end
 end

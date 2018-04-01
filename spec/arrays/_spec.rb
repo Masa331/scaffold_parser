@@ -84,7 +84,7 @@ RSpec.describe 'arrays' do
       |end })
   end
 
-  it 'scaffolds subtype with extension and element which can occure more than once' do
+  it 'scaffolds parser for subtype with extension and element which can occure more than once' do
     expect(scaffolds['parsers/messages.rb']).to eq_multiline(%{
       |module Parsers
       |  class Messages < MessageType
@@ -127,7 +127,7 @@ RSpec.describe 'arrays' do
       |end })
   end
 
-  it 'scaffolds subtype which is inherited with element which can occure more than once' do
+  it 'scaffolds parser subtype which is inherited with element which can occure more than once' do
     expect(scaffolds['parsers/message_type.rb']).to eq_multiline(%{
       |module Parsers
       |  class MessageType
@@ -148,11 +148,8 @@ RSpec.describe 'arrays' do
       |end })
   end
 
-  xit 'builder scaffolder matches template' do
-    scaffolds = scaffold_schema('./spec/arrays/schema.xsd')
-
-    order_parser = scaffolds['builders/order.rb']
-    expect(order_parser).to eq_multiline(%{
+  it 'scaffolds builder for type with various elements which can occure more than once' do
+    expect(scaffolds['builders/order.rb']).to eq_multiline(%{
       |module Builders
       |  class Order
       |    include BaseBuilder
@@ -163,26 +160,22 @@ RSpec.describe 'arrays' do
       |        data.attributes.each { |k, v| root[k] = v }
       |      end
       |
-      |      if data.key? :payments
-      |        root << PaymentType.new('payments', data[:payments]).builder
-      |      end
-      |
-      |      if data.key? :messages
-      |        root << Messages.new('messages', data[:messages]).builder
-      |      end
-      |
       |      if data.key? :items
       |        element = Ox::Element.new('items')
       |        data[:items].each { |i| element << ItemType.new('Item', i).builder }
       |        root << element
       |      end
-      |
+      |      if data.key? :payments
+      |        root << PaymentType.new('payments', data[:payments]).builder
+      |      end
       |      if data.key? :documents
       |        element = Ox::Element.new('documents')
       |        data[:documents].map { |i| Ox::Element.new('document') << i }.each { |i| element << i }
       |        root << element
       |      end
-      |
+      |      if data.key? :messages
+      |        root << Messages.new('messages', data[:messages]).builder
+      |      end
       |      if data.key? :id
       |        data[:id].map { |i| Ox::Element.new('ID') << i }.each { |i| root << i }
       |      end
@@ -191,12 +184,10 @@ RSpec.describe 'arrays' do
       |    end
       |  end
       |end })
+  end
 
-    payment_type_parser = scaffolds['builders/payment_type.rb']
-    expect(payment_type_parser).to eq_multiline(%{
-      |require 'builders/base_builder'
-      |require 'builders/payment'
-      |
+  it 'scaffolds builder for type including element which can occure more than once' do
+    expect(scaffolds['builders/payment_type.rb']).to eq_multiline(%{
       |module Builders
       |  class PaymentType
       |    include BaseBuilder
@@ -217,11 +208,11 @@ RSpec.describe 'arrays' do
       |    end
       |  end
       |end })
+  end
 
+  it 'scaffolds builder for subtype which can occure more than once' do
     payment_parser = scaffolds['builders/payment.rb']
     expect(payment_parser).to eq_multiline(%{
-      |require 'builders/base_builder'
-      |
       |module Builders
       |  class Payment
       |    include BaseBuilder
@@ -238,14 +229,12 @@ RSpec.describe 'arrays' do
       |    end
       |  end
       |end })
+  end
 
-    messages_parser = scaffolds['builders/messages.rb']
-    expect(messages_parser).to eq_multiline(%{
-      |require 'builders/base_builder'
-      |require 'builders/recipient_type'
-      |
+  it 'scaffolds builder for subtype with extension and element which can occure more than once' do
+    expect(scaffolds['builders/messages.rb']).to eq_multiline(%{
       |module Builders
-      |  class Messages
+      |  class Messages < MessageType
       |    include BaseBuilder
       |
       |    def builder
@@ -258,19 +247,14 @@ RSpec.describe 'arrays' do
       |        data[:recipient].each { |i| root << RecipientType.new('recipient', i).builder }
       |      end
       |
-      |      if data.key? :error
-      |        data[:error].map { |i| Ox::Element.new('error') << i }.each { |i| root << i }
-      |      end
-      |
       |      root
       |    end
       |  end
       |end })
+  end
 
-    recipient_type_parser = scaffolds['builders/recipient_type.rb']
-    expect(recipient_type_parser).to eq_multiline(%{
-      |require 'builders/base_builder'
-      |
+  it 'scaffolds builder for subtype in extension which can occure more than once' do
+    expect(scaffolds['builders/recipient_type.rb']).to eq_multiline(%{
       |module Builders
       |  class RecipientType
       |    include BaseBuilder
@@ -282,6 +266,28 @@ RSpec.describe 'arrays' do
       |      end
       |
       |      root << build_element('name', data[:name]) if data.key? :name
+      |
+      |      root
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'scaffolds builder for subtype which is inherited with element which can occure more than once' do
+    expect(scaffolds['builders/message_type.rb']).to eq_multiline(%{
+      |module Builders
+      |  class MessageType
+      |    include BaseBuilder
+      |
+      |    def builder
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
+      |      end
+      |
+      |      if data.key? :error
+      |        data[:error].map { |i| Ox::Element.new('error') << i }.each { |i| root << i }
+      |      end
       |
       |      root
       |    end

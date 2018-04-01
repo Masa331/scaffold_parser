@@ -123,16 +123,29 @@ RSpec.describe ScaffoldParser do
       |end })
   end
 
-  xit 'builder scaffolder output matches template' do
-    scaffolds = scaffold_schema('./spec/extensions/schema.xsd')
-
-    order_builder = scaffolds['builders/order.rb']
-    expect(order_builder).to eq_multiline(%{
-      |require 'builders/base_builder'
-      |require 'builders/customer'
-      |require 'builders/seller'
-      |require 'builders/reference_type'
+  it 'scaffolds parser for element from which is extended' do
+    expect(scaffolds['parsers/base_element.rb']).to eq_multiline(%{
+      |module Parsers
+      |  class BaseElement
+      |    include BaseParser
       |
+      |    def title
+      |      at 'title'
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:title] = title if has? 'title'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'scaffolds builder for type with various extensions' do
+    expect(scaffolds['builders/order.rb']).to eq_multiline(%{
       |module Builders
       |  class Order
       |    include BaseBuilder
@@ -146,11 +159,9 @@ RSpec.describe ScaffoldParser do
       |      if data.key? :customer
       |        root << Customer.new('customer', data[:customer]).builder
       |      end
-      |
       |      if data.key? :seller
       |        root << Seller.new('seller', data[:seller]).builder
       |      end
-      |
       |      if data.key? :invoice
       |        root << ReferenceType.new('invoice', data[:invoice]).builder
       |      end
@@ -159,13 +170,12 @@ RSpec.describe ScaffoldParser do
       |    end
       |  end
       |end })
+  end
 
-    customer_builder = scaffolds['builders/customer.rb']
-    expect(customer_builder).to eq_multiline(%{
-      |require 'builders/base_builder'
-      |
+  it 'scaffolds builder for subtype with extension' do
+    expect(scaffolds['builders/customer.rb']).to eq_multiline(%{
       |module Builders
-      |  class Customer
+      |  class Customer < BaseElement
       |    include BaseBuilder
       |
       |    def builder
@@ -175,20 +185,17 @@ RSpec.describe ScaffoldParser do
       |      end
       |
       |      root << build_element('id', data[:id]) if data.key? :id
-      |      root << build_element('title', data[:title]) if data.key? :title
       |
       |      root
       |    end
       |  end
       |end })
+  end
 
-    seller_builder = scaffolds['builders/seller.rb']
-    expect(seller_builder).to eq_multiline(%{
-      |require 'builders/base_builder'
-      |require 'builders/contact_info'
-      |
+  it 'scaffolds builder for subtype with extension and choice' do
+    expect(scaffolds['builders/seller.rb']).to eq_multiline(%{
       |module Builders
-      |  class Seller
+      |  class Seller < BaseElement
       |    include BaseBuilder
       |
       |    def builder
@@ -196,8 +203,6 @@ RSpec.describe ScaffoldParser do
       |      if data.respond_to? :attributes
       |        data.attributes.each { |k, v| root[k] = v }
       |      end
-      |
-      |      root << build_element('title', data[:title]) if data.key? :title
       |
       |      if data.key? :contact_info
       |        root << ContactInfo.new('contactInfo', data[:contact_info]).builder
@@ -207,11 +212,30 @@ RSpec.describe ScaffoldParser do
       |    end
       |  end
       |end })
+  end
 
-    contact_info_builder = scaffolds['builders/contact_info.rb']
-    expect(contact_info_builder).to eq_multiline(%{
-      |require 'builders/base_builder'
+  it 'scaffolds builder for type with simpleType extension' do
+    expect(scaffolds['builders/reference_type.rb']).to eq_multiline(%{
+      |module Builders
+      |  class ReferenceType
+      |    include BaseBuilder
       |
+      |    def builder
+      |      root = Ox::Element.new(name)
+      |      if data.respond_to? :attributes
+      |        data.attributes.each { |k, v| root[k] = v }
+      |      end
+      |
+      |      root << build_element('ID', data[:id]) if data.key? :id
+      |
+      |      root
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'scaffolds builder for subtype from extension' do
+    expect(scaffolds['builders/contact_info.rb']).to eq_multiline(%{
       |module Builders
       |  class ContactInfo
       |    include BaseBuilder
@@ -229,13 +253,12 @@ RSpec.describe ScaffoldParser do
       |    end
       |  end
       |end })
+  end
 
-    reference_type_builder = scaffolds['builders/reference_type.rb']
-    expect(reference_type_builder).to eq_multiline(%{
-      |require 'builders/base_builder'
-      |
+  it 'scaffolds builder for element from which is extended' do
+    expect(scaffolds['builders/base_element.rb']).to eq_multiline(%{
       |module Builders
-      |  class ReferenceType
+      |  class BaseElement
       |    include BaseBuilder
       |
       |    def builder
@@ -244,7 +267,7 @@ RSpec.describe ScaffoldParser do
       |        data.attributes.each { |k, v| root[k] = v }
       |      end
       |
-      |      root << build_element('ID', data[:id]) if data.key? :id
+      |      root << build_element('title', data[:title]) if data.key? :title
       |
       |      root
       |    end

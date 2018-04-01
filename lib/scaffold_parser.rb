@@ -180,8 +180,6 @@ module ScaffoldParser
 
   def self.scaffold_to_string(path, options = {})
     collect_only = -> (e) { ['schema', 'document', 'element', 'extension', 'complexType', 'simpleType', 'include'].include?(e.name) }
-    # ignore = -> (e) { e.name == 'complexType' && e['name'].nil? }
-    # doc = XsdModel.parse(File.read(path), { collect_only: collect_only, ignore: ignore })
     doc = XsdModel.parse(File.read(path), { collect_only: collect_only })
 
     Scaffolders::XSD.call(doc, options)

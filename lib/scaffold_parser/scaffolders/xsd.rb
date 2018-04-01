@@ -1,5 +1,5 @@
-# require 'scaffold_parser/scaffolders/xsd/reactor_parser'
 require 'scaffold_parser/scaffolders/xsd/parser'
+require 'scaffold_parser/scaffolders/xsd/builder'
 
 module ScaffoldParser
   module Scaffolders
@@ -14,9 +14,7 @@ module ScaffoldParser
       end
 
       def call
-        code = Parser.call(@doc, @options)
-
-        code
+        Parser.call(@doc, @options) + Builder.call(@doc, @options)
       end
     end
   end

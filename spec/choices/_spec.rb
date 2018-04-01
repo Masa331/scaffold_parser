@@ -27,7 +27,7 @@ RSpec.describe 'choices' do
       |end })
   end
 
-  xit 'scaffolds builder for type which includes choice' do
+  it 'scaffolds builder for type which includes choice' do
     expect(scaffolds['builders/order.rb']).to eq_multiline(%{
       |module Builders
       |  class Order

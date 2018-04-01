@@ -29,7 +29,7 @@ RSpec.describe ScaffoldParser do
       |end })
   end
 
-  xit 'scaffolds builder with given namespace' do
+  it 'scaffolds builder with given namespace' do
     expect(scaffolds['builders/order.rb']).to eq_multiline(%{
       |module Something
       |  module Builders
@@ -43,7 +43,6 @@ RSpec.describe ScaffoldParser do
       |        end
       |
       |        root << build_element('name', data[:name]) if data.key? :name
-      |
       |        if data.key? :customer
       |          root << CustomerType.new('customer', data[:customer]).builder
       |        end

@@ -18,5 +18,15 @@ module ScaffoldParser
     def to_h_with_attrs_method
         "hash[:#{method_name}] = #{method_name}.to_h_with_attrs if has? '#{source.name}'"
     end
+
+    def to_builder
+      f = StringIO.new
+
+      f.puts "if data.key? :#{method_name}"
+      f.puts "  root << #{submodel_class}.new('#{source.name}', data[:#{source.name.underscore}]).builder"
+      f.puts 'end'
+
+      f.string.strip
+    end
   end
 end
