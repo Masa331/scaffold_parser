@@ -1,9 +1,8 @@
 RSpec.describe ScaffoldParser do
-  it 'extensions are parsed correctly' do
-    codes = scaffold_schema('./spec/extensions/schema.xsd')
+  let(:scaffolds) { scaffold_schema('./spec/extensions/schema.xsd') }
 
-    order_parser = codes['parsers/order.rb']
-    expect(order_parser).to eq_multiline(%{
+  it 'scaffolds parser for type with various extensions' do
+    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Parsers
       |  class Order
       |    include BaseParser
@@ -33,11 +32,8 @@ RSpec.describe ScaffoldParser do
       |end })
   end
 
-  it 'extensions are parsed correctly' do
-    codes = scaffold_schema('./spec/extensions/schema.xsd')
-
-    customer_parser = codes['parsers/customer.rb']
-    expect(customer_parser).to eq_multiline(%{
+  it 'scaffolds parser for subtype with extension' do
+    expect(scaffolds['parsers/customer.rb']).to eq_multiline(%{
       |module Parsers
       |  class Customer < BaseElement
       |    include BaseParser
@@ -58,11 +54,8 @@ RSpec.describe ScaffoldParser do
       |end })
   end
 
-  it 'extensions are parsed correctly' do
-    codes = scaffold_schema('./spec/extensions/schema.xsd')
-
-    seller_parser = codes['parsers/seller.rb']
-    expect(seller_parser).to eq_multiline(%{
+  it 'scaffolds parser for subtype with extension and choice' do
+    expect(scaffolds['parsers/seller.rb']).to eq_multiline(%{
       |module Parsers
       |  class Seller < BaseElement
       |    include BaseParser
@@ -83,11 +76,8 @@ RSpec.describe ScaffoldParser do
       |end })
   end
 
-  it 'extensions are parsed correctly' do
-    codes = scaffold_schema('./spec/extensions/schema.xsd')
-
-    reference_type_parser = codes['parsers/reference_type.rb']
-    expect(reference_type_parser).to eq_multiline(%{
+  it 'scaffolds parser for type with simpleType extension' do
+    expect(scaffolds['parsers/reference_type.rb']).to eq_multiline(%{
       |module Parsers
       |  class ReferenceType
       |    include BaseParser
@@ -107,11 +97,8 @@ RSpec.describe ScaffoldParser do
       |end })
   end
 
-  it 'extensions are parsed correctly' do
-    codes = scaffold_schema('./spec/extensions/schema.xsd')
-
-    contact_info_parser = codes['parsers/contact_info.rb']
-    expect(contact_info_parser).to eq_multiline(%{
+  it 'scaffolds parser for subtype from extension' do
+    expect(scaffolds['parsers/contact_info.rb']).to eq_multiline(%{
       |module Parsers
       |  class ContactInfo
       |    include BaseParser
@@ -137,9 +124,9 @@ RSpec.describe ScaffoldParser do
   end
 
   xit 'builder scaffolder output matches template' do
-    codes = scaffold_schema('./spec/extensions/schema.xsd')
+    scaffolds = scaffold_schema('./spec/extensions/schema.xsd')
 
-    order_builder = codes['builders/order.rb']
+    order_builder = scaffolds['builders/order.rb']
     expect(order_builder).to eq_multiline(%{
       |require 'builders/base_builder'
       |require 'builders/customer'
@@ -173,7 +160,7 @@ RSpec.describe ScaffoldParser do
       |  end
       |end })
 
-    customer_builder = codes['builders/customer.rb']
+    customer_builder = scaffolds['builders/customer.rb']
     expect(customer_builder).to eq_multiline(%{
       |require 'builders/base_builder'
       |
@@ -195,7 +182,7 @@ RSpec.describe ScaffoldParser do
       |  end
       |end })
 
-    seller_builder = codes['builders/seller.rb']
+    seller_builder = scaffolds['builders/seller.rb']
     expect(seller_builder).to eq_multiline(%{
       |require 'builders/base_builder'
       |require 'builders/contact_info'
@@ -221,7 +208,7 @@ RSpec.describe ScaffoldParser do
       |  end
       |end })
 
-    contact_info_builder = codes['builders/contact_info.rb']
+    contact_info_builder = scaffolds['builders/contact_info.rb']
     expect(contact_info_builder).to eq_multiline(%{
       |require 'builders/base_builder'
       |
@@ -243,7 +230,7 @@ RSpec.describe ScaffoldParser do
       |  end
       |end })
 
-    reference_type_builder = codes['builders/reference_type.rb']
+    reference_type_builder = scaffolds['builders/reference_type.rb']
     expect(reference_type_builder).to eq_multiline(%{
       |require 'builders/base_builder'
       |

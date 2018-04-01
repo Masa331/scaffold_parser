@@ -1,8 +1,8 @@
 RSpec.describe ScaffoldParser do
-  it 'includes are parsed correctly' do
-    parser_code = parser_for('./spec/includes/schema.xsd', 'parsers/order.rb')
+  let(:scaffolds) { scaffold_schema('./spec/includes/schema.xsd') }
 
-    expect(parser_code).to eq_multiline(%{
+  it 'scaffolds parser for type referencing subtypes from included schema' do
+    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Parsers
       |  class Order
       |    include BaseParser
@@ -27,10 +27,8 @@ RSpec.describe ScaffoldParser do
       |end })
   end
 
-  it 'includes are parsed correctly' do
-    parser_code = parser_for('./spec/includes/schema.xsd', 'parsers/person.rb')
-
-    expect(parser_code).to eq_multiline(%{
+  it 'scaffolds parser for type defined in included schema' do
+    expect(scaffolds['parsers/person.rb']).to eq_multiline(%{
       |module Parsers
       |  class Person
       |    include BaseParser

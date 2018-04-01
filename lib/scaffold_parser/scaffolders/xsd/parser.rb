@@ -175,7 +175,9 @@ module ScaffoldParser
           end
 
           template = ClassTemplate.new(complex_type.name.camelize) do |template|
+            template.namespace = @options[:namespace]
             template.methods = methods
+
             if complex_type.has_base?
               template.inherit_from = complex_type.base.camelize
             end

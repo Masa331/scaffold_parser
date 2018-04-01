@@ -1,8 +1,8 @@
 RSpec.describe 'simple types' do
-  it 'parser scaffolder output matches template' do
-    parser_code = parser_for('./spec/simple_types/schema.xsd', 'parsers/order.rb')
+  let(:scaffolds) { scaffold_schema('./spec/simple_types/schema.xsd') }
 
-    expect(parser_code).to eq_multiline(%{
+  it 'scaffolds parser for type including only basic elements' do
+    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Parsers
       |  class Order
       |    include BaseParser

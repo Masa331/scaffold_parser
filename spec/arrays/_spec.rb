@@ -1,9 +1,8 @@
 RSpec.describe 'arrays' do
-  it 'parser scaffolder matches template' do
-    codes = scaffold_schema('./spec/arrays/schema.xsd')
+  let(:scaffolds) { scaffold_schema('./spec/arrays/schema.xsd') }
 
-    order_parser = codes['parsers/order.rb']
-    expect(order_parser).to eq_multiline(%{
+  it 'scaffolds parser for type with various elements which can occure more than once' do
+    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Parsers
       |  class Order
       |    include BaseParser
@@ -43,11 +42,8 @@ RSpec.describe 'arrays' do
       |end })
   end
 
-  it 'parser scaffolder matches template' do
-    codes = scaffold_schema('./spec/arrays/schema.xsd')
-
-    payment_type_parser = codes['parsers/payment_type.rb']
-    expect(payment_type_parser).to eq_multiline(%{
+  it 'scaffolds parser for type including element which can occure more than once' do
+    expect(scaffolds['parsers/payment_type.rb']).to eq_multiline(%{
       |module Parsers
       |  class PaymentType
       |    include BaseParser
@@ -67,11 +63,8 @@ RSpec.describe 'arrays' do
       |end })
   end
 
-  it 'parser scaffolder matches template' do
-    codes = scaffold_schema('./spec/arrays/schema.xsd')
-
-    payment_parser = codes['parsers/payment.rb']
-    expect(payment_parser).to eq_multiline(%{
+  it 'scaffolds parser for subtype which can occure more than once' do
+    expect(scaffolds['parsers/payment.rb']).to eq_multiline(%{
       |module Parsers
       |  class Payment
       |    include BaseParser
@@ -91,11 +84,8 @@ RSpec.describe 'arrays' do
       |end })
   end
 
-  it 'parser scaffolder matches template' do
-    codes = scaffold_schema('./spec/arrays/schema.xsd')
-
-    messages_parser = codes['parsers/messages.rb']
-    expect(messages_parser).to eq_multiline(%{
+  it 'scaffolds subtype with extension and element which can occure more than once' do
+    expect(scaffolds['parsers/messages.rb']).to eq_multiline(%{
       |module Parsers
       |  class Messages < MessageType
       |    include BaseParser
@@ -116,11 +106,8 @@ RSpec.describe 'arrays' do
       |end })
   end
 
-  it 'parser scaffolder matches template' do
-    codes = scaffold_schema('./spec/arrays/schema.xsd')
-
-    recipient_type_parser = codes['parsers/recipient_type.rb']
-    expect(recipient_type_parser).to eq_multiline(%{
+  it 'scaffolds parser for subtype in extension which can occure more than once' do
+    expect(scaffolds['parsers/recipient_type.rb']).to eq_multiline(%{
       |module Parsers
       |  class RecipientType
       |    include BaseParser
@@ -140,11 +127,8 @@ RSpec.describe 'arrays' do
       |end })
   end
 
-  it 'parser scaffolder matches template' do
-    codes = scaffold_schema('./spec/arrays/schema.xsd')
-
-    recipient_type_parser = codes['parsers/message_type.rb']
-    expect(recipient_type_parser).to eq_multiline(%{
+  it 'scaffolds subtype which is inherited with element which can occure more than once' do
+    expect(scaffolds['parsers/message_type.rb']).to eq_multiline(%{
       |module Parsers
       |  class MessageType
       |    include BaseParser
@@ -165,9 +149,9 @@ RSpec.describe 'arrays' do
   end
 
   xit 'builder scaffolder matches template' do
-    codes = scaffold_schema('./spec/arrays/schema.xsd')
+    scaffolds = scaffold_schema('./spec/arrays/schema.xsd')
 
-    order_parser = codes['builders/order.rb']
+    order_parser = scaffolds['builders/order.rb']
     expect(order_parser).to eq_multiline(%{
       |module Builders
       |  class Order
@@ -208,7 +192,7 @@ RSpec.describe 'arrays' do
       |  end
       |end })
 
-    payment_type_parser = codes['builders/payment_type.rb']
+    payment_type_parser = scaffolds['builders/payment_type.rb']
     expect(payment_type_parser).to eq_multiline(%{
       |require 'builders/base_builder'
       |require 'builders/payment'
@@ -234,7 +218,7 @@ RSpec.describe 'arrays' do
       |  end
       |end })
 
-    payment_parser = codes['builders/payment.rb']
+    payment_parser = scaffolds['builders/payment.rb']
     expect(payment_parser).to eq_multiline(%{
       |require 'builders/base_builder'
       |
@@ -255,7 +239,7 @@ RSpec.describe 'arrays' do
       |  end
       |end })
 
-    messages_parser = codes['builders/messages.rb']
+    messages_parser = scaffolds['builders/messages.rb']
     expect(messages_parser).to eq_multiline(%{
       |require 'builders/base_builder'
       |require 'builders/recipient_type'
@@ -283,7 +267,7 @@ RSpec.describe 'arrays' do
       |  end
       |end })
 
-    recipient_type_parser = codes['builders/recipient_type.rb']
+    recipient_type_parser = scaffolds['builders/recipient_type.rb']
     expect(recipient_type_parser).to eq_multiline(%{
       |require 'builders/base_builder'
       |

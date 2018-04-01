@@ -1,9 +1,8 @@
 RSpec.describe 'complex types' do
-  it 'parser scaffolder output matches template' do
-    codes = scaffold_schema('./spec/complex_types/schema.xsd')
+  let(:scaffolds) { scaffold_schema('./spec/complex_types/schema.xsd') }
 
-    order_parser = codes['parsers/order.rb']
-    expect(order_parser).to eq_multiline(%{
+  it 'scaffolds parser for type with various complex types' do
+    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Parsers
       |  class Order
       |    include BaseParser
@@ -33,11 +32,8 @@ RSpec.describe 'complex types' do
       |end })
   end
 
-  it 'parser scaffolder output matches template' do
-    codes = scaffold_schema('./spec/complex_types/schema.xsd')
-
-    currency_parser = codes['parsers/currency.rb']
-    expect(currency_parser).to eq_multiline(%{
+  it 'scaffolds parser for subtype' do
+    expect(scaffolds['parsers/currency.rb']).to eq_multiline(%{
       |module Parsers
       |  class Currency
       |    include BaseParser
@@ -57,11 +53,8 @@ RSpec.describe 'complex types' do
       |end })
   end
 
-  it 'parser scaffolder output matches template' do
-    codes = scaffold_schema('./spec/complex_types/schema.xsd')
-
-    customer_type_parser = codes['parsers/customer_type.rb']
-    expect(customer_type_parser).to eq_multiline(%{
+  it 'scaffolds parser for type including simpleType' do
+    expect(scaffolds['parsers/customer_type.rb']).to eq_multiline(%{
       |module Parsers
       |  class CustomerType
       |    include BaseParser
@@ -82,9 +75,9 @@ RSpec.describe 'complex types' do
   end
 
   xit 'builder scaffolder output matches template' do
-    codes = scaffold_schema('./spec/complex_types/schema.xsd')
+    scaffolds = scaffold_schema('./spec/complex_types/schema.xsd')
 
-    order_builder = codes['builders/order.rb']
+    order_builder = scaffolds['builders/order.rb']
     expect(order_builder).to eq_multiline(%{
       |require 'builders/base_builder'
       |
@@ -115,7 +108,7 @@ RSpec.describe 'complex types' do
       |  end
       |end })
 
-    currency_builder = codes['builders/currency.rb']
+    currency_builder = scaffolds['builders/currency.rb']
     expect(currency_builder).to eq_multiline(%{
       |require 'builders/base_builder'
       |
@@ -136,7 +129,7 @@ RSpec.describe 'complex types' do
       |  end
       |end })
 
-    customer_type_builder = codes['builders/customer_type.rb']
+    customer_type_builder = scaffolds['builders/customer_type.rb']
     expect(customer_type_builder).to eq_multiline(%{
       |require 'builders/base_builder'
       |

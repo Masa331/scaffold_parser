@@ -2,7 +2,7 @@ module ScaffoldParser
   class ClassTemplate
     include TemplateUtils
 
-    attr_accessor :name, :module, :methods, :inherit_from
+    attr_accessor :name, :namespace, :methods, :inherit_from
 
     def initialize(name = nil)
       @name = name
@@ -39,16 +39,17 @@ module ScaffoldParser
 
       string = f.string.strip
 
-      wrapped = wrap_in_module(string, 'Parsers')
+      wrapped = wrap_in_namespace(string, 'Parsers')
+      wrapped = wrap_in_namespace(wrapped, namespace) if namespace
 
       wrapped
     end
 
-    def wrap_in_module(klass, module_name)
+    def wrap_in_namespace(klass, namespace)
       lines = klass.lines
       indented = indent(lines)
 
-      indented.unshift "module #{module_name}\n"
+      indented.unshift "module #{namespace}\n"
       indented << "\nend"
 
       indented.join
