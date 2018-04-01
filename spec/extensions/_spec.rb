@@ -4,11 +4,6 @@ RSpec.describe ScaffoldParser do
 
     order_parser = codes['parsers/order.rb']
     expect(order_parser).to eq_multiline(%{
-      |require 'parsers/base_parser'
-      |require 'parsers/customer'
-      |require 'parsers/seller'
-      |require 'parsers/reference_type'
-      |
       |module Parsers
       |  class Order
       |    include BaseParser
@@ -36,46 +31,41 @@ RSpec.describe ScaffoldParser do
       |    end
       |  end
       |end })
+  end
+
+  it 'extensions are parsed correctly' do
+    codes = scaffold_schema('./spec/extensions/schema.xsd')
 
     customer_parser = codes['parsers/customer.rb']
     expect(customer_parser).to eq_multiline(%{
-      |require 'parsers/base_parser'
-      |
       |module Parsers
-      |  class Customer
+      |  class Customer < BaseElement
       |    include BaseParser
       |
       |    def id
       |      at 'id'
       |    end
       |
-      |    def title
-      |      at 'title'
-      |    end
-      |
       |    def to_h_with_attrs
       |      hash = HashWithAttributes.new({}, attributes)
       |
       |      hash[:id] = id if has? 'id'
-      |      hash[:title] = title if has? 'title'
       |
       |      hash
+      |      super.merge(hash)
       |    end
       |  end
       |end })
+  end
+
+  it 'extensions are parsed correctly' do
+    codes = scaffold_schema('./spec/extensions/schema.xsd')
 
     seller_parser = codes['parsers/seller.rb']
     expect(seller_parser).to eq_multiline(%{
-      |require 'parsers/base_parser'
-      |require 'parsers/contact_info'
-      |
       |module Parsers
-      |  class Seller
+      |  class Seller < BaseElement
       |    include BaseParser
-      |
-      |    def title
-      |      at 'title'
-      |    end
       |
       |    def contact_info
       |      submodel_at(ContactInfo, 'contactInfo')
@@ -84,18 +74,20 @@ RSpec.describe ScaffoldParser do
       |    def to_h_with_attrs
       |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:title] = title if has? 'title'
       |      hash[:contact_info] = contact_info.to_h_with_attrs if has? 'contactInfo'
       |
       |      hash
+      |      super.merge(hash)
       |    end
       |  end
       |end })
+  end
+
+  it 'extensions are parsed correctly' do
+    codes = scaffold_schema('./spec/extensions/schema.xsd')
 
     reference_type_parser = codes['parsers/reference_type.rb']
     expect(reference_type_parser).to eq_multiline(%{
-      |require 'parsers/base_parser'
-      |
       |module Parsers
       |  class ReferenceType
       |    include BaseParser
@@ -113,11 +105,13 @@ RSpec.describe ScaffoldParser do
       |    end
       |  end
       |end })
+  end
+
+  it 'extensions are parsed correctly' do
+    codes = scaffold_schema('./spec/extensions/schema.xsd')
 
     contact_info_parser = codes['parsers/contact_info.rb']
     expect(contact_info_parser).to eq_multiline(%{
-      |require 'parsers/base_parser'
-      |
       |module Parsers
       |  class ContactInfo
       |    include BaseParser
@@ -142,7 +136,7 @@ RSpec.describe ScaffoldParser do
       |end })
   end
 
-  it 'builder scaffolder output matches template' do
+  xit 'builder scaffolder output matches template' do
     codes = scaffold_schema('./spec/extensions/schema.xsd')
 
     order_builder = codes['builders/order.rb']

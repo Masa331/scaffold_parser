@@ -9,6 +9,7 @@ require 'scaffold_parser/at_method_template'
 require 'scaffold_parser/submodel_method_template'
 require 'scaffold_parser/list_method_template'
 require 'scaffold_parser/string_list_method_template'
+require 'scaffold_parser/proxy_list_method_template'
 require 'scaffold_parser/method_factory'
 
 require 'scaffold_parser/scaffolders/xsd'
@@ -25,43 +26,84 @@ module XsdModel
       def element_name
         self.class.name.demodulize.underscore
       end
+
+      def no_type?
+        attributes['type'].nil?
+      end
+
+      def type
+        attributes['type']
+      end
+
+      def has_type?
+        !attributes['type'].nil?
+      end
+
+      def basic_xsd_type?
+        type && type.start_with?("#{xsd_prefix}:")
+      end
+
+      def empty?
+        children.empty?
+      end
+
+      def has_base?
+        !attributes['base'].nil?
+      end
+
+      def has_name?
+        !attributes['name'].nil?
+      end
     end
 
     class Extension
-      def extending_basic_xsd_type?
+      def basic_xsd_extension?
         base.start_with?("#{xsd_prefix}:")
       end
 
       def base
-        attributes['base'].value
+        attributes['base']
+      end
+    end
+
+    class Schema
+      def complex_types
+        children.select { |child| child.is_a? Elements::ComplexType }
+      end
+
+      def simple_types
+        children.select { |child| child.is_a? Elements::SimpleType }
+      end
+    end
+
+    class SimpleType
+      def name
+        attributes['name']
       end
     end
 
     class ComplexType
       def name
-        attributes['name']&.value
+        attributes['name']
       end
 
       def elements
         children.select { |child| child.is_a? Elements::Element }
       end
+
+      def base
+        attributes['base']
+      end
     end
 
     class Element
-      def type
-        attributes['type']&.value
-      end
-
       def name
-        attributes['name'].value
+        attributes['name']
       end
 
       def max_occurs
-        value = attributes['maxOccurs']&.value
+        value = attributes['maxOccurs']
 
-        # if value
-        #   attr.value.to_i
-        # else
         case value
         when 'unbounded'
           then Float::INFINITY
@@ -72,12 +114,17 @@ module XsdModel
         end
       end
 
+      # take se nehodi uz do xsd_model asi
+      def somehow_multiple?
+        multiple? || multiple_proxy?
+      end
+
       def multiple?
         max_occurs > 1
       end
 
-      def basic_xsd_type?
-        type && type.start_with?("#{xsd_prefix}:")
+      def multiple_proxy?
+        children.size == 1 && children.last.multiple?
       end
 
       def custom_type?
@@ -132,7 +179,7 @@ module ScaffoldParser
   end
 
   def self.scaffold_to_string(path, options = {})
-    collect_only = -> (e) { ['schema', 'document', 'element', 'extension', 'complexType'].include?(e.name) }
+    collect_only = -> (e) { ['schema', 'document', 'element', 'extension', 'complexType', 'simpleType', 'include'].include?(e.name) }
     # ignore = -> (e) { e.name == 'complexType' && e['name'].nil? }
     # doc = XsdModel.parse(File.read(path), { collect_only: collect_only, ignore: ignore })
     doc = XsdModel.parse(File.read(path), { collect_only: collect_only })

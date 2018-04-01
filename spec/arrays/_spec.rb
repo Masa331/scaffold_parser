@@ -97,24 +97,20 @@ RSpec.describe 'arrays' do
     messages_parser = codes['parsers/messages.rb']
     expect(messages_parser).to eq_multiline(%{
       |module Parsers
-      |  class Messages
+      |  class Messages < MessageType
       |    include BaseParser
       |
       |    def recipient
       |      array_of_at(RecipientType, ['recipient'])
       |    end
       |
-      |    def error
-      |      array_of_at(String, ['error'])
-      |    end
-      |
       |    def to_h_with_attrs
       |      hash = HashWithAttributes.new({}, attributes)
       |
       |      hash[:recipient] = recipient.map(&:to_h_with_attrs) if has? 'recipient'
-      |      hash[:error] = error if has? 'error'
       |
       |      hash
+      |      super.merge(hash)
       |    end
       |  end
       |end })
@@ -137,6 +133,30 @@ RSpec.describe 'arrays' do
       |      hash = HashWithAttributes.new({}, attributes)
       |
       |      hash[:name] = name if has? 'name'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'parser scaffolder matches template' do
+    codes = scaffold_schema('./spec/arrays/schema.xsd')
+
+    recipient_type_parser = codes['parsers/message_type.rb']
+    expect(recipient_type_parser).to eq_multiline(%{
+      |module Parsers
+      |  class MessageType
+      |    include BaseParser
+      |
+      |    def error
+      |      array_of_at(String, ['error'])
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:error] = error if has? 'error'
       |
       |      hash
       |    end

@@ -3,8 +3,6 @@ RSpec.describe ScaffoldParser do
     parser_code = parser_for('./spec/includes/schema.xsd', 'parsers/order.rb')
 
     expect(parser_code).to eq_multiline(%{
-      |require 'parsers/base_parser'
-      |
       |module Parsers
       |  class Order
       |    include BaseParser
@@ -29,7 +27,30 @@ RSpec.describe ScaffoldParser do
       |end })
   end
 
-  it 'builder scaffolder output matches template' do
+  it 'includes are parsed correctly' do
+    parser_code = parser_for('./spec/includes/schema.xsd', 'parsers/person.rb')
+
+    expect(parser_code).to eq_multiline(%{
+      |module Parsers
+      |  class Person
+      |    include BaseParser
+      |
+      |    def name
+      |      at 'name'
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:name] = name if has? 'name'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
+  xit 'builder scaffolder output matches template' do
     codes = scaffold_schema('./spec/includes/schema.xsd')
 
     order_builder = codes['builders/order.rb']

@@ -5,4 +5,10 @@
       <xs:maxLength value="50"/>
     </xs:restriction>
   </xs:simpleType>
+
+  <xs:complexType name="person">
+    <xs:sequence>
+      <xs:element name="name"/>
+    </xs:sequence>
+  </xs:complexType>
 </xs:schema>

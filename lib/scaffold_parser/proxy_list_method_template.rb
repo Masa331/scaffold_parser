@@ -1,5 +1,5 @@
 module ScaffoldParser
-  class ListMethodTemplate
+  class ProxyListMethodTemplate
     include BaseMethodTemplate
     include TemplateUtils
 
@@ -7,8 +7,8 @@ module ScaffoldParser
 
     def initialize(source)
       @source = source
-      @at = [source.name]
-      @item_class = source&.type&.classify || 'String'
+      @at = [source.name, source.children.last.name]
+      @item_class = source.children.last&.type&.classify || 'String'
     end
 
     def method_body

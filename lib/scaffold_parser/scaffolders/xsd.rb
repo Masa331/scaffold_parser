@@ -1,4 +1,5 @@
-require 'scaffold_parser/scaffolders/xsd/reactor_parser'
+# require 'scaffold_parser/scaffolders/xsd/reactor_parser'
+require 'scaffold_parser/scaffolders/xsd/parser'
 
 module ScaffoldParser
   module Scaffolders
@@ -13,7 +14,7 @@ module ScaffoldParser
       end
 
       def call
-        code = ReactorParser.call(@doc, @options)
+        code = Parser.call(@doc, @options)
 
         code
       end

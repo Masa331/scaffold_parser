@@ -14,7 +14,11 @@ module ScaffoldParser
     def to_s
       f = StringIO.new
 
-      f.puts "class #{name}"
+      if inherit_from
+        f.puts "class #{name} < #{inherit_from}"
+      else
+        f.puts "class #{name}"
+      end
       f.puts "  include BaseParser"
       f.puts
 
@@ -23,19 +27,12 @@ module ScaffoldParser
       f.puts "  def to_h_with_attrs"
       f.puts "    hash = HashWithAttributes.new({}, attributes)"
       f.puts
-      methods.each do |method|
-        if method.is_a? AtMethodTemplate
-          f.puts "    hash[:#{method.method_name}] = #{method.method_name} if has? '#{method.source.name}'"
-        elsif method.is_a? SubmodelMethodTemplate
-          f.puts "    hash[:#{method.method_name}] = #{method.method_name}.to_h_with_attrs if has? '#{method.source.name}'"
-        elsif method.is_a? ListMethodTemplate
-          f.puts "    hash[:#{method.method_name}] = #{method.method_name}.map(&:to_h_with_attrs) if has? '#{method.source.name}'"
-        elsif method.is_a? StringListMethodTemplate
-          f.puts "    hash[:#{method.method_name}] = #{method.method_name} if has? '#{method.source.name}'"
-        end
-      end
+      methods.each { |method| f.puts "    #{method.to_h_with_attrs_method}" }
       f.puts
       f.puts "    hash"
+      if inherit_from
+        f.puts "    super.merge(hash)"
+      end
       f.puts "  end"
 
       f.puts "end"
