@@ -22,6 +22,11 @@ module ScaffoldParser
             memo + schema.complex_types + schema.simple_types
           end
 
+          imported_schemas = xsd.schema.collect_imported_schemas({ collect_only: collect_only })
+          imported_complex_types = imported_schemas.inject([]) do |memo, schema|
+            memo + schema.complex_types + schema.simple_types
+          end
+
           complex_types = normalize_complex_types(original_complex_types + included_complex_types)
 
           classes = complex_types.map do |complex_type|
@@ -46,7 +51,7 @@ module ScaffoldParser
           result = remove_simple_types(result)
 
           result = prepare_unbounded_elements(result)
-          result = extract_anonymous_complex_types(result)
+          result = extract_anonymous_complex_types(result, result.map(&:name))
           result = remove_basic_xsd_types(result)
 
           result
@@ -71,6 +76,49 @@ module ScaffoldParser
           end
 
           normalized + extracted
+        end
+
+        def extract_anonymous_complex_types(complex_types, names)
+          complex_types.each do |complex_type|
+            complex_type.traverse do |node|
+              if node.no_type? && node.children.last.is_a?(XsdModel::Elements::ComplexType) && node.children.last.no_type?
+                new_node = node.children.pop
+                name = node.name
+                new_node.attributes['name'] = name
+                node.attributes['type'] = name
+
+                if complex_types.include? new_node
+                  node.attributes['type'] = new_node.name
+                elsif names.include? new_node.name
+
+                  counter = 1
+                  begin
+                    counter += 1
+                    candidate = "#{name}#{counter}"
+                  end while names.include? candidate
+
+                  names << candidate
+                  new_node.attributes['name'] = candidate
+                  node.attributes['type'] = candidate
+
+                  complex_types += extract_anonymous_complex_types([new_node], names)
+                else
+                  name = node.name
+
+                  new_node.attributes['name'] = name
+                  node.attributes['type'] = name
+
+                  names << name
+
+                  complex_types += extract_anonymous_complex_types([new_node], names)
+                end
+              end
+            end
+
+            complex_type
+          end
+
+          complex_types
         end
 
         def remove_simple_types(complex_types)
