@@ -74,6 +74,10 @@ module XsdModel
       def simple_types
         children.select { |child| child.is_a? Elements::SimpleType }
       end
+
+      def elements
+        children.select { |child| child.is_a? Elements::Element }
+      end
     end
 
     class SimpleType

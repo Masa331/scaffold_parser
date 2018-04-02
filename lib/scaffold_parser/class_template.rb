@@ -20,20 +20,21 @@ module ScaffoldParser
         f.puts "class #{name}"
       end
       f.puts "  include BaseParser"
-      f.puts
-
-      f.puts methods.map { |method| indent(method.to_s.lines).join  }.join("\n\n")
-      f.puts
-      f.puts "  def to_h_with_attrs"
-      f.puts "    hash = HashWithAttributes.new({}, attributes)"
-      f.puts
-      methods.each { |method| f.puts "    #{method.to_h_with_attrs_method}" }
-      f.puts
-      f.puts "    hash"
-      if inherit_from
-        f.puts "    super.merge(hash)"
+      if methods.any?
+        f.puts
+        f.puts methods.map { |method| indent(method.to_s.lines).join  }.join("\n\n")
+        f.puts
+        f.puts "  def to_h_with_attrs"
+        f.puts "    hash = HashWithAttributes.new({}, attributes)"
+        f.puts
+        methods.each { |method| f.puts "    #{method.to_h_with_attrs_method}" }
+        f.puts
+        f.puts "    hash"
+        if inherit_from
+          f.puts "    super.merge(hash)"
+        end
+        f.puts "  end"
       end
-      f.puts "  end"
 
       f.puts "end"
 

@@ -45,13 +45,13 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="person">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="baseElement"/>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
+  <!-- <xs:complexType name="person"> -->
+  <!--   <xs:complexType> -->
+  <!--     <xs:complexContent> -->
+  <!--       <xs:extension base="baseElement"/> -->
+  <!--     </xs:complexContent> -->
+  <!--   </xs:complexType> -->
+  <!-- </xs:element> -->
 
   <xs:complexType name="baseElement">
     <xs:sequence>

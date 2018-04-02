@@ -14,17 +14,18 @@ module ScaffoldParser
         end
 
         def call
-          original_complex_types = xsd.schema.complex_types
+          original_complex_types = xsd.schema.elements + xsd.schema.complex_types + xsd.schema.simple_types
 
           collect_only = -> (e) { ['schema', 'document', 'element', 'extension', 'complexType', 'simpleType', 'include', 'import'].include?(e.name) }
           included_schemas = xsd.schema.collect_included_schemas({ collect_only: collect_only })
           included_complex_types = included_schemas.inject([]) do |memo, schema|
-            memo + schema.complex_types + schema.simple_types
+            memo + schema.elements + schema.complex_types + schema.simple_types
           end
 
           imported_schemas = xsd.schema.collect_imported_schemas({ collect_only: collect_only })
           imported_complex_types = imported_schemas.inject([]) do |memo, schema|
-            memo + schema.complex_types + schema.simple_types
+            memo + schema.children
+            memo + schema.elements + schema.complex_types + schema.simple_types
           end
 
           complex_types = normalize_complex_types(original_complex_types + included_complex_types + imported_complex_types)
@@ -40,22 +41,45 @@ module ScaffoldParser
 
           classes.flat_map do |class_template|
             [["parsers/#{class_template.name.underscore}.rb", class_template.to_s],
-             ["builders/#{class_template.name.underscore}.rb", class_template.to_builder_s]
+             ["builders/#{class_template.name.underscore}.rb", class_template.to_builder_s],
+             ["parsers/base_parser.rb", base_parser_template],
+             ["builders/base_builder.rb", base_builder_template],
+             ["requires.rb", create_requires_template(classes)]
             ]
           end
         end
 
         def normalize_complex_types(complex_types)
-          result = normalize_extensions(complex_types)
-          result = remove_empty_complex_types(result)
+          result0 = remove_elements_from_root(complex_types)
 
-          result = remove_simple_types(result)
+          result1 = normalize_extensions(result0)
+          result2 = remove_empty_complex_types(result1)
 
-          result = prepare_unbounded_elements(result)
-          result = extract_anonymous_complex_types(result, result.map(&:name))
-          result = remove_basic_xsd_types(result)
+          result3 = remove_simple_types(result2)
 
-          result
+          result4 = prepare_unbounded_elements(result3)
+          result5 = extract_anonymous_complex_types(result4, result4.map(&:name))
+          result6 = remove_basic_xsd_types(result5)
+
+          result6
+        end
+
+        def remove_elements_from_root(complex_types)
+          complex_types.map do |complex_type|
+            if complex_type.is_a?(XsdModel::Elements::Element)
+
+              child = complex_type.children.first
+              if child.nil?
+              require 'pry'; binding.pry
+              end
+              child.attributes = complex_type.attributes
+              child.namespaces = complex_type.namespaces
+
+              child
+            else
+              complex_type
+            end
+          end
         end
 
         def extract_anonymous_complex_types(complex_types, names)
@@ -137,7 +161,8 @@ module ScaffoldParser
         def remove_empty_complex_types(complex_types)
           normalized = complex_types.map do |complex_type|
             complex_type.traverse do |node|
-              if node.no_type? && node.children.last.is_a?(XsdModel::Elements::ComplexType) && node.children.last.empty?
+              if node.no_type?  && node.children.last.is_a?(XsdModel::Elements::ComplexType) && node.children.last.empty?  && node.children.last.base.nil?
+
                 node.children = []
               end
             end
@@ -212,6 +237,118 @@ module ScaffoldParser
               template.inherit_from = complex_type.base.camelize
             end
           end
+        end
+
+        def base_parser_template
+          <<~TEMPLATE
+          module Parsers
+            module BaseParser
+              EMPTY_ARRAY = []
+
+              attr_accessor :raw
+
+              def initialize(raw)
+                @raw = raw
+              end
+
+              def attributes
+                raw.attributes
+              end
+
+              private
+
+              def at(locator)
+                return nil if raw.nil?
+
+                element = raw.locate(locator.to_s).first
+
+                if element
+                  StringWithAttributes.new(element.text, element.attributes)
+                end
+              end
+
+              def has?(locator)
+                raw.locate(locator).any?
+              end
+
+              def submodel_at(klass, locator)
+                element_xml = raw.locate(locator).first
+
+                klass.new(element_xml) if element_xml
+              end
+
+              def array_of_at(klass, locator)
+                return EMPTY_ARRAY if raw.nil?
+
+                elements = raw.locate([*locator].join('/'))
+
+                elements.map do |element|
+                  klass.new(element)
+                end
+              end
+            end
+          end
+          TEMPLATE
+        end
+
+        def base_builder_template
+          <<~TEMPLATE
+          module Builders
+            module BaseBuilder
+              attr_accessor :name, :data
+
+              def initialize(name, data = {})
+                @name = name
+                @data = data || {}
+              end
+
+              def to_xml
+                doc = Ox::Document.new(version: '1.0')
+                doc << builder
+
+                Ox.dump(doc, with_xml: true)
+              end
+
+              def build_element(name, content)
+                element = Ox::Element.new(name)
+                if content.respond_to? :attributes
+                  content.attributes.each { |k, v| element[k] = v }
+                end
+
+                if content.respond_to? :value
+                  element << content.value if content.value
+                else
+                  element << content if content
+                end
+                element
+              end
+            end
+          end
+          TEMPLATE
+        end
+
+        def create_requires_template(classes)
+          with_inheritance, others = classes.partition { |klass| klass.inherit_from }
+
+          requires = []
+          others.each do |klass|
+            requires << "parsers/#{klass.name.underscore}"
+            requires << "builders/#{klass.name.underscore}"
+          end
+          with_inheritance.each do |klass|
+            requires << "parsers/#{klass.name.underscore}"
+            requires << "builders/#{klass.name.underscore}"
+          end
+          requires.unshift('parsers/base_parser')
+          requires.unshift('builders/base_builder')
+
+          if @options[:namespace]
+            requires = requires.map { |r| r.prepend("#{@options[:namespace].underscore}/") }
+          end
+
+          requires = requires.map { |r| "require '#{r}'" }
+
+          requires.join("\n")
         end
       end
     end

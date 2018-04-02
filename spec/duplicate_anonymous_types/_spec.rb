@@ -3,20 +3,23 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
 
   it 'scaffolds 12 classes total' do
     expect(scaffolds.keys).to eq(
-      ['parsers/order.rb',
-       'builders/order.rb',
-       'parsers/invoice.rb',
-       'builders/invoice.rb',
-       'parsers/offer.rb',
-       'builders/offer.rb',
-       'parsers/buyer.rb',
-       'builders/buyer.rb',
-       'parsers/seller.rb',
-       'builders/seller.rb',
-       'parsers/buyer2.rb',
-       'builders/buyer2.rb',
-       'parsers/buyer3.rb',
-       'builders/buyer3.rb']
+      ["parsers/order.rb",
+       "builders/order.rb",
+       "parsers/base_parser.rb",
+       "builders/base_builder.rb",
+       "requires.rb",
+       "parsers/invoice.rb",
+       "builders/invoice.rb",
+       "parsers/offer.rb",
+       "builders/offer.rb",
+       "parsers/buyer.rb",
+       "builders/buyer.rb",
+       "parsers/seller.rb",
+       "builders/seller.rb",
+       "parsers/buyer2.rb",
+       "builders/buyer2.rb",
+       "parsers/buyer3.rb",
+       "builders/buyer3.rb"]
     )
   end
 
