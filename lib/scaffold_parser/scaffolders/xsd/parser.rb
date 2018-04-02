@@ -33,8 +33,8 @@ module ScaffoldParser
             scaffold_class(complex_type)
           end
 
-          if classes.group_by(&:name).values.any? { |v| v.size > 1 }
-            require 'pry'; binding.pry
+          same_classes = classes.group_by(&:name).select { |k, v| v.size > 1}
+          if same_classes.any?
             fail 'multiple classes with same name'
           end
 
@@ -56,27 +56,6 @@ module ScaffoldParser
           result = remove_basic_xsd_types(result)
 
           result
-        end
-
-        def extract_anonymous_complex_types(complex_types)
-          extracted = []
-
-          normalized = complex_types.map do |complex_type|
-            complex_type.traverse do |node|
-              if node.no_type? && node.children.last.is_a?(XsdModel::Elements::ComplexType) && node.children.last.no_type?
-                new_node = node.children.pop
-                name = node.name
-
-                new_node.attributes['name'] = name
-                node.attributes['type'] = name
-                extracted = extracted + extract_anonymous_complex_types([new_node])
-              end
-            end
-
-            complex_type
-          end
-
-          normalized + extracted
         end
 
         def extract_anonymous_complex_types(complex_types, names)

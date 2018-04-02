@@ -144,6 +144,24 @@ RSpec.describe ScaffoldParser do
       |end })
   end
 
+  it 'scaffolds parser for elements with only extension and no other content' do
+    expect(scaffolds['parsers/person.rb']).to eq_multiline(%{
+      |module Parsers
+      |  class Title < BaseElement
+      |    include BaseParser
+      |  end
+      |end })
+  end
+
+  it 'scaffolds parser for company' do
+    expect(scaffolds['parsers/company.rb']).to eq_multiline(%{
+      |module Parsers
+      |  class Company < BaseElement
+      |    include BaseParser
+      |  end
+      |end })
+  end
+
   it 'scaffolds builder for type with various extensions' do
     expect(scaffolds['builders/order.rb']).to eq_multiline(%{
       |module Builders
