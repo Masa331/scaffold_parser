@@ -11,26 +11,25 @@ module ScaffoldParser
         def initialize(xsd, options)
           @xsd = xsd
           @options = options
+
+          @schemas = []
+          @collected_elements = []
+
+          @collected_nodes = []
         end
 
         def call
-          original_complex_types = xsd.schema.elements + xsd.schema.complex_types + xsd.schema.simple_types
+          collect_schemas
+          collect_elements
 
-          collect_only = -> (e) { ['schema', 'document', 'element', 'extension', 'complexType', 'simpleType', 'include', 'import'].include?(e.name) }
-          included_schemas = xsd.schema.collect_included_schemas({ collect_only: collect_only })
-          included_complex_types = included_schemas.inject([]) do |memo, schema|
-            memo + schema.elements + schema.complex_types + schema.simple_types
+          original_complex_types = @schemas.flat_map do |schema|
+            xsd.schema.complex_types + xsd.schema.simple_types
           end
+          normalized_complex_types = normalize_complex_types(original_complex_types)
 
-          imported_schemas = xsd.schema.collect_imported_schemas({ collect_only: collect_only })
-          imported_complex_types = imported_schemas.inject([]) do |memo, schema|
-            memo + schema.children
-            memo + schema.elements + schema.complex_types + schema.simple_types
-          end
+          # @collected_elements = normalize_elements(@collected_elements)
 
-          complex_types = normalize_complex_types(original_complex_types + included_complex_types + imported_complex_types)
-
-          classes = complex_types.map do |complex_type|
+          classes = (normalized_complex_types + @collected_elements).map do |complex_type|
             scaffold_class(complex_type)
           end
 
@@ -49,10 +48,53 @@ module ScaffoldParser
           end
         end
 
-        def normalize_complex_types(complex_types)
-          result0 = remove_elements_from_root(complex_types)
+        def call
+          collect_schemas
+          collect_elements
 
-          result1 = normalize_extensions(result0)
+          collect_complex_types
+
+          _remove_basic_xsd_types
+          _extract_anoymous_complex_types
+
+
+          classes = @collected_nodes.map { |node| scaffold_class(node) }
+
+          same_classes = classes.group_by(&:name).select { |k, v| v.size > 1 }
+          if same_classes.any?
+            fail 'multiple classes with same name'
+          end
+
+          classes.flat_map do |class_template|
+            [["parsers/#{class_template.name.underscore}.rb", class_template.to_s],
+             ["builders/#{class_template.name.underscore}.rb", class_template.to_builder_s],
+             ["parsers/base_parser.rb", base_parser_template],
+             ["builders/base_builder.rb", base_builder_template],
+             ["requires.rb", create_requires_template(classes)]
+            ]
+          end
+        end
+
+        def collect_schemas
+          collect_only = -> (e) { ['schema', 'document', 'element', 'extension', 'complexType', 'simpleType', 'include', 'import'].include?(e.name) }
+
+          @schemas = [xsd.schema] + xsd.schema.collect_included_schemas({ collect_only: collect_only }) + xsd.schema.collect_imported_schemas({ collect_only: collect_only })
+        end
+
+        def collect_elements
+          @schemas.each do |schema|
+            @collected_nodes += schema.delete_children [:element]
+          end
+        end
+
+        def collect_complex_types
+          @schemas.each do |schema|
+            @collected_nodes += schema.delete_children [:complex_type]
+          end
+        end
+
+        def normalize_complex_types(complex_types)
+          result1 = normalize_extensions(complex_types)
           result2 = remove_empty_complex_types(result1)
 
           result3 = remove_simple_types(result2)
@@ -64,24 +106,26 @@ module ScaffoldParser
           result6
         end
 
-        def remove_elements_from_root(complex_types)
-          complex_types.map do |complex_type|
-            if complex_type.is_a?(XsdModel::Elements::Element)
+        # def remove_elements_from_root(complex_types)
+        #   complex_types.map do |complex_type|
+        #     if complex_type.is_a?(XsdModel::Elements::Element)
+        #
+        #       child = complex_type.children.first
+        #       if child.nil?
+        #       require 'pry'; binding.pry
+        #       end
+        #       child.attributes = complex_type.attributes
+        #       child.namespaces = complex_type.namespaces
+        #
+        #       child
+        #     else
+        #       complex_type
+        #     end
+        #   end
+        # end
 
-              child = complex_type.children.first
-              if child.nil?
-              require 'pry'; binding.pry
-              end
-              child.attributes = complex_type.attributes
-              child.namespaces = complex_type.namespaces
-
-              child
-            else
-              complex_type
-            end
-          end
+        def _extract_anonymous_complex_types
         end
-
         def extract_anonymous_complex_types(complex_types, names)
           complex_types.each do |complex_type|
             complex_type.traverse do |node|
@@ -129,7 +173,7 @@ module ScaffoldParser
           extracted = []
 
           normalized, extracted = complex_types.partition do |type|
-            type.is_a? XsdModel::Elements::ComplexType
+            type.is_a?(XsdModel::Elements::ComplexType) || type.is_a?(XsdModel::Elements::Element)
           end
 
           normalized = normalized.map do |complex_type|
@@ -188,15 +232,19 @@ module ScaffoldParser
           end
         end
 
-        def remove_basic_xsd_types(complex_types)
-          complex_types.map do |complex_type|
-            complex_type.traverse do |node|
-              if node.basic_xsd_type?
-                node.attributes.delete 'type'
+        def _remove_basic_xsd_types
+          @collected_nodes = remove_basic_xsd_types(@collected_nodes)
+        end
+
+        def remove_basic_xsd_types(nodes)
+          nodes.map do |node|
+            node.traverse do |n|
+              if n.basic_xsd_type?
+                n.attributes.delete 'type'
               end
             end
 
-            complex_type
+            node
           end
         end
 
@@ -215,6 +263,15 @@ module ScaffoldParser
         end
 
         def scaffold_class(complex_type)
+          if complex_type.is_a? XsdModel::Elements::ComplexType
+            scaffold_class_from_complex_type(complex_type)
+          elsif complex_type.is_a? XsdModel::Elements::Element
+            scaffold_class_from_element(complex_type)
+          else
+            fail 'fok'
+          end
+        end
+        def scaffold_class_from_complex_type(complex_type)
           methods = complex_type.elements.map do |element|
             if element.somehow_multiple?
               if element.multiple_proxy?
@@ -235,6 +292,30 @@ module ScaffoldParser
 
             if complex_type.has_base?
               template.inherit_from = complex_type.base.camelize
+            end
+          end
+        end
+        def scaffold_class_from_element(element)
+          methods = element.complex_types.first.elements.map do |element|
+            if element.somehow_multiple?
+              if element.multiple_proxy?
+                ProxyListMethodTemplate.new(element)
+              else
+                ListMethodTemplate.new(element)
+              end
+            elsif element.has_type?
+              SubmodelMethodTemplate.new(element)
+            else
+              AtMethodTemplate.new(element)
+            end
+          end
+
+          template = ClassTemplate.new(element.name.camelize) do |template|
+            template.namespace = @options[:namespace]
+            template.methods = methods
+
+            if element.has_base?
+              template.inherit_from = element.base.camelize
             end
           end
         end

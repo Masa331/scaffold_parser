@@ -54,6 +54,12 @@ module XsdModel
       def has_name?
         !attributes['name'].nil?
       end
+
+      def delete_children(types = [])
+        deleted = children.select { |child| types.include? child.element_name.to_sym }
+        children.reject!{ |child| types.include? child.element_name.to_sym }
+        deleted
+      end
     end
 
     class Extension
@@ -151,6 +157,10 @@ module XsdModel
       # TODO: tohle nedavat do xsd_modelu ale nechat tady
       def elements
         children.select { |child| child.is_a? Elements::Element }
+      end
+
+      def complex_types
+        children.select { |child| child.is_a? Elements::ComplexType }
       end
     end
   end
