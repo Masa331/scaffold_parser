@@ -27,13 +27,12 @@ module ScaffoldParser
           class Blank
             include Base
 
-            def element(source)
-              new_wip = wip || []
-              new_wip << AtMethodTemplate.new(source)
+            def element(source, wip)
+              new_wip = wip << AtMethodTemplate.new(source)
               Element.new(stack, new_wip)
             end
 
-            def document(_)
+            def document(_, _)
               @stack
             end
           end
@@ -41,7 +40,7 @@ module ScaffoldParser
           class Sequence
             include Base
 
-            def complex_type(source)
+            def complex_type(source, wip)
               if source.has_name?
                 template = ClassTemplate.new(source.name.classify) do |template|
                   template.methods = wip
@@ -57,7 +56,8 @@ module ScaffoldParser
           class Element
             include Base
 
-            def element(source)
+            def element(source, wip)
+              # require 'pry'; binding.pry
               template =
                 if source.custom_type?
                   SubmodelMethodTemplate.new(source)
@@ -73,7 +73,7 @@ module ScaffoldParser
           class ComplexType
             include Base
 
-            def element(source)
+            def element(source, wip)
               template = ClassTemplate.new(source.name.classify) do |template|
                 template.methods = wip
               end
@@ -106,8 +106,8 @@ module ScaffoldParser
             #   end
             # puts "Calling #{handler.class.to_s.demodulize}##{element.element_name} with #{element.attributes}, wip is #{wip_content}"
 
-            require 'pry'; binding.pry
-            handler = handler.send(element.element_name, element)
+            sub_result = children_result.flat_map(&:wip).compact
+            handler = handler.send(element.element_name, element, sub_result)
           end
 
           classes = handler

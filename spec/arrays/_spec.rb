@@ -1,4 +1,10 @@
 RSpec.describe 'arrays' do
+  it 'spec_name' do
+    scaffold = scaffold_schema('./spec/arrays/schema2.xsd')['parsers/order.rb']
+
+    expect(scaffold).to eq ''
+  end
+
   let(:scaffolds) { scaffold_schema('./spec/arrays/schema.xsd') }
 
   it 'scaffolds parser for type with various elements which can occure more than once' do
