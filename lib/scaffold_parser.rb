@@ -8,7 +8,6 @@ require 'scaffold_parser/base_method_template'
 require 'scaffold_parser/at_method_template'
 require 'scaffold_parser/submodel_method_template'
 require 'scaffold_parser/list_method_template'
-require 'scaffold_parser/string_list_method_template'
 require 'scaffold_parser/proxy_list_method_template'
 require 'scaffold_parser/method_factory'
 
@@ -193,8 +192,7 @@ module ScaffoldParser
   end
 
   def self.scaffold_to_string(path, options = {})
-    collect_only = -> (e) { ['schema', 'document', 'element', 'extension', 'complexType', 'simpleType', 'include', 'import'].include?(e.name) }
-    doc = XsdModel.parse(File.read(path), { collect_only: collect_only })
+    doc = XsdModel.parse(File.read(path), { ignore: [:annotation, :text] })
 
     Scaffolders::XSD.call(doc, options)
   end
