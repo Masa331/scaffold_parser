@@ -9,7 +9,6 @@ require 'scaffold_parser/at_method_template'
 require 'scaffold_parser/submodel_method_template'
 require 'scaffold_parser/list_method_template'
 require 'scaffold_parser/proxy_list_method_template'
-require 'scaffold_parser/method_factory'
 
 require 'scaffold_parser/scaffolders/xsd'
 
