@@ -1,6 +1,6 @@
 module ScaffoldParser
   module Templates
-    class Class
+    class Klass
       include Utils
 
       attr_accessor :name, :namespace, :methods, :inherit_from

@@ -8,10 +8,11 @@ module ScaffoldParser
 
             def complex_type(source)
               if source.has_name?
-                template = ClassTemplate.new(source.name.camelize) do |template|
+                template = Templates::Klass.new(source.name.camelize) do |template|
                   template.methods = [*wip]
                 end
                 STACK.push template
+                # Blank.new
                 Handlers::Blank.new
               else
                 super

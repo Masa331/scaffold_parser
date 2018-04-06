@@ -1,17 +1,6 @@
 require 'xsd_model'
-
 require 'active_support/all'
-
-# require 'scaffold_parser/template_utils'
-# require 'scaffold_parser/class_template'
-# require 'scaffold_parser/base_method_template'
-# require 'scaffold_parser/at_method_template'
-# require 'scaffold_parser/submodel_method_template'
-# require 'scaffold_parser/list_method_template'
-# require 'scaffold_parser/proxy_list_method_template'
-
-Dir[File.join(__dir__, 'lib', 'scaffold_parser', 'templates', '*.rb')].each { |file| require file }
-
+require 'scaffold_parser/templates/all'
 require 'scaffold_parser/scaffolders/xsd'
 
 module XsdModel

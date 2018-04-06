@@ -4,6 +4,7 @@ require 'scaffold_parser/scaffolders/xsd/parser/handlers/base'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/blank'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/sequence'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/complex_type'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/element'
 
 module ScaffoldParser
   module Scaffolders
