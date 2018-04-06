@@ -12,8 +12,7 @@ module ScaffoldParser
                   template.methods = [*wip]
                 end
                 STACK.push template
-                # Blank.new
-                Handlers::Blank.new
+                Blank.new
               else
                 super
               end

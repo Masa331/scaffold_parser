@@ -7,11 +7,15 @@ module ScaffoldParser
             include Base
 
             def element(source)
-              Element.new(Templates::AtMethod.new(source))
+              if source.has_custom_type?
+                Element.new(Templates::SubmodelMethod.new(source))
+              else
+                Element.new(Templates::AtMethod.new(source))
+              end
             end
 
-            def document(_)
-              STACK
+            def schema(_)
+              Schema.new
             end
           end
         end

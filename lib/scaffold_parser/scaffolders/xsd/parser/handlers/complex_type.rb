@@ -8,11 +8,11 @@ module ScaffoldParser
 
             def element(source)
               if source.has_name?
-                template = Klass.new(source.name.camelize) do |template|
+                template = Templates::Klass.new(source.name.camelize) do |template|
                   template.methods = [*wip]
                 end
                 STACK.push template
-                Handlers::Element.new SubmodelMethod.new(source, source.name.camelize)
+                Element.new Templates::SubmodelMethod.new(source, source.name.camelize)
               else
                 fail 'fok'
               end

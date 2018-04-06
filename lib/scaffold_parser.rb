@@ -28,6 +28,10 @@ module XsdModel
         !attributes['type'].nil?
       end
 
+      def has_custom_type?
+        type && !type.start_with?("#{xsd_prefix}:")
+      end
+
       def basic_xsd_type?
         type && type.start_with?("#{xsd_prefix}:")
       end
