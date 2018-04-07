@@ -36,6 +36,14 @@ module ScaffoldParser
               self
             end
 
+            def schema(_)
+              self
+            end
+
+            def document(_)
+              STACK
+            end
+
             def complex_type(new_source)
               if new_source.has_name?
                 template = Templates::Klass.new(new_source.name.camelize) do |template|
@@ -48,6 +56,15 @@ module ScaffoldParser
                 fail 'fok'
                 self
               end
+            end
+
+            def extension(new_source)
+              template = Templates::Klass.new do |template|
+                template.methods = [self]
+                template.inherit_from = new_source.base.camelize
+              end
+
+              template
             end
           end
         end

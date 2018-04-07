@@ -8,8 +8,12 @@ module ScaffoldParser
 
             def element(source)
               if source.has_name?
-                Templates::ListMethod.new(source) do |template|
-                  template.item_class = 'String'
+                if source.multiple?
+                  Templates::ListMethod.new(source) do |template|
+                    template.item_class = 'String'
+                  end
+                else
+                  Templates::AtMethod.new(source)
                 end
               else
                 fail 'fok'

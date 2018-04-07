@@ -47,6 +47,10 @@ module ScaffoldParser
                 Handlers::Elements.new(children_result)
               end
 
+            # current_handler = handler.class.to_s.demodulize
+            # childrens = children_result.map { |child| child.class.to_s.demodulize }
+            # puts "#{current_handler}##{element.element_name} with #{element.attributes}, childrens are #{childrens}"
+
             handler.send(element.element_name, element)
           end.to_a
 

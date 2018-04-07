@@ -17,6 +17,19 @@ module ScaffoldParser
                 Templates::AtMethod.new(source)
               end
             end
+
+            def extension(new_source)
+              if new_source.basic_xsd_extension?
+                self
+              else
+                template = Templates::Klass.new do |template|
+                  template.methods = []
+                  template.inherit_from = new_source.base.camelize
+                end
+
+                template
+              end
+            end
           end
         end
       end

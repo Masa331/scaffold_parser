@@ -59,6 +59,15 @@ module ScaffoldParser
                 fail 'fok'
               end
             end
+
+            def extension(new_source)
+              template = Templates::Klass.new do |template|
+                template.methods = [self]
+                template.inherit_from = new_source.base.camelize
+              end
+
+              template
+            end
           end
         end
       end

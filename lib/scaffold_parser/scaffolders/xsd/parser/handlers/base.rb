@@ -13,20 +13,6 @@ module ScaffoldParser
                 super
               end
             end
-
-            # def subclasses
-            #   Handlers.constants
-            # end
-
-            # def respond_to?(sym, *args)
-            #   name = sym.to_s.classify
-            #
-            #   if Handlers.const_defined? name
-            #     true
-            #   else
-            #     super
-            #   end
-            # end
           end
         end
       end

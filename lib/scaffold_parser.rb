@@ -185,7 +185,7 @@ module ScaffoldParser
   end
 
   def self.scaffold_to_string(path, options = {})
-    doc = XsdModel.parse(File.read(path), { ignore: [:annotation, :text] })
+    doc = XsdModel.parse(File.read(path), { ignore: [:annotation, :text, :comment] })
 
     Scaffolders::XSD.call(doc, options)
   end
