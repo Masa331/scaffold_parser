@@ -13,7 +13,7 @@ module ScaffoldParser
       end
 
       def call
-        classes = Parser.call(@doc, @options)
+        classes = Parser.call(@doc)
 
         same_classes = classes.group_by(&:name).select { |k, v| v.size > 1}
         if same_classes.any?

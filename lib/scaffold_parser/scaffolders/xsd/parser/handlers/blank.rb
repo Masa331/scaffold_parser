@@ -17,10 +17,6 @@ module ScaffoldParser
                 Templates::AtMethod.new(source)
               end
             end
-
-            def schema(_)
-              Schema.new
-            end
           end
         end
       end

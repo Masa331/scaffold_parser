@@ -11,7 +11,6 @@ module ScaffoldParser
 
             def initialize(source, submodel_class = nil)
               @source = source
-              # @submodel_class = submodel_class || source.type.classify
               @submodel_class = submodel_class || source.type.camelize
             end
 

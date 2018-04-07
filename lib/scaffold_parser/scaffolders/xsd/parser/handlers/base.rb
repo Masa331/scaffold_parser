@@ -4,41 +4,13 @@ module ScaffoldParser
       class Parser
         module Handlers
           module Base
-            attr_accessor :wip
-
-            def initialize(wip = nil)
-              @wip = wip
-            end
-
             def method_missing(sym, *args)
               name = sym.to_s.camelize.to_sym
 
               if Handlers.constants.include? name
-                Handlers.const_get(name).new(wip)
+                Handlers.const_get(name).new
               else
                 super
-                # path = "#{Dir.pwd}/lib/scaffold_parser/scaffolders/xsd/parser/handlers/#{name.underscore}.rb"
-                #
-                # template =
-                #   <<~TEMPLATE
-                #     module ScaffoldParser
-                #       module Scaffolders
-                #         class XSD
-                #           class Parser
-                #             module Handlers
-                #               class Element
-                #                 include Base
-                #               end
-                #             end
-                #           end
-                #         end
-                #       end
-                #     end
-                #   TEMPLATE
-                # template.gsub!('Element', name)
-                # File.open(path, 'wb') { |f| f.write template }
-                # require path
-                # Handlers.const_get(name).new(wip)
               end
             end
 

@@ -8,21 +8,11 @@ module ScaffoldParser
             include Utils
 
             attr_accessor :at, :item_class
-            # attr_reader :item_class
 
             def initialize(source)
               @source = source
               @at = [source.name]
-              # @item_class =
-              #   if source.has_custom_type?
-              #     source&.type&.classify
-              #   elsif source.no_type?
-              #     source&.name&.classify
-              #   else
-              #     'String'
-              #   end
-                # source.has_custom_type? ? source&.type&.classify : 'String'
-                yield self if block_given?
+              yield self if block_given?
             end
 
             def method_body
