@@ -7,7 +7,9 @@ module ScaffoldParser
             include Base
 
             def element(source)
-              if source.has_custom_type?
+              if source.multiple?
+                Element.new(Templates::ListMethod.new(source))
+              elsif source.has_custom_type?
                 Element.new(Templates::SubmodelMethod.new(source))
               else
                 Element.new(Templates::AtMethod.new(source))

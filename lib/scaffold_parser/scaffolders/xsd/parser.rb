@@ -3,13 +3,17 @@ require 'scaffold_parser/scaffolders/xsd/parser/array_refinement'
 
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/base'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/blank'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/choice'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/complex_content'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/complex_type'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/element'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/elements'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/extension'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/max_length'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/restriction'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/schema'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/sequence'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/simple_content'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/simple_type'
 
 module ScaffoldParser

@@ -4,12 +4,13 @@ module ScaffoldParser
       include BaseMethod
       include Utils
 
-      attr_accessor :at, :item_class
+      attr_accessor :at
+      attr_reader :item_class
 
       def initialize(source)
         @source = source
         @at = [source.name]
-        @item_class = source&.type&.classify || 'String'
+        @item_class = source.has_custom_type? ? source&.type&.classify : 'String'
       end
 
       def method_body
@@ -36,6 +37,13 @@ module ScaffoldParser
         f.puts 'end'
 
         f.string.strip
+      end
+
+      def to_proxy_list(new_source, path)
+        ProxyListMethod.new(new_source) do |m|
+          m.at = [path] + @at
+          m.item_class = @item_class
+        end
       end
     end
   end

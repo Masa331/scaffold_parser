@@ -8,8 +8,7 @@ module ScaffoldParser
 
       def initialize(source)
         @source = source
-        @at = [source.name, source.children.last.name]
-        @item_class = source.children.last&.type&.classify || 'String'
+        yield self if block_given?
       end
 
       def method_body

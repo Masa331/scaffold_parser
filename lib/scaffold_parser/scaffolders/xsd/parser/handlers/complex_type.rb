@@ -7,12 +7,21 @@ module ScaffoldParser
             include Base
 
             def element(source)
-              if source.has_name?
+              if wip.is_a? Templates::ListMethod
+                template = wip.to_proxy_list(source, source.name)
+
+                Element.new template
+              elsif source.has_name?
                 template = Templates::Klass.new(source.name.camelize) do |template|
                   template.methods = [*wip]
                 end
                 STACK.push template
-                Element.new Templates::SubmodelMethod.new(source, source.name.camelize)
+
+                if source.multiple?
+                  Element.new Templates::ListMethod.new(source)
+                else
+                  Element.new Templates::SubmodelMethod.new(source, source.name.camelize)
+                end
               else
                 fail 'fok'
               end
