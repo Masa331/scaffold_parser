@@ -1,0 +1,7 @@
+require 'scaffold_parser/scaffolders/xsd/parser/templates/utils'
+require 'scaffold_parser/scaffolders/xsd/parser/templates/base_method'
+require 'scaffold_parser/scaffolders/xsd/parser/templates/at_method'
+require 'scaffold_parser/scaffolders/xsd/parser/templates/klass'
+require 'scaffold_parser/scaffolders/xsd/parser/templates/list_method'
+require 'scaffold_parser/scaffolders/xsd/parser/templates/proxy_list_method'
+require 'scaffold_parser/scaffolders/xsd/parser/templates/submodel_method'

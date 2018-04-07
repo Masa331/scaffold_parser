@@ -16,6 +16,8 @@ require 'scaffold_parser/scaffolders/xsd/parser/handlers/sequence'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/simple_content'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/simple_type'
 
+require 'scaffold_parser/scaffolders/xsd/parser/templates/all'
+
 module ScaffoldParser
   module Scaffolders
     class XSD
@@ -40,11 +42,13 @@ module ScaffoldParser
 
           classes = xsd.reverse_traverse do |element, children_result|
             # current_handler = children_result.handler.class.to_s.demodulize
-            # wip = children_result.handler.wip.class.to_s.demodulize
-            # puts "Current handler: #{current_handler}, calling #{element.element_name} with #{element.attributes}, wip is #{wip}"
+            # childrens = children_result.map { |child| child.class.to_s.demodulize }
+            # puts "#{current_handler}##{element.element_name} with #{element.attributes}, childrens are #{childrens}"
 
             children_result.handler.send(element.element_name, element)
           end.to_a
+
+          classes
         end
       end
     end

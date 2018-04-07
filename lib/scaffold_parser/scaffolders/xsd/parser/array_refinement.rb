@@ -7,7 +7,8 @@ module ArrayRefinement
       elsif one?
         first
       else
-        ScaffoldParser::Scaffolders::XSD::Parser::Handlers::Elements.new(flat_map(&:wip))
+        # ScaffoldParser::Scaffolders::XSD::Parser::Handlers::Elements.new(flat_map(&:wip))
+        ScaffoldParser::Scaffolders::XSD::Parser::Handlers::Elements.new(self)
       end
     end
   end

@@ -7,7 +7,7 @@ module ScaffoldParser
             include Base
 
             def element(source)
-              Element.new(Templates::AtMethod.new(source))
+              Templates::AtMethod.new(source)
             end
           end
         end

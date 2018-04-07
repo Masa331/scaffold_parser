@@ -8,11 +8,13 @@ module ScaffoldParser
 
             def element(source)
               if source.multiple?
-                Element.new(Templates::ListMethod.new(source))
+                Templates::ListMethod.new(source) do |template|
+                  template.item_class = source.has_custom_type? ? source&.type&.classify : 'String'
+                end
               elsif source.has_custom_type?
-                Element.new(Templates::SubmodelMethod.new(source))
+                Templates::SubmodelMethod.new(source)
               else
-                Element.new(Templates::AtMethod.new(source))
+                Templates::AtMethod.new(source)
               end
             end
 

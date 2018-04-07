@@ -1,6 +1,5 @@
 require 'xsd_model'
 require 'active_support/all'
-require 'scaffold_parser/templates/all'
 require 'scaffold_parser/scaffolders/xsd'
 
 module XsdModel
