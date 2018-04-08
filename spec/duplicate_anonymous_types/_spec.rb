@@ -2,8 +2,7 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
   let(:scaffolds) { scaffold_schema('./spec/duplicate_anonymous_types/schema.xsd') }
 
   it 'scaffolds 12 classes total' do
-    expect(scaffolds.keys).to eq(
-      ["parsers/order.rb",
+    expected = ["parsers/order.rb",
        "builders/order.rb",
        "parsers/base_parser.rb",
        "builders/base_builder.rb",
@@ -20,7 +19,8 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
        "builders/buyer2.rb",
        "parsers/buyer3.rb",
        "builders/buyer3.rb"]
-    )
+
+    expect(scaffolds.keys.sort).to eq(expected.sort)
   end
 
   it 'scaffolds parser for order' do

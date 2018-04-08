@@ -44,10 +44,9 @@ module ScaffoldParser
                 template = Templates::Klass.new(new_source.name.camelize) do |template|
                   template.methods = elements
                 end
-                STACK.push template
+                new_class = STACK.push template
 
-                # Templates::AtMethod.new(new_source)
-                Templates::SubmodelMethod.new(new_source, new_source.name.camelize)
+                Templates::SubmodelMethod.new(new_source, new_class.name.camelize)
               else
                 self
               end

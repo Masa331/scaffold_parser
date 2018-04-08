@@ -34,6 +34,13 @@ module ScaffoldParser
               Templates::SubmodelMethod.new(new_source, new_source.name.camelize)
             end
 
+            def ==(other)
+              name == other.name &&
+                namespace == other.namespace &&
+                methods == other.methods &&
+                inherit_from == other.inherit_from
+            end
+
             def to_s
               f = StringIO.new
 
