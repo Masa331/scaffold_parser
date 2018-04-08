@@ -13,7 +13,27 @@ module ScaffoldParser
       end
 
       def call
-        classes = Parser.call(@doc)
+        # require 'pry'; binding.pry
+
+        all = [@doc.schema] + @doc.schema.collect_included_schemas({ ignore: [:annotation, :text, :comment] }) + @doc.schema.collect_imported_schemas({ ignore: [:annotation, :text, :comment] })
+
+        # classes = Parser.call(@doc)
+        all_classes = Parser.call(all)
+
+        simple_types, classes = all_classes.partition do |klass|
+          klass.is_a? Parser::Templates::SimpleTypeKlass
+        end
+
+        #TODO: get rid of this. SimpleType elements handling
+        classes.each do |klass|
+          klass.methods = klass.methods.map do |meth|
+            if meth.is_a?(Parser::Templates::SubmodelMethod) && simple_types.map(&:name).include?(meth.submodel_class)
+              meth.to_at_method
+            else
+              meth
+            end
+          end
+        end
 
         same_classes = classes.group_by(&:name).select { |k, v| v.size > 1}
         if same_classes.any?

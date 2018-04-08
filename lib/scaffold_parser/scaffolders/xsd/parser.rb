@@ -22,14 +22,14 @@ module ScaffoldParser
     class XSD
       class Parser
 
-        attr_reader :xsd
+        attr_reader :xsds
 
-        def self.call(xsd)
-          self.new(xsd).call
+        def self.call(xsds)
+          self.new(xsds).call
         end
 
-        def initialize(xsd)
-          @xsd = xsd
+        def initialize(xsds)
+          @xsds = xsds
         end
 
         STACK = Stack.instance
@@ -37,24 +37,27 @@ module ScaffoldParser
         def call
           STACK.clear
 
-          classes = xsd.reverse_traverse do |element, children_result|
-            handler =
-              if children_result.empty?
-                Handlers::Blank.new
-              elsif children_result.one?
-                children_result.first
-              else
-                Handlers::Elements.new(children_result)
+          classes =
+            xsds.map do |xsd|
+              xsd.reverse_traverse do |element, children_result|
+                handler =
+                  if children_result.empty?
+                    Handlers::Blank.new
+                  elsif children_result.one?
+                    children_result.first
+                  else
+                    Handlers::Elements.new(children_result)
+                  end
+
+                current_handler = handler.class.to_s.demodulize
+                childrens = children_result.map { |child| child.class.to_s.demodulize }
+                puts "#{current_handler}##{element.element_name} with #{element.attributes}, childrens are #{childrens}"
+
+                handler.send(element.element_name, element)
               end
+            end
 
-            # current_handler = handler.class.to_s.demodulize
-            # childrens = children_result.map { |child| child.class.to_s.demodulize }
-            # puts "#{current_handler}##{element.element_name} with #{element.attributes}, childrens are #{childrens}"
-
-            handler.send(element.element_name, element)
-          end.to_a
-
-          classes
+          classes = STACK.to_a
         end
       end
     end

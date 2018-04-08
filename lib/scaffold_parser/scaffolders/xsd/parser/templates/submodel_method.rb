@@ -37,11 +37,16 @@ module ScaffoldParser
             end
 
             def schema(_)
-              self
+              STACK
+              # self
             end
 
-            def document(_)
-              STACK
+            # def document(_)
+            #   STACK
+            # end
+
+            def to_at_method
+              Templates::AtMethod.new(source)
             end
 
             def complex_type(new_source)

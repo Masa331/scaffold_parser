@@ -32,6 +32,10 @@ module ScaffoldParser
             end
           end
 
+          # def push_raw(value)
+          #   @stack.push value
+          # end
+
           def clear
             @stack.clear
           end

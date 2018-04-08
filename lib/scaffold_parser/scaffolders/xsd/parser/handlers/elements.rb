@@ -15,16 +15,17 @@ module ScaffoldParser
             end
 
             def schema(_)
-              self
+              # self
+              STACK
             end
 
             def choice(_)
               self
             end
 
-            def document(_)
-              STACK
-            end
+            # def document(_)
+            #   STACK
+            # end
 
             def complex_type(new_source)
               if new_source.has_name?

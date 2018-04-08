@@ -30,6 +30,14 @@ module ScaffoldParser
                 template
               end
             end
+
+            def include(_)
+              self
+            end
+
+            def schema(_)
+              self
+            end
           end
         end
       end
