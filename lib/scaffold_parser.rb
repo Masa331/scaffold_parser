@@ -27,6 +27,14 @@ module XsdModel
         !attributes['type'].nil?
       end
 
+      def ref
+        attributes['ref']
+      end
+
+      def has_ref?
+        !attributes['ref'].nil?
+      end
+
       def has_custom_type?
         type && !type.start_with?("#{xsd_prefix}:")
       end

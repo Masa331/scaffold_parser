@@ -17,7 +17,7 @@ RSpec.describe 'simple types' do
       |
       |      hash[:buyer] = buyer.to_h_with_attrs if has? 'buyer'
       |
-      |      hash
+      |      mega.inject(hash) { |memo, r| memo.merge r }
       |    end
       |  end
       |end })
@@ -26,19 +26,29 @@ RSpec.describe 'simple types' do
   it 'scaffolds parser for type including group' do
     expect(scaffolds['parsers/buyer.rb']).to eq_multiline(%{
       |module Parsers
-      |  class Order
+      |  class Buyer
       |    include BaseParser
       |    include Configuration
+      |
+      |    def name
+      |      at 'name'
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:name] = name if has? 'name'
+      |
+      |      mega.inject(hash) { |memo, r| memo.merge r }
+      |    end
       |  end
       |end })
   end
 
   it 'scaffolds parser for group' do
-    expect(scaffolds['parsers/group.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/configuration.rb']).to eq_multiline(%{
       |module Parsers
-      |  class Group
-      |    include BaseParser
-      |
+      |  module Configuration
       |    def flag
       |      at 'flag'
       |    end
@@ -46,7 +56,7 @@ RSpec.describe 'simple types' do
       |    def to_h_with_attrs
       |      hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:flag] = flag.to_h_with_attrs if has? 'flag'
+      |      hash[:flag] = flag if has? 'flag'
       |
       |      hash
       |    end

@@ -38,6 +38,14 @@ module ScaffoldParser
             def schema(_)
               self
             end
+
+            def group(source)
+              if source.has_ref?
+                Templates::Include.new(source.ref.camelize)
+              else
+                fail 'fok'
+              end
+            end
           end
         end
       end

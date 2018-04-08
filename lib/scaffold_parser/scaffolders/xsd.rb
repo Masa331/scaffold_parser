@@ -35,6 +35,10 @@ module ScaffoldParser
           end
         end
 
+        classes.each do |klass|
+          klass.namespace = @options.fetch(:namespace, nil)
+        end
+
         same_classes = classes.group_by(&:name).select { |k, v| v.size > 1}
         if same_classes.any?
           fail 'multiple classes with same name'

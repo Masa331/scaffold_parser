@@ -73,6 +73,14 @@ module ScaffoldParser
 
               template
             end
+
+            def group(new_source)
+              template = Templates::Module.new(new_source.name.camelize) do |template|
+                template.methods = [self]
+              end
+
+              STACK.push template
+            end
           end
         end
       end

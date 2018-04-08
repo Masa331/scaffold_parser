@@ -15,7 +15,6 @@ module ScaffoldParser
             end
 
             def schema(_)
-              # self
               STACK
             end
 
@@ -23,14 +22,15 @@ module ScaffoldParser
               self
             end
 
-            # def document(_)
-            #   STACK
-            # end
-
             def complex_type(new_source)
               if new_source.has_name?
+                includes, methods = elements.partition do |e|
+                  e.is_a? Templates::Include
+                end
+
                 template = Templates::Klass.new(new_source.name.camelize) do |template|
-                  template.methods = elements
+                  template.methods = methods
+                  template.includes = includes
                 end
                 STACK.push template
 
@@ -42,8 +42,13 @@ module ScaffoldParser
 
             def element(new_source)
               if new_source.has_name?
+                includes, methods = elements.partition do |e|
+                  e.is_a? Templates::Include
+                end
+
                 template = Templates::Klass.new(new_source.name.camelize) do |template|
-                  template.methods = elements
+                  template.methods = methods
+                  template.includes = includes
                 end
                 new_class = STACK.push template
 
