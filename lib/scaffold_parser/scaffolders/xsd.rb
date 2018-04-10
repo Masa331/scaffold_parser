@@ -15,7 +15,7 @@ module ScaffoldParser
       def call
         # require 'pry'; binding.pry
 
-        all = [@doc.schema] + @doc.schema.collect_included_schemas({ ignore: [:annotation, :text, :comment] }) + @doc.schema.collect_imported_schemas({ ignore: [:annotation, :text, :comment] })
+        all = [@doc.schema] + @doc.schema.collect_included_schemas({ ignore: [:annotation, :text, :comment, :documentation, :attribute, :length, :enumeration, :appinfo] }) + @doc.schema.collect_imported_schemas({ ignore: [:annotation, :text, :comment, :documentation, :attribute, :length, :enumeration, :appinfo] })
 
         # classes = Parser.call(@doc)
         all_classes = Parser.call(all)

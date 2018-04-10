@@ -183,7 +183,7 @@ module ScaffoldParser
       puts './tmp/parsers directory created'
     end
 
-    scaffold_to_string(path, options).each do |path, content|
+    scaffold_to_string(File.read(path), options).each do |path, content|
       complete_path = path.prepend('./tmp/')
 
       puts "Writing out #{complete_path}" if options[:verbose]
@@ -192,8 +192,8 @@ module ScaffoldParser
     end
   end
 
-  def self.scaffold_to_string(path, options = {})
-    doc = XsdModel.parse(File.read(path), { ignore: [:annotation, :text, :comment] })
+  def self.scaffold_to_string(schema, options = {})
+    doc = XsdModel.parse(schema, { ignore: [:annotation, :text, :comment, :documentation, :attribute, :length, :enumeration, :appinfo] })
 
     Scaffolders::XSD.call(doc, options)
   end

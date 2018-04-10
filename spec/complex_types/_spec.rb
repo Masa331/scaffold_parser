@@ -1,4 +1,33 @@
 RSpec.describe 'complex types' do
+  it 'parses complex type allright' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      |  <xs:complexType name="souhrnDPHType">
+      |    <xs:sequence>
+      |      <xs:element name="SeznamDalsiSazby" minOccurs="0">
+      |        <xs:complexType>
+      |          <xs:sequence>
+      |            <xs:element name="DalsiSazba">
+      |              <xs:complexType>
+      |                <xs:sequence>
+      |                  <xs:element name="Popis" minOccurs="0">
+      |                  </xs:element>
+      |                </xs:sequence>
+      |              </xs:complexType>
+      |            </xs:element>
+      |          </xs:sequence>
+      |        </xs:complexType>
+      |      </xs:element>
+      |    </xs:sequence>
+      |  </xs:complexType>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/order.rb']
+    expect(scaffold).to eq ''
+  end
+
   let(:scaffolds) { scaffold_schema('./spec/complex_types/schema.xsd') }
 
   it 'scaffolds parser for type with various complex types' do
