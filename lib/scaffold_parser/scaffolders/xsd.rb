@@ -3,19 +3,18 @@ require 'scaffold_parser/scaffolders/xsd/parser'
 module ScaffoldParser
   module Scaffolders
     class XSD
-      def self.call(doc, options)
-        self.new(doc, options).call
+      def self.call(doc, options, parse_options = {})
+        self.new(doc, options, parse_options).call
       end
 
-      def initialize(doc, options)
+      def initialize(doc, options, parse_options = {})
         @doc = doc
         @options = options
+        @parse_options = parse_options
       end
 
       def call
-        # require 'pry'; binding.pry
-
-        all = [@doc.schema] + @doc.schema.collect_included_schemas({ ignore: [:annotation, :text, :comment, :documentation, :attribute, :length, :enumeration, :appinfo] }) + @doc.schema.collect_imported_schemas({ ignore: [:annotation, :text, :comment, :documentation, :attribute, :length, :enumeration, :appinfo] })
+        all = [@doc.schema] + @doc.schema.collect_included_schemas(@parse_options) + @doc.schema.collect_imported_schemas(@parse_options)
 
         # classes = Parser.call(@doc)
         all_classes = Parser.call(all)

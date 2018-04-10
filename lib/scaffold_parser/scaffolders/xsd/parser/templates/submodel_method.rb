@@ -49,6 +49,20 @@ module ScaffoldParser
               Templates::AtMethod.new(source)
             end
 
+            def element(new_source)
+              if new_source.has_name?
+                template = Templates::Klass.new(new_source.name.camelize) do |template|
+                  template.methods = [self]
+                end
+                STACK.push template
+
+                Templates::SubmodelMethod.new(new_source, new_source.name.camelize)
+                # Handlers::Blank.new
+              else
+                fail 'fok'
+              end
+            end
+
             def complex_type(new_source)
               if new_source.has_name?
                 template = Templates::Klass.new(new_source.name.camelize) do |template|
@@ -58,7 +72,7 @@ module ScaffoldParser
 
                 Handlers::Blank.new
               else
-                fail 'fok'
+              #   fail 'fok'
                 self
               end
             end

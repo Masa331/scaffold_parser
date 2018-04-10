@@ -5,16 +5,10 @@ RSpec.describe 'complex types' do
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:complexType name="souhrnDPHType">
       |    <xs:sequence>
-      |      <xs:element name="SeznamDalsiSazby" minOccurs="0">
+      |      <xs:element name="SeznamDalsiSazby">
       |        <xs:complexType>
       |          <xs:sequence>
-      |            <xs:element name="DalsiSazba">
-      |              <xs:complexType>
-      |                <xs:sequence>
-      |                  <xs:element name="Popis" minOccurs="0">
-      |                  </xs:element>
-      |                </xs:sequence>
-      |              </xs:complexType>
+      |            <xs:element name="DalsiSazba" type="someType">
       |            </xs:element>
       |          </xs:sequence>
       |        </xs:complexType>
@@ -24,8 +18,25 @@ RSpec.describe 'complex types' do
       |</xs:schema> })
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
-    scaffold = Hash[scaffolds]['parsers/order.rb']
-    expect(scaffold).to eq ''
+    scaffold = Hash[scaffolds]['parsers/seznam_dalsi_sazby.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class SeznamDalsiSazby
+      |    include BaseParser
+      |
+      |    def dalsi_sazba
+      |      submodel_at(SomeType, 'DalsiSazba')
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:dalsi_sazba] = dalsi_sazba.to_h_with_attrs if has? 'DalsiSazba'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
   end
 
   let(:scaffolds) { scaffold_schema('./spec/complex_types/schema.xsd') }

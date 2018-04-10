@@ -193,8 +193,17 @@ module ScaffoldParser
   end
 
   def self.scaffold_to_string(schema, options = {})
-    doc = XsdModel.parse(schema, { ignore: [:annotation, :text, :comment, :documentation, :attribute, :length, :enumeration, :appinfo] })
+    parse_options = { ignore: [:annotation,
+                               :text,
+                               :comment,
+                               :documentation,
+                               :attribute,
+                               :length,
+                               :enumeration,
+                               :appinfo,
+                               :pattern, :total_digits, :total_digit] }
+    doc = XsdModel.parse(schema, parse_options)
 
-    Scaffolders::XSD.call(doc, options)
+    Scaffolders::XSD.call(doc, options, parse_options)
   end
 end
