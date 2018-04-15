@@ -22,7 +22,10 @@ module ScaffoldParser
 
             def complex_type(new_source)
               if new_source.has_name?
-                fail 'fok'
+                self.name = new_source.name.camelize
+                STACK.push self
+
+                Handlers::Blank.new
               else
                 self
               end
@@ -52,15 +55,18 @@ module ScaffoldParser
               end
               f.puts "  include BaseParser"
               includes.each { |incl| f.puts "  include #{incl.ref}" }
-              if methods.any?
-                f.puts
+              if methods.any? || includes.any?
+                f.puts if methods.any?
                 f.puts methods.map { |method| indent(method.to_s.lines).join  }.join("\n\n")
-                f.puts
+                f.puts if methods.any?
                 f.puts "  def to_h_with_attrs"
                 f.puts "    hash = HashWithAttributes.new({}, attributes)"
                 f.puts
+                # if methods.any? { |m| !m.respond_to?(:to_h_with_attrs_method) }
+                #   require 'pry'; binding.pry
+                # end
                 methods.each { |method| f.puts "    #{method.to_h_with_attrs_method}" }
-                f.puts
+                f.puts if methods.any?
                 if includes.any?
                   f.puts "    mega.inject(hash) { |memo, r| memo.merge r }"
                 else

@@ -3,6 +3,7 @@ module ScaffoldParser
     class XSD
       class Parser
         module Handlers
+          #TODO this whole class can be thrown away. SimpleType can be called directly on Blank if needed
           class Restriction
             include Base
 

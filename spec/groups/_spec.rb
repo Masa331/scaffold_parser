@@ -1,4 +1,125 @@
 RSpec.describe 'simple types' do
+  it 'parses complex type allright' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      |  <xs:complexType name="order">
+      |    <xs:sequence>
+      |      <xs:group ref="configuration"/>
+      |    </xs:sequence>
+      |  </xs:complexType>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/order.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class Order
+      |    include BaseParser
+      |    include Configuration
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      mega.inject(hash) { |memo, r| memo.merge r }
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'parses complex type allright' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      |  <xs:complexType name="order">
+      |    <xs:group ref="configuration"/>
+      |  </xs:complexType>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/order.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class Order
+      |    include BaseParser
+      |    include Configuration
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      mega.inject(hash) { |memo, r| memo.merge r }
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'parses complex type allright' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      |  <xs:element name="order" minOccurs="0">
+      |    <xs:complexType>
+      |      <xs:group ref="configuration"/>
+      |    </xs:complexType>
+      |  </xs:element>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/order.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class Order
+      |    include BaseParser
+      |    include Configuration
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      mega.inject(hash) { |memo, r| memo.merge r }
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'parses complex type allright' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      |  <xs:group name="configuration">
+      |    <xs:sequence>
+      |      <xs:element name="flag" type="xs:string">
+      |      </xs:element>
+      |      <xs:element name="flag2" type="xs:string">
+      |      </xs:element>
+      |    </xs:sequence>
+      |  </xs:group>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/configuration.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  module Configuration
+      |    def flag
+      |      at 'flag'
+      |    end
+      |
+      |    def flag2
+      |      at 'flag2'
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:flag] = flag if has? 'flag'
+      |      hash[:flag2] = flag2 if has? 'flag2'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
   let(:scaffolds) { scaffold_schema('./spec/groups/schema.xsd') }
 
   it 'scaffolds parser for type including group' do

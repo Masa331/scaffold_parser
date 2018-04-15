@@ -1,4 +1,51 @@
 RSpec.describe 'complex types' do
+  it 'sequence inside a sequence inside i sequence... i know..' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      |  <xs:complexType name="order">
+      |    <xs:sequence>
+      |      <xs:element name="name"/>
+      |      <xs:sequence>
+      |        <xs:element name="company_name"/>
+      |        <xs:element name="company_address"/>
+      |      </xs:sequence>
+      |    </xs:sequence>
+      |  </xs:complexType>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/order.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class Order
+      |    include BaseParser
+      |
+      |    def name
+      |      at 'name'
+      |    end
+      |
+      |    def company_name
+      |      at 'company_name'
+      |    end
+      |
+      |    def company_address
+      |      at 'company_address'
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:name] = name if has? 'name'
+      |      hash[:company_name] = company_name if has? 'company_name'
+      |      hash[:company_address] = company_address if has? 'company_address'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
   it 'parses complex type allright' do
     schema = multiline(%{
       |<?xml version="1.0" encoding="UTF-8"?>

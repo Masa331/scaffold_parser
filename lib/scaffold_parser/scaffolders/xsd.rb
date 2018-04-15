@@ -16,8 +16,7 @@ module ScaffoldParser
       def call
         all = [@doc.schema] + @doc.schema.collect_included_schemas(@parse_options) + @doc.schema.collect_imported_schemas(@parse_options)
 
-        # classes = Parser.call(@doc)
-        all_classes = Parser.call(all)
+        all_classes = Parser.call(all, @options)
 
         simple_types, classes = all_classes.partition do |klass|
           klass.is_a? Parser::Templates::SimpleTypeKlass

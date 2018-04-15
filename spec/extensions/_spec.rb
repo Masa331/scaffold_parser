@@ -1,4 +1,48 @@
 RSpec.describe ScaffoldParser do
+  it 'parses elements with extension' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      |  <xs:complexType name="order">
+      |   <xs:complexContent>
+      |     <xs:extension base="baseElement">
+      |       <xs:sequence>
+      |         <xs:element name="name"/>
+      |         <xs:element name="title"/>
+      |       </xs:sequence>
+      |     </xs:extension>
+      |   </xs:complexContent>
+      |  </xs:complexType>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/order.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class Order < BaseElement
+      |    include BaseParser
+      |
+      |    def name
+      |      at 'name'
+      |    end
+      |
+      |    def title
+      |      at 'title'
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:name] = name if has? 'name'
+      |      hash[:title] = title if has? 'title'
+      |
+      |      hash
+      |      super.merge(hash)
+      |    end
+      |  end
+      |end })
+  end
+
   let(:scaffolds) { scaffold_schema('./spec/extensions/schema.xsd') }
 
   it 'scaffolds parser for type with various extensions' do

@@ -6,6 +6,7 @@ module ScaffoldParser
           class Elements
             attr_accessor :elements
 
+            #TODO wtf
             def initialize(elements = elements)
               @elements = elements
             end
@@ -56,6 +57,30 @@ module ScaffoldParser
               else
                 self
               end
+            end
+
+            def extension(new_source)
+              includes, methods = elements.partition do |e|
+                e.is_a? Templates::Include
+              end
+
+              template = Templates::Klass.new do |template|
+                template.methods = methods
+                template.includes = includes
+                template.inherit_from = new_source.base.camelize
+              end
+
+              template
+            end
+
+            def group(new_source)
+              template = Templates::Module.new(new_source.name.camelize) do |template|
+                template.methods = elements
+              end
+
+              STACK.push template
+
+              Handlers::Blank.new
             end
           end
         end

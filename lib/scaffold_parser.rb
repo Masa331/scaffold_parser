@@ -201,7 +201,10 @@ module ScaffoldParser
                                :length,
                                :enumeration,
                                :appinfo,
-                               :pattern, :total_digits, :total_digit] }
+                               :pattern,
+                               :total_digits, :fraction_digits, :white_space, :min_exclusive, :collection,
+                               :schema_info, :doctype, :logical, :content, :min_length
+    ] }
     doc = XsdModel.parse(schema, parse_options)
 
     Scaffolders::XSD.call(doc, options, parse_options)
