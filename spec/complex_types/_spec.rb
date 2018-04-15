@@ -46,6 +46,70 @@ RSpec.describe 'complex types' do
       |end })
   end
 
+  it 'empty complex type' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      |  <xs:complexType name="list_type"/>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/list_type.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class ListType
+      |    include BaseParser
+      |  end
+      |end })
+  end
+
+  it 'empty complex type' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      |  <xs:complexType name="order">
+      |    <xs:sequence>
+      |      <xs:element name="ISDOC">
+      |        <xs:annotation>
+      |          <xs:documentation>some comment..</xs:documentation>
+      |        </xs:annotation>
+      |        <xs:complexType>
+      |          <xs:attribute name="OznacDok" use="optional">
+      |            <xs:annotation>
+      |              <xs:documentation>Označení dokumentu, kterým dal příjemce vystaviteli souhlas s elektronickou formou faktury</xs:documentation>
+      |            </xs:annotation>
+      |          </xs:attribute>
+      |          <xs:attribute name="IdZboziKupujici" use="optional"/>
+      |          <xs:attribute name="Katalog" use="optional"/>
+      |          <xs:attribute name="UzivCode" use="optional"/>
+      |        </xs:complexType>
+      |      </xs:element>
+      |    </xs:sequence>
+      |  </xs:complexType>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/order.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class Order
+      |    include BaseParser
+      |
+      |    def isdoc
+      |      at 'ISDOC'
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:isdoc] = isdoc if has? 'ISDOC'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
   it 'parses complex type allright' do
     schema = multiline(%{
       |<?xml version="1.0" encoding="UTF-8"?>

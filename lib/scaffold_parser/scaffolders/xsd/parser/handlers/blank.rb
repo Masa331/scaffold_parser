@@ -18,6 +18,21 @@ module ScaffoldParser
               end
             end
 
+            def complex_type(new_source)
+              if new_source.has_name?
+                template = Templates::Klass.new(new_source.name.camelize)
+
+                STACK.push template
+
+                Handlers::Blank.new
+              else
+                # require 'pry'; binding.pry
+                # fail 'fok'
+
+                Handlers::Blank.new
+              end
+            end
+
             def extension(new_source)
               if new_source.basic_xsd_extension?
                 self

@@ -16,7 +16,7 @@ RSpec.describe 'simple types' do
       |module Parsers
       |  class Order
       |    include BaseParser
-      |    include Configuration
+      |    include Groups::Configuration
       |
       |    def to_h_with_attrs
       |      hash = HashWithAttributes.new({}, attributes)
@@ -42,7 +42,7 @@ RSpec.describe 'simple types' do
       |module Parsers
       |  class Order
       |    include BaseParser
-      |    include Configuration
+      |    include Groups::Configuration
       |
       |    def to_h_with_attrs
       |      hash = HashWithAttributes.new({}, attributes)
@@ -70,7 +70,7 @@ RSpec.describe 'simple types' do
       |module Parsers
       |  class Order
       |    include BaseParser
-      |    include Configuration
+      |    include Groups::Configuration
       |
       |    def to_h_with_attrs
       |      hash = HashWithAttributes.new({}, attributes)
@@ -96,25 +96,27 @@ RSpec.describe 'simple types' do
       |</xs:schema> })
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
-    scaffold = Hash[scaffolds]['parsers/configuration.rb']
+    scaffold = Hash[scaffolds]['parsers/groups/configuration.rb']
     expect(scaffold).to eq_multiline(%{
       |module Parsers
-      |  module Configuration
-      |    def flag
-      |      at 'flag'
-      |    end
+      |  module Groups
+      |    module Configuration
+      |      def flag
+      |        at 'flag'
+      |      end
       |
-      |    def flag2
-      |      at 'flag2'
-      |    end
+      |      def flag2
+      |        at 'flag2'
+      |      end
       |
-      |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      def to_h_with_attrs
+      |        hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:flag] = flag if has? 'flag'
-      |      hash[:flag2] = flag2 if has? 'flag2'
+      |        hash[:flag] = flag if has? 'flag'
+      |        hash[:flag2] = flag2 if has? 'flag2'
       |
-      |      hash
+      |        hash
+      |      end
       |    end
       |  end
       |end })
@@ -127,7 +129,7 @@ RSpec.describe 'simple types' do
       |module Parsers
       |  class Order
       |    include BaseParser
-      |    include Configuration
+      |    include Groups::Configuration
       |
       |    def buyer
       |      submodel_at(Buyer, 'buyer')
@@ -149,7 +151,7 @@ RSpec.describe 'simple types' do
       |module Parsers
       |  class Buyer
       |    include BaseParser
-      |    include Configuration
+      |    include Groups::Configuration
       |
       |    def name
       |      at 'name'
@@ -167,19 +169,21 @@ RSpec.describe 'simple types' do
   end
 
   it 'scaffolds parser for group' do
-    expect(scaffolds['parsers/configuration.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/groups/configuration.rb']).to eq_multiline(%{
       |module Parsers
-      |  module Configuration
-      |    def flag
-      |      at 'flag'
-      |    end
+      |  module Groups
+      |    module Configuration
+      |      def flag
+      |        at 'flag'
+      |      end
       |
-      |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      def to_h_with_attrs
+      |        hash = HashWithAttributes.new({}, attributes)
       |
-      |      hash[:flag] = flag if has? 'flag'
+      |        hash[:flag] = flag if has? 'flag'
       |
-      |      hash
+      |        hash
+      |      end
       |    end
       |  end
       |end })

@@ -1,8 +1,11 @@
 require 'scaffold_parser/scaffolders/xsd/parser'
+require 'scaffold_parser/scaffolders/xsd/parser/templates/utils'
 
 module ScaffoldParser
   module Scaffolders
     class XSD
+      include Parser::Templates::Utils
+
       def self.call(doc, options, parse_options = {})
         self.new(doc, options, parse_options).call
       end
@@ -55,97 +58,117 @@ module ScaffoldParser
       private
 
       def base_parser_template
-        <<~TEMPLATE
-          module Parsers
-            module BaseParser
-              EMPTY_ARRAY = []
+        template =
+          <<~TEMPLATE
+            module Parsers
+              module BaseParser
+                EMPTY_ARRAY = []
 
-              attr_accessor :raw
+                attr_accessor :raw
 
-              def initialize(raw)
-                @raw = raw
-              end
-
-              def attributes
-                raw.attributes
-              end
-
-              private
-
-              def at(locator)
-                return nil if raw.nil?
-
-                element = raw.locate(locator.to_s).first
-
-                if element
-                  StringWithAttributes.new(element.text, element.attributes)
+                def initialize(raw)
+                  @raw = raw
                 end
-              end
 
-              def has?(locator)
-                raw.locate(locator).any?
-              end
+                def attributes
+                  raw.attributes
+                end
 
-              def submodel_at(klass, locator)
-                element_xml = raw.locate(locator).first
+                private
 
-                klass.new(element_xml) if element_xml
-              end
+                def at(locator)
+                  return nil if raw.nil?
 
-              def array_of_at(klass, locator)
-                return EMPTY_ARRAY if raw.nil?
+                  element = raw.locate(locator.to_s).first
 
-                elements = raw.locate([*locator].join('/'))
+                  if element
+                    StringWithAttributes.new(element.text, element.attributes)
+                  end
+                end
 
-                elements.map do |element|
-                  klass.new(element)
+                def has?(locator)
+                  raw.locate(locator).any?
+                end
+
+                def submodel_at(klass, locator)
+                  element_xml = raw.locate(locator).first
+
+                  klass.new(element_xml) if element_xml
+                end
+
+                def array_of_at(klass, locator)
+                  return EMPTY_ARRAY if raw.nil?
+
+                  elements = raw.locate([*locator].join('/'))
+
+                  elements.map do |element|
+                    klass.new(element)
+                  end
                 end
               end
             end
-          end
-        TEMPLATE
+          TEMPLATE
+
+        if @options.fetch(:namespace, nil)
+          wrap_in_namespace(template, @options[:namespace])
+        else
+          template
+        end
       end
 
       def base_builder_template
-        <<~TEMPLATE
-          module Builders
-            module BaseBuilder
-              attr_accessor :name, :data
+        template =
+          <<~TEMPLATE
+            module Builders
+              module BaseBuilder
+                attr_accessor :name, :data
 
-              def initialize(name, data = {})
-                @name = name
-                @data = data || {}
-              end
-
-              def to_xml
-                doc = Ox::Document.new(version: '1.0')
-                doc << builder
-
-                Ox.dump(doc, with_xml: true)
-              end
-
-              def build_element(name, content)
-                element = Ox::Element.new(name)
-                if content.respond_to? :attributes
-                  content.attributes.each { |k, v| element[k] = v }
+                def initialize(name, data = {})
+                  @name = name
+                  @data = data || {}
                 end
 
-                if content.respond_to? :value
-                  element << content.value if content.value
-                else
-                  element << content if content
+                def to_xml
+                  doc = Ox::Document.new(version: '1.0')
+                  doc << builder
+
+                  Ox.dump(doc, with_xml: true)
                 end
-                element
+
+                def build_element(name, content)
+                  element = Ox::Element.new(name)
+                  if content.respond_to? :attributes
+                    content.attributes.each { |k, v| element[k] = v }
+                  end
+
+                  if content.respond_to? :value
+                    element << content.value if content.value
+                  else
+                    element << content if content
+                  end
+                  element
+                end
               end
             end
-          end
-        TEMPLATE
+          TEMPLATE
+
+        if @options.fetch(:namespace, nil)
+          wrap_in_namespace(template, @options[:namespace])
+        else
+          template
+        end
       end
 
       def create_requires_template(classes)
+        modules = classes.select { |cl| cl.is_a? Parser::Templates::Module }
+        classes = classes.reject { |cl| cl.is_a? Parser::Templates::Module }
         with_inheritance, others = classes.partition { |klass| klass.inherit_from }
 
         requires = []
+        modules.each do |klass|
+          requires << "parsers/#{klass.name.underscore}"
+          requires << "builders/#{klass.name.underscore}"
+        end
         others.each do |klass|
           requires << "parsers/#{klass.name.underscore}"
           requires << "builders/#{klass.name.underscore}"

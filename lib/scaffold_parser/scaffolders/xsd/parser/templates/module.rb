@@ -47,7 +47,7 @@ module ScaffoldParser
             def to_s
               f = StringIO.new
 
-              f.puts "module #{name}"
+              f.puts "module #{name.demodulize}"
               if methods.any?
                 f.puts methods.map { |method| indent(method.to_s.lines).join  }.join("\n\n")
                 f.puts
@@ -64,7 +64,8 @@ module ScaffoldParser
 
               string = f.string.strip
 
-              wrapped = wrap_in_namespace(string, 'Parsers')
+              wrapped = wrap_in_namespace(string, 'Groups')
+              wrapped = wrap_in_namespace(wrapped, 'Parsers')
               wrapped = wrap_in_namespace(wrapped, namespace) if namespace
 
               wrapped
@@ -73,7 +74,7 @@ module ScaffoldParser
             def to_builder_s
               f = StringIO.new
 
-              f.puts "module #{name}"
+              f.puts "module #{name.demodulize}"
               f.puts "  def builder"
               f.puts "    root = Ox::Element.new(name)"
               f.puts "    if data.respond_to? :attributes"
@@ -90,7 +91,8 @@ module ScaffoldParser
 
               string = f.string.strip
 
-              wrapped = wrap_in_namespace(string, 'Builders')
+              wrapped = wrap_in_namespace(string, 'Groups')
+              wrapped = wrap_in_namespace(wrapped, 'Builders')
               wrapped = wrap_in_namespace(wrapped, namespace) if namespace
 
               wrapped

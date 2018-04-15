@@ -19,6 +19,16 @@ module ScaffoldParser
             def single_quote(string)
               string.to_s.gsub('"', '\'')
             end
+
+            def wrap_in_namespace(klass, namespace)
+              lines = klass.lines
+              indented = indent(lines)
+
+              indented.unshift "module #{namespace}\n"
+              indented << "\nend"
+
+              indented.join
+            end
           end
         end
       end

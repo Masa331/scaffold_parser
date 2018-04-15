@@ -178,8 +178,18 @@ module ScaffoldParser
       puts './tmp/builders directory created'
     end
 
+    unless Dir.exists?('./tmp/builders/groups')
+      Dir.mkdir('./tmp/builders/groups')
+      puts './tmp/builders directory created'
+    end
+
     unless Dir.exists?('./tmp/parsers')
       Dir.mkdir('./tmp/parsers')
+      puts './tmp/parsers directory created'
+    end
+
+    unless Dir.exists?('./tmp/parsers/groups')
+      Dir.mkdir('./tmp/parsers/groups')
       puts './tmp/parsers directory created'
     end
 

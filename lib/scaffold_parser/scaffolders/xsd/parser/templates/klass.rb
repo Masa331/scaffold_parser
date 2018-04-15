@@ -54,7 +54,7 @@ module ScaffoldParser
                 f.puts "class #{name}"
               end
               f.puts "  include BaseParser"
-              includes.each { |incl| f.puts "  include #{incl.ref}" }
+              includes.each { |incl| f.puts "  include Groups::#{incl.ref}" }
               if methods.any? || includes.any?
                 f.puts if methods.any?
                 f.puts methods.map { |method| indent(method.to_s.lines).join  }.join("\n\n")
@@ -121,16 +121,6 @@ module ScaffoldParser
               wrapped = wrap_in_namespace(wrapped, namespace) if namespace
 
               wrapped
-            end
-
-            def wrap_in_namespace(klass, namespace)
-              lines = klass.lines
-              indented = indent(lines)
-
-              indented.unshift "module #{namespace}\n"
-              indented << "\nend"
-
-              indented.join
             end
           end
         end

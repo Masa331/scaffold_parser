@@ -74,7 +74,9 @@ module ScaffoldParser
             end
 
             def group(new_source)
-              template = Templates::Module.new(new_source.name.camelize) do |template|
+              # require 'pry'; binding.pry
+              # template = Templates::Module.new(new_source.name.camelize) do |template|
+              template = Templates::Module.new("Groups::#{new_source.name.camelize}") do |template|
                 template.methods = elements
               end
 
