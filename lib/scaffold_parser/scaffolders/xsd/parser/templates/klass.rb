@@ -35,7 +35,13 @@ module ScaffoldParser
               self.name = new_source.name.camelize
               STACK.push self
 
-              Templates::SubmodelMethod.new(new_source, new_source.name.camelize)
+              if new_source.multiple?
+                Templates::ListMethod.new(new_source) do |template|
+                  template.item_class = name.camelize
+                end
+              else
+                Templates::SubmodelMethod.new(new_source, new_source.name.camelize)
+              end
             end
 
             def ==(other)

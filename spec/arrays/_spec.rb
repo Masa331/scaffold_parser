@@ -1,4 +1,76 @@
 RSpec.describe 'arrays' do
+  it 'unbounded element with extension wrapped in extension...' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      |  <xs:element name="MoneyData">
+      |    <xs:complexType>
+      |      <xs:sequence>
+      |        <xs:element name="SeznamFaktVyd" minOccurs="0">
+      |          <xs:complexType>
+      |            <xs:complexContent>
+      |              <xs:extension base="seznamType">
+      |                <xs:sequence>
+      |                  <xs:element name="FaktVyd" minOccurs="0" maxOccurs="unbounded">
+      |                    <xs:complexType>
+      |                      <xs:complexContent>
+      |                        <xs:extension base="fakturaType"/>
+      |                      </xs:complexContent>
+      |                    </xs:complexType>
+      |                  </xs:element>
+      |                </xs:sequence>
+      |              </xs:extension>
+      |            </xs:complexContent>
+      |          </xs:complexType>
+      |        </xs:element>
+      |      </xs:sequence>
+      |    </xs:complexType>
+      |  </xs:element>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/money_data.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class MoneyData
+      |    include BaseParser
+      |
+      |    def seznam_fakt_vyd
+      |      submodel_at(SeznamFaktVyd, 'SeznamFaktVyd')
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:seznam_fakt_vyd] = seznam_fakt_vyd.to_h_with_attrs if has? 'SeznamFaktVyd'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+
+    scaffold = Hash[scaffolds]['parsers/seznam_fakt_vyd.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class SeznamFaktVyd < SeznamType
+      |    include BaseParser
+      |
+      |    def fakt_vyd
+      |      array_of_at(FaktVyd, ['FaktVyd'])
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:fakt_vyd] = fakt_vyd.map(&:to_h_with_attrs) if has? 'FaktVyd'
+      |
+      |      hash
+      |      super.merge(hash)
+      |    end
+      |  end
+      |end })
+  end
+
   let(:scaffolds) { scaffold_schema('./spec/arrays/schema.xsd') }
 
   it 'scaffolds parser for type with various elements which can occure more than once' do
