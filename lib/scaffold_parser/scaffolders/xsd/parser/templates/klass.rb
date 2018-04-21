@@ -106,13 +106,16 @@ module ScaffoldParser
               f.puts
               f.puts "  def builder"
               f.puts "    root = Ox::Element.new(name)"
-              # if inherit_from
-              #   fail 'fok'
-              # end
               f.puts "    if data.respond_to? :attributes"
               f.puts "      data.attributes.each { |k, v| root[k] = v }"
               f.puts "    end"
               f.puts
+              if inherit_from
+                f.puts "    super.nodes.each do |n|"
+                f.puts "      root << n"
+                f.puts "    end"
+                f.puts
+              end
 
               f.puts methods.map { |method| indent(indent(method.to_builder.lines)).join  }.join("\n")
               f.puts

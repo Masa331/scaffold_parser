@@ -370,6 +370,10 @@ RSpec.describe 'arrays' do
       |        data.attributes.each { |k, v| root[k] = v }
       |      end
       |
+      |      super.nodes.each do |n||
+      |        root << n
+      |      end
+      |
       |      if data.key? :recipient
       |        data[:recipient].each { |i| root << RecipientType.new('recipient', i).builder }
       |      end
