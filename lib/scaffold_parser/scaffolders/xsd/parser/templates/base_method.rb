@@ -23,6 +23,11 @@ module ScaffoldParser
 
               f.string.strip
             end
+
+            def ==(other)
+              method_name == other.method_name &&
+                method_body == other.method_body
+            end
           end
         end
       end

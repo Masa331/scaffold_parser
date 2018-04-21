@@ -23,10 +23,10 @@ module ScaffoldParser
               self
             end
 
-            def ==(other)
-              method_name == other.method_name &&
-                method_body == other.method_body
-            end
+            # def ==(other)
+            #   method_name == other.method_name &&
+            #     method_body == other.method_body
+            # end
 
             def complex_type(new_source)
               if new_source.has_name?

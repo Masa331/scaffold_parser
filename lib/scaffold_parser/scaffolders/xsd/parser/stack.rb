@@ -16,9 +16,6 @@ module ScaffoldParser
             same_named_class = @stack.find { |klass| klass.name == value.name }
             similar_classes = @stack.select { |klass| klass.name.start_with? value.name }
 
-            # if value.name == 'Buyer'
-            #   require 'pry'; binding.pry
-            # end
 
             if similar_classes.any?
               same_structure_class = similar_classes.find do |kl|
