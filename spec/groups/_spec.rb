@@ -1,4 +1,38 @@
 RSpec.describe 'simple types' do
+  it 'parses one member group allright' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      |  <xs:group name="configuration">
+      |    <xs:all>
+      |      <xs:element name="flag" type="flag">
+      |      </xs:element>
+      |    </xs:all>
+      |  </xs:group>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/groups/configuration.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  module Groups
+      |    module Configuration
+      |      def flag
+      |        submodel_at(Flag, 'flag')
+      |      end
+      |
+      |      def to_h_with_attrs
+      |        hash = HashWithAttributes.new({}, attributes)
+      |
+      |        hash[:flag] = flag.to_h_with_attrs if has? 'flag'
+      |
+      |        hash
+      |      end
+      |    end
+      |  end
+      |end })
+  end
+
   it 'parses complex type allright' do
     schema = multiline(%{
       |<?xml version="1.0" encoding="UTF-8"?>

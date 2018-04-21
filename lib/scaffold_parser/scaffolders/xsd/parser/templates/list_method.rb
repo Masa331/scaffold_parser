@@ -52,6 +52,14 @@ module ScaffoldParser
               self
             end
 
+            def choice(_)
+              self
+            end
+
+            def all(_)
+              self
+            end
+
             def complex_type(new_source)
               if new_source.has_name?
                 template = Templates::Klass.new(new_source.name.camelize) do |template|

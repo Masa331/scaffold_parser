@@ -23,6 +23,14 @@ module ScaffoldParser
               self
             end
 
+            def choice(_)
+              self
+            end
+
+            def all(_)
+              self
+            end
+
             # def ==(other)
             #   method_name == other.method_name &&
             #     method_body == other.method_body

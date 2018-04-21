@@ -36,6 +36,14 @@ module ScaffoldParser
               self
             end
 
+            def choice(_)
+              self
+            end
+
+            def all(_)
+              self
+            end
+
             def schema(_)
               STACK
               # self
@@ -84,6 +92,16 @@ module ScaffoldParser
               end
 
               template
+            end
+
+            def group(new_source)
+              template = Templates::Module.new("Groups::#{new_source.name.camelize}") do |template|
+                template.methods = [self]
+              end
+
+              STACK.push template
+
+              Handlers::Blank.new
             end
           end
         end

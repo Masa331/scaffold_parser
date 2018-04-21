@@ -20,6 +20,10 @@ module ScaffoldParser
               self
             end
 
+            def simple_content(_)
+              self
+            end
+
             def complex_type(new_source)
               if new_source.has_name?
                 self.name = new_source.name.camelize

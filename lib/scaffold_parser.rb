@@ -213,7 +213,7 @@ module ScaffoldParser
                                :appinfo,
                                :pattern,
                                :total_digits, :fraction_digits, :white_space, :min_exclusive, :collection,
-                               :schema_info, :doctype, :logical, :content, :min_length
+                               :schema_info, :doctype, :logical, :content, :min_length, :min_inclusive, :max_inclusive, :union, :attribute_group
     ] }
     doc = XsdModel.parse(schema, parse_options)
 

@@ -50,6 +50,10 @@ module ScaffoldParser
               self
             end
 
+            def import(_)
+              self
+            end
+
             def schema(_)
               self
             end

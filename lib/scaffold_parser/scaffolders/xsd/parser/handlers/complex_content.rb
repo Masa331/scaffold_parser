@@ -3,7 +3,7 @@ module ScaffoldParser
     class XSD
       class Parser
         module Handlers
-          class SimpleContent
+          class ComplexContent
             include Base
           end
         end
