@@ -1,4 +1,59 @@
 RSpec.describe 'arrays' do
+  it 'fixed mx occurs' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      |  <xs:complexType name="souhrnDPHType">
+      |    <xs:sequence>
+      |      <xs:element name="Zaklad0" type="xs:string">
+      |      </xs:element>
+      |      <xs:element name="SeznamDalsiSazby">
+      |        <xs:complexType>
+      |          <xs:sequence>
+      |            <xs:element name="DalsiSazba" maxOccurs="6">
+      |              <xs:complexType>
+      |                <xs:sequence>
+      |                  <xs:element name="Popis">
+      |                  </xs:element>
+      |                  <xs:element name="Sazba">
+      |                  </xs:element>
+      |                </xs:sequence>
+      |              </xs:complexType>
+      |            </xs:element>
+      |          </xs:sequence>
+      |        </xs:complexType>
+      |      </xs:element>
+      |    </xs:sequence>
+      |  </xs:complexType>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/souhrn_dph_type.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class SouhrnDPHType
+      |    include BaseParser
+      |
+      |    def zaklad0
+      |      at 'Zaklad0'
+      |    end
+      |
+      |    def seznam_dalsi_sazby
+      |      array_of_at(DalsiSazba, ['SeznamDalsiSazby', 'DalsiSazba'])
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:zaklad0] = zaklad0 if has? 'Zaklad0'
+      |      hash[:seznam_dalsi_sazby] = seznam_dalsi_sazby.map(&:to_h_with_attrs) if has? 'SeznamDalsiSazby'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
   it 'unbounded element with extension wrapped in extension...' do
     schema = multiline(%{
       |<?xml version="1.0" encoding="UTF-8"?>

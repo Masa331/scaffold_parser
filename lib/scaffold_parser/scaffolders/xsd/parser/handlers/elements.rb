@@ -53,7 +53,19 @@ module ScaffoldParser
                 end
                 new_class = STACK.push template
 
-                Templates::SubmodelMethod.new(new_source, new_class.name.camelize)
+                # Templates::SubmodelMethod.new(new_source, new_class.name.camelize)
+                if new_source.multiple?
+                  Templates::ListMethod.new(new_source) do |template|
+                    template.item_class =
+                      if new_source.has_custom_type?
+                        new_source&.type&.classify
+                      else
+                        new_source&.name&.classify
+                      end
+                  end
+                else
+                  Templates::SubmodelMethod.new(new_source, new_class.name.camelize)
+                end
               else
                 self
               end
