@@ -50,7 +50,9 @@ module ScaffoldParser
            ["builders/#{class_template.name.underscore}.rb", class_template.to_builder_s],
            ["parsers/base_parser.rb", base_parser_template],
            ["builders/base_builder.rb", base_builder_template],
-           ["requires.rb", create_requires_template(classes)]
+           ["requires.rb", create_requires_template(classes)],
+           ["hash_with_attrs.rb", hash_with_attrs_template],
+           ["mega.rb", mega_template]
           ]
         end
       end
@@ -62,6 +64,7 @@ module ScaffoldParser
           <<~TEMPLATE
             module Parsers
               module BaseParser
+                include Mega
                 EMPTY_ARRAY = []
 
                 attr_accessor :raw
@@ -104,6 +107,12 @@ module ScaffoldParser
                   elements.map do |element|
                     klass.new(element)
                   end
+                end
+
+                def to_h_with_attrs
+                  hash = HashWithAttributes.new({}, attributes)
+
+                  hash
                 end
               end
             end
@@ -155,6 +164,86 @@ module ScaffoldParser
                   end
                   element
                 end
+              end
+            end
+          TEMPLATE
+
+        if @options.fetch(:namespace, nil)
+          wrap_in_namespace(template, @options[:namespace])
+        else
+          template
+        end
+      end
+
+      def hash_with_attrs_template
+        template =
+          <<~TEMPLATE
+            class HashWithAttributes
+              def initialize(hash, attributes = nil)
+                @hash = hash
+                @attributes = attributes if attributes
+              end
+
+              def value
+                @hash
+              end
+
+              def attributes
+                @attributes ||= {}
+              end
+
+              def attributes=(attributes)
+                @attributes = attributes
+              end
+
+              def ==(other)
+                if other.respond_to?(:value) && other.respond_to?(:attributes)
+                  value == other.value && other.attributes == attributes
+                else
+                  value == other
+                end
+              end
+
+              def merge(other)
+                merged_hash = value.merge other.value
+                merged_attrs = attributes.merge other.attributes
+
+                self.class.new(merged_hash, merged_attrs)
+              end
+
+              def key?(key)
+                value.key? key
+              end
+
+              def [](key)
+                value[key]
+              end
+
+              def []=(key, key_value)
+                value[key] = key_value
+              end
+
+              def dig(*attrs)
+                value.dig(*attrs)
+              end
+            end
+          TEMPLATE
+
+        if @options.fetch(:namespace, nil)
+          wrap_in_namespace(template, @options[:namespace])
+        else
+          template
+        end
+      end
+
+      def mega_template
+        template =
+          <<~TEMPLATE
+            module Mega
+              def mega
+                called_from = caller_locations[0].label
+                included_modules = (self.class.included_modules - Class.included_modules - [Mega])
+                included_modules.map { |m| m.instance_method(called_from).bind(self).call }
               end
             end
           TEMPLATE

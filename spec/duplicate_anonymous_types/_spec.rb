@@ -7,6 +7,8 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
        "parsers/base_parser.rb",
        "builders/base_builder.rb",
        "requires.rb",
+       "hash_with_attrs.rb",
+       "mega.rb",
        "parsers/invoice.rb",
        "builders/invoice.rb",
        "parsers/offer.rb",
