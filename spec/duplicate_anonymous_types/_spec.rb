@@ -4,12 +4,14 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
   it 'scaffolds 12 classes total' do
     expected = ["parsers/order.rb",
        "builders/order.rb",
+       "builders/reservation.rb",
        "parsers/base_parser.rb",
        "builders/base_builder.rb",
        "requires.rb",
        "hash_with_attrs.rb",
        "mega.rb",
        "parsers/invoice.rb",
+       "parsers/reservation.rb",
        "builders/invoice.rb",
        "parsers/offer.rb",
        "builders/offer.rb",
@@ -81,6 +83,27 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
     expect(scaffolds['parsers/offer.rb']).to eq_multiline(%{
       |module Parsers
       |  class Offer
+      |    include BaseParser
+      |
+      |    def buyer
+      |      submodel_at(Buyer3, 'buyer')
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:buyer] = buyer.to_h_with_attrs if has? 'buyer'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'scaffolds parser for offer' do
+    expect(scaffolds['parsers/reservation.rb']).to eq_multiline(%{
+      |module Parsers
+      |  class Reservation
       |    include BaseParser
       |
       |    def buyer
