@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:inv="http://www.stormware.cz/schema/version_2/invoice.xsd"
+  xmlns="http://www.stormware.cz/schema/version_2/invoice.xsd"
+  targetNamespace="http://www.stormware.cz/schema/version_2/invoice.xsd"
+  elementFormDefault="qualified">
+  <xs:element name="invoice" type="invoiceType"/>
+
+  <xs:complexType name="invoiceType">
+    <xs:sequence>
+      <xs:element name="name"/>
+      <xs:sequence>
+        <xs:element name="company_name"/>
+        <xs:element name="company_address"/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

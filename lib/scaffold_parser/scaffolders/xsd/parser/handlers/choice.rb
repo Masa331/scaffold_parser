@@ -12,7 +12,7 @@ module ScaffoldParser
 
             def complex_type(source)
               if source.has_name?
-                STACK.push Klass.new(source.name, elements)
+                STACK.push Klass.new(source, elements)
               else
                 ComplexType.new(elements)
               end
@@ -29,6 +29,10 @@ module ScaffoldParser
               end
 
               Sequence.new flattened
+            end
+
+            def extension(source)
+              Extension.new elements, source.attributes
             end
           end
         end

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:cmn="common-types"
+  xmlns="common-types"
+  targetNamespace="common-types"
+  elementFormDefault="qualified" >
+
+  <xs:element name="item" type="itemType" />
+
+  <xs:complexType name="itemType">
+    <xs:sequence>
+      <xs:element name="code"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

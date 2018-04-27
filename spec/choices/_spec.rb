@@ -32,7 +32,7 @@ RSpec.describe 'choices' do
     expect(scaffold).to eq_multiline(%{
       |module Parsers
       |  class Order
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def customer_name
       |      at 'customer_name'
@@ -51,7 +51,7 @@ RSpec.describe 'choices' do
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:customer_name] = customer_name if has? 'customer_name'
       |      hash[:id] = id if has? 'id'
@@ -70,7 +70,7 @@ RSpec.describe 'choices' do
     expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Parsers
       |  class Order
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def name
       |      at 'name'
@@ -81,7 +81,7 @@ RSpec.describe 'choices' do
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:name] = name if has? 'name'
       |      hash[:company_name] = company_name if has? 'company_name'
@@ -96,7 +96,7 @@ RSpec.describe 'choices' do
     expect(scaffolds['builders/order.rb']).to eq_multiline(%{
       |module Builders
       |  class Order
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)

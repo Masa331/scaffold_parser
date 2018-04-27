@@ -20,220 +20,115 @@ module ScaffoldParser
         all = [@doc.schema] + @doc.schema.collect_included_schemas(@parse_options) + @doc.schema.collect_imported_schemas(@parse_options)
 
         classes = Parser.call(all, @options)
+        top_level_elements = all.flat_map(&:elements)
+        ref_map = top_level_elements.map { |e| [e.name_with_prefix, e.type_with_prefix]}.to_h
+
+        # reject dumb classes which are just extension proxies to simple types :D
+        classes = classes.reject do |klass|
+          inherit_from = classes.find do |cl|
+            cl.name_with_prefix == klass&.inherit_from&.split(':')&.map(&:camelize)&.join('::')
+          end
+
+          klass.methods.empty? && klass.includes.empty? && inherit_from.nil?
+        end
+
+        # remove dumb classes inheritance
+        classes = classes.map do |klass|
+          inherit_from = classes.find do |cl|
+            cl.name_with_prefix == klass&.inherit_from&.split(':')&.map(&:camelize)&.join('::')
+          end
+
+          if inherit_from.nil?
+            klass.inherit_from = nil
+          end
+          klass
+        end
+
+        # remove dumb classes includes
+        classes = classes.map do |klass|
+          existing_includes = (klass.includes || []).select do |incl|
+            classes.map(&:name_with_prefix).include? incl.full_ref
+          end
+
+          klass.includes = existing_includes
+
+          klass
+        end
+
+        # remove proxy lists through named complex types
+        # #TODO: could i somehow remove proxy complex types so they are not outputted into class files?
+        #   ... they are not used anyhow.. probably not used..? Can't they be inherited from or something?
+        classes = classes.map do |klass|
+          klass.methods = klass.methods.map do |meth|
+            if meth.is_a?(Parser::Handlers::SubmodelMethod)
+              submodel_class = classes.find { |cl| cl.name_with_prefix == meth.submodel_class }
+
+              if (submodel_class.methods.size == 1) && submodel_class.methods.first.is_a?(Parser::Handlers::ListMethod) && submodel_class.inherit_from.nil? && submodel_class.includes.empty?
+                submodel_class.methods.first.to_proxy_list(meth.source, meth.at)
+              else
+                meth
+              end
+            else
+              meth
+            end
+          end
+
+          klass
+        end
 
         classes.each do |klass|
           klass.methods = klass.methods.map do |meth|
-            if meth.is_a?(Parser::Handlers::SubmodelMethod) && !classes.map(&:name).include?(meth.submodel_class)
+            if meth.is_a?(Parser::Handlers::SubmodelMethod) && !classes.map(&:name_with_prefix).include?(meth.submodel_class)
               meth.to_at_method
+            elsif  meth.is_a?(Parser::Handlers::ElementRef)
+              meth.to_submodel_method(ref_map)
             else
               meth
             end
           end
         end
 
-        classes.each do |klass|
-          klass.namespace = @options[:namespace]
+        requires = create_requires_template(classes)
+        parsers = classes.map do |klass|
+          path = ["parsers", klass.namespace&.underscore, "#{klass.name.underscore}.rb"].compact.join('/')
+          string = wrap_in_namespace(klass.to_s, 'Parsers')
+
+          [path, string]
+        end
+        builders = classes.map do |klass|
+          path = ["builders", klass.namespace&.underscore, "#{klass.name.underscore}.rb"].compact.join('/')
+          string = wrap_in_namespace(klass.to_builder_s, 'Builders')
+
+          [path, string]
         end
 
-        classes.flat_map do |class_template|
-          [["parsers/#{class_template.name.underscore}.rb", class_template.to_s],
-           ["builders/#{class_template.name.underscore}.rb", class_template.to_builder_s],
-           ["parsers/base_parser.rb", wrap_in_namespace(base_parser_template, @options[:namespace])],
-           ["builders/base_builder.rb", wrap_in_namespace(base_builder_template, @options[:namespace])],
-           ["requires.rb", create_requires_template(classes)],
-           ["hash_with_attrs.rb", wrap_in_namespace(hash_with_attrs_template, @options[:namespace])],
-           ["mega.rb", wrap_in_namespace(mega_template, @options[:namespace])]
-          ]
+        all = parsers + builders
+        result = all.map do |path, string|
+          [path, wrap_in_namespace(string, @options[:namespace])]
         end
+
+        result + [['requires.rb', requires]]
       end
 
       private
-
-      def base_parser_template
-        <<~TEMPLATE
-          module Parsers
-            module BaseParser
-              include Mega
-              EMPTY_ARRAY = []
-
-              attr_accessor :raw
-
-              def initialize(raw)
-                @raw = raw
-              end
-
-              def attributes
-                raw.attributes
-              end
-
-              private
-
-              def at(locator)
-                return nil if raw.nil?
-
-                element = raw.locate(locator.to_s).first
-
-                if element
-                  StringWithAttributes.new(element.text, element.attributes)
-                end
-              end
-
-              def has?(locator)
-                raw.locate(locator).any?
-              end
-
-              def submodel_at(klass, locator)
-                element_xml = raw.locate(locator).first
-
-                klass.new(element_xml) if element_xml
-              end
-
-              def array_of_at(klass, locator)
-                return EMPTY_ARRAY if raw.nil?
-
-                elements = raw.locate([*locator].join('/'))
-
-                elements.map do |element|
-                  klass.new(element)
-                end
-              end
-
-              def to_h_with_attrs
-                hash = HashWithAttributes.new({}, attributes)
-
-                hash
-              end
-            end
-          end
-        TEMPLATE
-      end
-
-      def base_builder_template
-        <<~TEMPLATE
-          module Builders
-            module BaseBuilder
-              attr_accessor :name, :data, :options
-
-              def initialize(name, data = {}, options = {})
-                @name = name
-                @data = data || {}
-                @options = options || {}
-              end
-
-              def to_xml
-                encoding = options[:encoding]
-
-                doc_options = { version: '1.0' }
-                doc_options[:encoding] = encoding if encoding
-                doc = Ox::Document.new(doc_options)
-                doc << builder
-
-                dump_options = { with_xml: true }
-                dump_options[:encoding] = encoding if encoding
-                Ox.dump(doc, dump_options)
-              end
-
-              def build_element(name, content)
-                element = Ox::Element.new(name)
-                if content.respond_to? :attributes
-                  content.attributes.each { |k, v| element[k] = v }
-                end
-
-                if content.respond_to? :value
-                  element << content.value if content.value
-                else
-                  element << content if content
-                end
-                element
-              end
-            end
-          end
-        TEMPLATE
-      end
-
-      def hash_with_attrs_template
-        <<~TEMPLATE
-          class HashWithAttributes
-            def initialize(hash, attributes = nil)
-              @hash = hash
-              @attributes = attributes if attributes
-            end
-
-            def value
-              @hash
-            end
-
-            def attributes
-              @attributes ||= {}
-            end
-
-            def attributes=(attributes)
-              @attributes = attributes
-            end
-
-            def ==(other)
-              if other.respond_to?(:value) && other.respond_to?(:attributes)
-                value == other.value && other.attributes == attributes
-              else
-                value == other
-              end
-            end
-
-            def merge(other)
-              merged_hash = value.merge other.value
-              merged_attrs = attributes.merge other.attributes
-
-              self.class.new(merged_hash, merged_attrs)
-            end
-
-            def key?(key)
-              value.key? key
-            end
-
-            def [](key)
-              value[key]
-            end
-
-            def []=(key, key_value)
-              value[key] = key_value
-            end
-
-            def dig(*attrs)
-              value.dig(*attrs)
-            end
-          end
-        TEMPLATE
-      end
-
-      def mega_template
-        <<~TEMPLATE
-          module Mega
-            def mega
-              called_from = caller_locations[0].label
-              included_modules = (self.class.included_modules - Class.included_modules - [Mega])
-              included_modules.map { |m| m.instance_method(called_from).bind(self).call }
-            end
-          end
-        TEMPLATE
-      end
 
       def create_requires_template(classes)
         modules = classes.select { |cl| cl.is_a? Parser::Handlers::Module }
         classes = classes.select { |cl| cl.is_a? Parser::Handlers::Klass }
         with_inheritance, others = classes.partition { |klass| klass.inherit_from }
 
-        requires = ['parsers/base_parser', 'builders/base_builder']
+        requires = []
         modules.each do |klass|
-          requires << "parsers/#{klass.name.underscore}"
-          requires << "builders/#{klass.name.underscore}"
+          requires << ["parsers", klass.namespace&.underscore, klass.name.underscore].compact.join('/')
+          requires << ["builders", klass.namespace&.underscore, klass.name.underscore].compact.join('/')
         end
         others.each do |klass|
-          requires << "parsers/#{klass.name.underscore}"
-          requires << "builders/#{klass.name.underscore}"
+          requires << ["parsers", klass.namespace&.underscore, klass.name.underscore].compact.join('/')
+          requires << ["builders", klass.namespace&.underscore, klass.name.underscore].compact.join('/')
         end
         with_inheritance.each do |klass|
-          requires << "parsers/#{klass.name.underscore}"
-          requires << "builders/#{klass.name.underscore}"
+          requires << ["parsers", klass.namespace&.underscore, klass.name.underscore].compact.join('/')
+          requires << ["builders", klass.namespace&.underscore, klass.name.underscore].compact.join('/')
         end
 
         if @options[:namespace]

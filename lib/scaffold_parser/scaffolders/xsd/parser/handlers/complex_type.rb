@@ -17,22 +17,22 @@ module ScaffoldParser
             def element(source)
               if source.multiple?
                 if elements.any?
-                  new_class = STACK.push Klass.new(source.name, elements)
+                  new_class = STACK.push Klass.new(source, elements)
 
                   ListMethod.new(source) do |template|
                     template.item_class = new_class.name.camelize
                   end
                 else
                   ListMethod.new(source) do |template|
-                    template.item_class = source.has_custom_type? ? source&.type&.classify : 'String'
+                    template.item_class = source.has_custom_type? ? source.type.split(':').map(&:classify).join('::') : 'String'
                   end
                 end
               elsif source.has_custom_type?
                 SubmodelMethod.new(source)
               else
                 if elements.any?
-                  new_class = STACK.push Klass.new(source.name, elements)
-                  SubmodelMethod.new(source, new_class.name.camelize)
+                  new_class = STACK.push Klass.new(source, elements)
+                  SubmodelMethod.new(source, new_class.name_with_prefix)
                 else
                   AtMethod.new(source)
                 end

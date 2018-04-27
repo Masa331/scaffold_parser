@@ -11,7 +11,8 @@ module ScaffoldParser
 
             def initialize(source)
               @source = source
-              @at = [source.name]
+              # @at = [source.name]
+              @at = [[source.xmlns_prefix, "#{source.name}"].compact.join(':')]
 
               yield self if block_given?
             end
@@ -20,11 +21,15 @@ module ScaffoldParser
               "array_of_at(#{item_class}, #{single_quote(at)})"
             end
 
+            def name_with_prefix
+              [source.xmlns_prefix, "#{source.name}"].compact.join(':')
+            end
+
             def to_h_with_attrs_method
               if item_class == 'String'
-                "hash[:#{method_name}] = #{method_name} if has? '#{source.name}'"
+                "hash[:#{method_name}] = #{method_name} if has? '#{name_with_prefix}'"
               else
-                "hash[:#{method_name}] = #{method_name}.map(&:to_h_with_attrs) if has? '#{source.name}'"
+                "hash[:#{method_name}] = #{method_name}.map(&:to_h_with_attrs) if has? '#{name_with_prefix}'"
               end
             end
 
@@ -44,7 +49,9 @@ module ScaffoldParser
 
             def to_proxy_list(source, path)
               ProxyListMethod.new(source) do |m|
-                m.at = [path] + @at
+                prefixed_path = [source.xmlns_prefix, "#{source.name}"].compact.join(':')
+
+                m.at = [prefixed_path] + @at
                 m.item_class = @item_class
               end
             end
@@ -63,7 +70,7 @@ module ScaffoldParser
 
             def complex_type(source)
               if source.has_name?
-                STACK.push Klass.new(source.name, [self])
+                STACK.push Klass.new(source, [self])
               else
                 self
               end

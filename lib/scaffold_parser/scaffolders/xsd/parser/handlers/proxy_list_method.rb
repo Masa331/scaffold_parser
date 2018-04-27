@@ -18,11 +18,15 @@ module ScaffoldParser
               "array_of_at(#{item_class}, #{single_quote(at)})"
             end
 
+            def name_with_prefix
+              [source.xmlns_prefix, "#{source.name}"].compact.join(':')
+            end
+
             def to_h_with_attrs_method
               if item_class == 'String'
-                "hash[:#{method_name}] = #{method_name} if has? '#{source.name}'"
+                "hash[:#{method_name}] = #{method_name} if has? '#{name_with_prefix}'"
               else
-                "hash[:#{method_name}] = #{method_name}.map(&:to_h_with_attrs) if has? '#{source.name}'"
+                "hash[:#{method_name}] = #{method_name}.map(&:to_h_with_attrs) if has? '#{name_with_prefix}'"
               end
             end
 

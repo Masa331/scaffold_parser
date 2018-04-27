@@ -8,8 +8,9 @@ module ScaffoldParser
 
             attr_accessor :name, :namespace, :methods, :inherit_from, :includes
 
-            def initialize(name = nil, elements = [])
-              @name = name&.camelize
+            def initialize(source = nil, elements = [])
+              @name = source&.name&.camelize
+              @namespace = source.xmlns_prefix&.camelize
 
               includes, methods = [*elements].partition do |e|
                 e.is_a? ModuleInclude
@@ -23,6 +24,10 @@ module ScaffoldParser
               @inherit_from = inherits.first.base if inherits.any?
 
               yield self if block_given?
+            end
+
+            def name_with_prefix
+              [namespace, name].compact.map(&:camelize).join('::')
             end
 
             def schema(_)
@@ -40,18 +45,19 @@ module ScaffoldParser
               f = StringIO.new
 
               if inherit_from
-                f.puts "class #{name} < #{inherit_from}"
+                i = inherit_from.split(':').compact.map(&:camelize).join('::')
+                f.puts "class #{name} < #{i}"
               else
                 f.puts "class #{name}"
               end
-              f.puts "  include BaseParser"
-              includes.each { |incl| f.puts "  include Groups::#{incl.ref}" }
+              f.puts "  include ParserCore::BaseParser"
+              includes.each { |incl| f.puts "  include #{incl.full_ref}" }
               if methods.any? || includes.any?
                 f.puts if methods.any?
                 f.puts methods.map { |method| indent(method.to_s.lines).join  }.join("\n\n")
                 f.puts if methods.any?
                 f.puts "  def to_h_with_attrs"
-                f.puts "    hash = HashWithAttributes.new({}, attributes)"
+                f.puts "    hash = ParserCore::HashWithAttributes.new({}, attributes)"
                 f.puts
                 methods.each { |method| f.puts "    #{method.to_h_with_attrs_method}" }
                 f.puts if methods.any?
@@ -70,21 +76,24 @@ module ScaffoldParser
 
               string = f.string.strip
 
-              wrapped = wrap_in_namespace(string, 'Parsers')
+              wrapped = string
               wrapped = wrap_in_namespace(wrapped, namespace) if namespace
 
               wrapped
             end
 
             def to_builder_s
+              #TODO: includes are missing from here?
               f = StringIO.new
 
               if inherit_from
-                f.puts "class #{name} < #{inherit_from}"
+                i = inherit_from.split(':').compact.map(&:camelize).join('::')
+                f.puts "class #{name} < #{i}"
               else
                 f.puts "class #{name}"
               end
-              f.puts "  include BaseBuilder"
+              f.puts "  include ParserCore::BaseBuilder"
+              includes.each { |incl| f.puts "  include #{incl.full_ref}" }
               f.puts
               f.puts "  def builder"
               f.puts "    root = Ox::Element.new(name)"
@@ -99,8 +108,16 @@ module ScaffoldParser
                 f.puts
               end
 
-              f.puts methods.map { |method| indent(indent(method.to_builder.lines)).join  }.join("\n")
-              f.puts
+              if methods.any?
+                f.puts methods.map { |method| indent(indent(method.to_builder.lines)).join  }.join("\n")
+                f.puts
+              end
+              if includes.any?
+                f.puts "    mega.each do |r|"
+                f.puts "      r.nodes.each { |n| root << n }"
+                f.puts "    end"
+                f.puts
+              end
               f.puts "    root"
               f.puts "  end"
 
@@ -108,7 +125,7 @@ module ScaffoldParser
 
               string = f.string.strip
 
-              wrapped = wrap_in_namespace(string, 'Builders')
+              wrapped = string
               wrapped = wrap_in_namespace(wrapped, namespace) if namespace
 
               wrapped

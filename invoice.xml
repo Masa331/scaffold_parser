@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inv:invoice
+  xmlns="http://www.stormware.cz/schema/version_2/invoice.xsd"
+  xmlns:inv="http://www.stormware.cz/schema/version_2/invoice.xsd">
+  <inv:name>Premysl Donat</inv:name>
+  <inv:company_name>Imagine Anything s.r.o.</inv:company_name>
+  <inv:company_address>Chudenická 1088</inv:company_address>
+</inv:invoice>

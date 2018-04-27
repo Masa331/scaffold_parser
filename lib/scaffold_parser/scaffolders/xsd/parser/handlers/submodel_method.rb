@@ -11,22 +11,50 @@ module ScaffoldParser
 
             def initialize(source, submodel_class = nil)
               @source = source
-              @submodel_class = submodel_class || source.type.camelize
+              # @submodel_class = submodel_class || source.type.camelize
+              @submodel_class =
+                submodel_class ||
+                source.type&.split(':')&.map(&:camelize)&.join('::')
+            end
+
+            def at
+              if source.name
+                # source.name.underscore
+                [source.xmlns_prefix, "#{source.name}"].compact.join(':')
+              elsif source.ref
+                # prefix, name = source.ref.split(':')
+                # name.underscore
+                source.ref
+              end
             end
 
             def method_body
-              "submodel_at(#{submodel_class}, '#{source.name}')"
+              "submodel_at(#{submodel_class}, '#{at}')"
+            end
+
+            def name_with_prefix
+              [source.xmlns_prefix, "#{method_name}"].compact.join(':')
+
+              # if source.name
+              #   source.name.underscore
+              # elsif source.ref
+              #   prefix, name = source.ref.split(':')
+              #   name.underscore
+              # end
             end
 
             def to_h_with_attrs_method
-              "hash[:#{method_name}] = #{method_name}.to_h_with_attrs if has? '#{source.name}'"
+              # "hash[:#{method_name}] = #{method_name}.to_h_with_attrs if has? '#{name_with_prefix}'"
+              "hash[:#{method_name}] = #{method_name}.to_h_with_attrs if has? '#{at}'"
             end
 
             def to_builder
               f = StringIO.new
 
               f.puts "if data.key? :#{method_name}"
-              f.puts "  root << #{submodel_class}.new('#{source.name}', data[:#{source.name.underscore}]).builder"
+              # f.puts "  root << #{submodel_class}.new('#{source.name}', data[:#{source.name.underscore}]).builder"
+              # f.puts "  root << #{submodel_class}.new('#{source.name}', data[:#{method_name}]).builder"
+              f.puts "  root << #{submodel_class}.new('#{at}', data[:#{method_name}]).builder"
               f.puts 'end'
 
               f.string.strip

@@ -1,4 +1,82 @@
 RSpec.describe ScaffoldParser do
+  it 'extension from namespaced element' do
+    schema = <<-XSD
+      <?xml version="1.0" encoding="UTF-8"?>
+      <xsd:schema
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:ord="order"
+        xmlns="order"
+        targetNamespace="order"
+        elementFormDefault="qualified">
+
+        <xsd:complexType name="numberRequested">
+          <xsd:simpleContent>
+            <xsd:extension base="ord:baseElement">
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+
+        <xsd:complexType name="baseElement">
+          <xsd:all>
+            <xsd:element name="numberRequested"/>
+          </xsd:all>
+        </xsd:complexType>
+      </xsd:schema>
+      XSD
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/ord/number_requested.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  module Ord
+      |    class NumberRequested < Ord::BaseElement
+      |      include ParserCore::BaseParser
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'extension from custom simple type' do
+    schema = <<-XSD
+      <?xml version="1.0" encoding="UTF-8"?>
+      <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <xsd:complexType name="numberADType">
+          <xsd:all>
+            <xsd:element name="numberRequested">
+              <xsd:complexType>
+                <xsd:simpleContent>
+                  <xsd:extension base="typ:string20">
+                  </xsd:extension>
+                </xsd:simpleContent>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:all>
+        </xsd:complexType>
+      </xsd:schema> })
+      XSD
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/number_ad_type.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class NumberADType
+      |    include ParserCore::BaseParser
+      |
+      |    def number_requested
+      |      at 'numberRequested'
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:number_requested] = number_requested if has? 'numberRequested'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
   it 'parses elements with extension' do
     schema = multiline(%{
       |<?xml version="1.0" encoding="UTF-8"?>
@@ -8,7 +86,6 @@ RSpec.describe ScaffoldParser do
       |     <xs:extension base="baseElement">
       |       <xs:sequence>
       |         <xs:element name="name"/>
-      |         <xs:element name="title"/>
       |       </xs:sequence>
       |     </xs:extension>
       |   </xs:complexContent>
@@ -19,22 +96,60 @@ RSpec.describe ScaffoldParser do
     scaffold = Hash[scaffolds]['parsers/order.rb']
     expect(scaffold).to eq_multiline(%{
       |module Parsers
-      |  class Order < BaseElement
-      |    include BaseParser
+      |  class Order
+      |    include ParserCore::BaseParser
       |
       |    def name
       |      at 'name'
       |    end
       |
-      |    def title
-      |      at 'title'
+      |    def to_h_with_attrs
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:name] = name if has? 'name'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'parses elements with extension' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      |  <xs:complexType name="order">
+      |   <xs:complexContent>
+      |     <xs:extension base="baseElement">
+      |       <xs:sequence>
+      |         <xs:element name="name"/>
+      |       </xs:sequence>
+      |     </xs:extension>
+      |   </xs:complexContent>
+      |  </xs:complexType>
+      |
+      |  <xs:complexType name="baseElement">
+      |    <xs:sequence>
+      |      <xs:element name="title" type"xs:string"/>
+      |    </xs:sequence>
+      |  </xs:complexType>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/order.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class Order < BaseElement
+      |    include ParserCore::BaseParser
+      |
+      |    def name
+      |      at 'name'
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:name] = name if has? 'name'
-      |      hash[:title] = title if has? 'title'
       |
       |      hash
       |      super.merge(hash)
@@ -49,7 +164,7 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Parsers
       |  class Order
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def customer
       |      submodel_at(Customer, 'customer')
@@ -68,7 +183,7 @@ RSpec.describe ScaffoldParser do
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:customer] = customer.to_h_with_attrs if has? 'customer'
       |      hash[:company] = company.to_h_with_attrs if has? 'company'
@@ -85,14 +200,14 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['parsers/customer.rb']).to eq_multiline(%{
       |module Parsers
       |  class Customer < BaseElement
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def id
       |      at 'id'
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:id] = id if has? 'id'
       |
@@ -107,14 +222,14 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['parsers/seller.rb']).to eq_multiline(%{
       |module Parsers
       |  class Seller < BaseElement
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def contact_info
       |      submodel_at(ContactInfo, 'contactInfo')
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:contact_info] = contact_info.to_h_with_attrs if has? 'contactInfo'
       |
@@ -129,14 +244,14 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['parsers/reference_type.rb']).to eq_multiline(%{
       |module Parsers
       |  class ReferenceType
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def id
       |      at 'ID'
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:id] = id if has? 'ID'
       |
@@ -150,7 +265,7 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['parsers/contact_info.rb']).to eq_multiline(%{
       |module Parsers
       |  class ContactInfo
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def email
       |      at 'email'
@@ -161,7 +276,7 @@ RSpec.describe ScaffoldParser do
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:email] = email if has? 'email'
       |      hash[:phone] = phone if has? 'phone'
@@ -176,14 +291,14 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['parsers/base_element.rb']).to eq_multiline(%{
       |module Parsers
       |  class BaseElement
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def title
       |      at 'title'
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:title] = title if has? 'title'
       |
@@ -197,7 +312,7 @@ RSpec.describe ScaffoldParser do
   #   expect(scaffolds['parsers/person.rb']).to eq_multiline(%{
   #     |module Parsers
   #     |  class Person < BaseElement
-  #     |    include BaseParser
+  #     |    include ParserCore::BaseParser
   #     |  end
   #     |end })
   # end
@@ -206,7 +321,7 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['parsers/company.rb']).to eq_multiline(%{
       |module Parsers
       |  class Company < BaseElement
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |  end
       |end })
   end
@@ -215,7 +330,7 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['builders/order.rb']).to eq_multiline(%{
       |module Builders
       |  class Order
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)
@@ -246,7 +361,7 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['builders/customer.rb']).to eq_multiline(%{
       |module Builders
       |  class Customer < BaseElement
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)
@@ -270,7 +385,7 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['builders/seller.rb']).to eq_multiline(%{
       |module Builders
       |  class Seller < BaseElement
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)
@@ -296,7 +411,7 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['builders/reference_type.rb']).to eq_multiline(%{
       |module Builders
       |  class ReferenceType
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)
@@ -316,7 +431,7 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['builders/contact_info.rb']).to eq_multiline(%{
       |module Builders
       |  class ContactInfo
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)
@@ -337,7 +452,7 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['builders/base_element.rb']).to eq_multiline(%{
       |module Builders
       |  class BaseElement
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)
