@@ -3,6 +3,52 @@ RSpec.describe 'complex types' do
     schema = multiline(%{
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      | <xs:element name="order">
+      |   <xs:complexType>
+      |     <xs:complexContent>
+      |       <xs:extension base="seznamType">
+      |         <xs:sequence>
+      |           <xs:element name="KmKarta" maxOccurs="unbounded">
+      |             <xs:complexType>
+      |               <xs:complexContent>
+      |                 <xs:extension base="kmKartaType"/>
+      |               </xs:complexContent>
+      |             </xs:complexType>
+      |           </xs:element>
+      |         </xs:sequence>
+      |       </xs:extension>
+      |     </xs:complexContent>
+      |   </xs:complexType>
+      | </xs:element>
+      |</xs:schema> })
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/order.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class Order < SeznamType
+      |    include BaseParser
+      |
+      |    def km_karta
+      |      array_of_at(KmKarta, ['KmKarta'])
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:km_karta] = km_karta.map(&:to_h_with_attrs) if has? 'KmKarta'
+      |
+      |      hash
+      |      super.merge(hash)
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'sequence inside a sequence inside i sequence... i know..' do
+    schema = multiline(%{
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:complexType name="order">
       |    <xs:sequence>
       |      <xs:element name="name"/>
@@ -125,6 +171,8 @@ RSpec.describe 'complex types' do
       |        </xs:complexType>
       |      </xs:element>
       |    </xs:sequence>
+      |  </xs:complexType>
+      |  <xs:complexType name="someType">
       |  </xs:complexType>
       |</xs:schema> })
 

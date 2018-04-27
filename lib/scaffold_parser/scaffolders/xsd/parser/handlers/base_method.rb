@@ -2,7 +2,7 @@ module ScaffoldParser
   module Scaffolders
     class XSD
       class Parser
-        module Templates
+        module Handlers
           module BaseMethod
             attr_accessor :source
 

@@ -4,7 +4,24 @@ module ScaffoldParser
       class Parser
         module Handlers
           class Extension
-            include Base
+            attr_accessor :elements, :attributes
+
+            def initialize(elements = [], attributes)
+              @elements = [*elements]
+              @attributes = attributes
+            end
+
+            def complex_type(source)
+              if source.has_name?
+                template = Klass.new(source.name.camelize, elements) do |template|
+                  template.inherit_from = attributes['base'].camelize
+                end
+
+                STACK.push template
+              else
+                ComplexType.new elements + [ClassInherit.new(attributes['base'])]
+              end
+            end
           end
         end
       end

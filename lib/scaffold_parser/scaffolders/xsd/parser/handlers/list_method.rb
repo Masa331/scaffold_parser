@@ -2,8 +2,8 @@ module ScaffoldParser
   module Scaffolders
     class XSD
       class Parser
-        module Templates
-          class ProxyListMethod
+        module Handlers
+          class ListMethod
             include BaseMethod
             include Utils
 
@@ -11,6 +11,8 @@ module ScaffoldParser
 
             def initialize(source)
               @source = source
+              @at = [source.name]
+
               yield self if block_given?
             end
 
@@ -30,33 +32,51 @@ module ScaffoldParser
               f = StringIO.new
 
               f.puts "if data.key? :#{method_name}"
-              f.puts "  element = Ox::Element.new('#{at.first}')"
               if item_class == 'String'
-                f.puts "  data[:#{method_name}].map { |i| Ox::Element.new('#{at.last}') << i }.each { |i| element << i }"
+                f.puts "  data[:#{method_name}].map { |i| Ox::Element.new('#{at.first}') << i }.each { |i| root << i }"
               else
-                f.puts "  data[:#{method_name}].each { |i| element << #{item_class}.new('#{at.last}', i).builder }"
+                f.puts "  data[:#{method_name}].each { |i| root << #{item_class}.new('#{at.first}', i).builder }"
               end
-              f.puts '  root << element'
               f.puts 'end'
 
               f.string.strip
+            end
+
+            def to_proxy_list(source, path)
+              ProxyListMethod.new(source) do |m|
+                m.at = [path] + @at
+                m.item_class = @item_class
+              end
             end
 
             def sequence(_)
               self
             end
 
-            def complex_type(new_source)
-              if new_source.has_name?
-                template = Templates::Klass.new(new_source.name.camelize) do |template|
-                  template.methods = [self]
-                end
-                STACK.push template
+            def choice(_)
+              self
+            end
 
-                Handlers::Blank.new
+            def all(_)
+              self
+            end
+
+            def complex_type(source)
+              if source.has_name?
+                STACK.push Klass.new(source.name, [self])
               else
-                fail 'fok'
+                self
               end
+            end
+
+            def element(source)
+              if source.has_name?
+                to_proxy_list(source, source.name)
+              end
+            end
+
+            def extension(source)
+              Extension.new(self, source.attributes)
             end
           end
         end

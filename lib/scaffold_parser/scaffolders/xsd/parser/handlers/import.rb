@@ -3,11 +3,9 @@ module ScaffoldParser
     class XSD
       class Parser
         module Handlers
-          class SimpleType
-            include Base
-
-            def element(source)
-              Templates::AtMethod.new(source)
+          class Import
+            def schema(_)
+              STACK
             end
           end
         end

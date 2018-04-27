@@ -1,27 +1,10 @@
 require 'scaffold_parser/scaffolders/xsd/parser/stack'
-
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/base'
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/blank'
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/choice'
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/complex_content'
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/complex_type'
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/element'
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/elements'
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/extension'
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/max_length'
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/restriction'
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/schema'
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/sequence'
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/simple_content'
-require 'scaffold_parser/scaffolders/xsd/parser/handlers/simple_type'
-
-require 'scaffold_parser/scaffolders/xsd/parser/templates/all'
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/requires'
 
 module ScaffoldParser
   module Scaffolders
     class XSD
       class Parser
-
         attr_reader :xsds
 
         def self.call(xsds, options)
@@ -40,11 +23,9 @@ module ScaffoldParser
 
           classes =
             xsds.map do |xsd|
-              if @options[:verbose]
-                puts "\n\nScaffolding schema which defines:"
-                puts "#{xsd.children.map { |c| c.name }.compact}"
-                puts
-              end
+              # if @options[:verbose]
+              #   puts "\n\nScaffolding schema which defines:\n#{xsd.children.map { |c| c.name }.compact}\n"
+              # end
 
               xsd.reverse_traverse do |element, children_result|
                 handler =
@@ -53,26 +34,13 @@ module ScaffoldParser
                   elsif children_result.one?
                     children_result.first
                   else
-                    #TODO: refactor. This is because of possible sequence inside of sequence
-                    children = children_result.map do |child|
-                      if child.is_a? Handlers::Elements
-                        child.elements
-                      else
-                        child
-                      end
-                    end.flatten
-
-                    #TODO: refactor. This shouldn't happen in fact. This is here only because of simple types right now
-                    children.reject! { |child| child.is_a? Handlers::Blank }
-
-
-                    Handlers::Elements.new(children)
+                    Handlers::Elements.new(children_result)
                   end
 
-                if @options[:verbose]
+                if @options[:verbose] || true
                   current_handler = handler.class.to_s.demodulize
-                  childrens = children_result.map { |child| child.class.to_s.demodulize }
-                  puts "#{current_handler}##{element.element_name} with #{element.attributes}, childrens are #{childrens}"
+                  childrens = (handler.instance_variable_get('@elements') || []).map { |child| child.class.to_s.demodulize }
+                  puts "#{current_handler}#{childrens}##{element.element_name}"
                 end
 
                 handler.send(element.element_name, element)
