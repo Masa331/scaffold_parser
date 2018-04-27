@@ -3,8 +3,12 @@ module ScaffoldParser
     class XSD
       class Parser
         module Handlers
-          class MaxLength
-            include Base
+          class ClassInherit
+            attr_reader :base
+
+            def initialize(base)
+              @base = base&.camelize
+            end
           end
         end
       end

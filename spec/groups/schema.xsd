@@ -5,7 +5,6 @@
       <xs:element name="buyer" minOccurs="0">
         <xs:complexType>
           <xs:group ref="configuration" minOccurs="0"/>
-          <xs:element name="name" type="xs:string"/>
         </xs:complexType>
       </xs:element>
       <xs:group ref="configuration" minOccurs="0"/>

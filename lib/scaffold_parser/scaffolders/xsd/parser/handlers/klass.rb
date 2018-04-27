@@ -2,50 +2,31 @@ module ScaffoldParser
   module Scaffolders
     class XSD
       class Parser
-        module Templates
+        module Handlers
           class Klass
             include Utils
 
             attr_accessor :name, :namespace, :methods, :inherit_from, :includes
 
-            def initialize(name = nil)
-              @name = name
-              @methods = []
-              @includes = []
+            def initialize(name = nil, elements = [])
+              @name = name&.camelize
+
+              includes, methods = [*elements].partition do |e|
+                e.is_a? ModuleInclude
+              end
+              inherits, methods = methods.partition do |e|
+                e.is_a? ClassInherit
+              end
+
+              @methods = methods
+              @includes = includes
+              @inherit_from = inherits.first.base if inherits.any?
 
               yield self if block_given?
             end
 
-            def complex_content(_)
-              self
-            end
-
-            def simple_content(_)
-              self
-            end
-
-            def complex_type(new_source)
-              if new_source.has_name?
-                self.name = new_source.name.camelize
-                STACK.push self
-
-                Handlers::Blank.new
-              else
-                self
-              end
-            end
-
-            def element(new_source)
-              self.name = new_source.name.camelize
-              STACK.push self
-
-              if new_source.multiple?
-                Templates::ListMethod.new(new_source) do |template|
-                  template.item_class = name.camelize
-                end
-              else
-                Templates::SubmodelMethod.new(new_source, new_source.name.camelize)
-              end
+            def schema(_)
+              STACK
             end
 
             def ==(other)
@@ -72,9 +53,6 @@ module ScaffoldParser
                 f.puts "  def to_h_with_attrs"
                 f.puts "    hash = HashWithAttributes.new({}, attributes)"
                 f.puts
-                # if methods.any? { |m| !m.respond_to?(:to_h_with_attrs_method) }
-                #   require 'pry'; binding.pry
-                # end
                 methods.each { |method| f.puts "    #{method.to_h_with_attrs_method}" }
                 f.puts if methods.any?
                 if includes.any?

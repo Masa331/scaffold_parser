@@ -2,7 +2,7 @@ module ScaffoldParser
   module Scaffolders
     class XSD
       class Parser
-        module Templates
+        module Handlers
           module Utils
             def indent(lines_or_string)
               if lines_or_string.is_a? Array
@@ -21,6 +21,8 @@ module ScaffoldParser
             end
 
             def wrap_in_namespace(klass, namespace)
+              return klass unless namespace
+
               lines = klass.lines
               indented = indent(lines)
 

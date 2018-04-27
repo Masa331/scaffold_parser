@@ -1,5 +1,5 @@
 RSpec.describe 'arrays' do
-  it 'fixed mx occurs' do
+  it 'fixed max occurs' do
     schema = multiline(%{
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">

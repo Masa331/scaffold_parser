@@ -4,10 +4,10 @@
     <xs:sequence>
       <xs:choice>
         <xs:sequence minOccurs="0">
-          <xs:element name="name" type="xs:string">
+          <xs:element name="name" type="xs:string"/>
         </xs:sequence>
 
-        <xs:element name="company_name" type="xs:string">
+        <xs:element name="company_name" type="xs:string"/>
       </xs:choice>
     </xs:sequence>
   </xs:complexType>

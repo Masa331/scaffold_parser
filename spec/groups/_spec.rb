@@ -9,6 +9,8 @@ RSpec.describe 'simple types' do
       |      </xs:element>
       |    </xs:all>
       |  </xs:group>
+      |  <xs:complexType name="flag">
+      |  </xs:complexType>
       |</xs:schema> })
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
@@ -27,6 +29,27 @@ RSpec.describe 'simple types' do
       |        hash[:flag] = flag.to_h_with_attrs if has? 'flag'
       |
       |        hash
+      |      end
+      |    end
+      |  end
+      |end })
+
+    scaffold = Hash[scaffolds]['builders/groups/configuration.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Builders
+      |  module Groups
+      |    module Configuration
+      |      def builder
+      |        root = Ox::Element.new(name)
+      |        if data.respond_to? :attributes
+      |          data.attributes.each { |k, v| root[k] = v }
+      |        end
+      |
+      |        if data.key? :flag
+      |          root << Flag.new('flag', data[:flag]).builder
+      |        end
+      |
+      |        root
       |      end
       |    end
       |  end
@@ -187,14 +210,8 @@ RSpec.describe 'simple types' do
       |    include BaseParser
       |    include Groups::Configuration
       |
-      |    def name
-      |      at 'name'
-      |    end
-      |
       |    def to_h_with_attrs
       |      hash = HashWithAttributes.new({}, attributes)
-      |
-      |      hash[:name] = name if has? 'name'
       |
       |      mega.inject(hash) { |memo, r| memo.merge r }
       |    end

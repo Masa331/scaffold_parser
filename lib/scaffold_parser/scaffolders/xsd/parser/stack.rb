@@ -3,8 +3,6 @@ module ScaffoldParser
     class XSD
       class Parser
         class Stack
-          class SameClassAlreadyInStack < StandardError; end
-
           include Singleton
 
           def initialize
@@ -12,10 +10,7 @@ module ScaffoldParser
           end
 
           def push(value)
-
-            same_named_class = @stack.find { |klass| klass.name == value.name }
             similar_classes = @stack.select { |klass| klass.name.start_with? value.name }
-
 
             if similar_classes.any?
               same_structure_class = similar_classes.find do |kl|
@@ -40,10 +35,6 @@ module ScaffoldParser
               value
             end
           end
-
-          # def push_raw(value)
-          #   @stack.push value
-          # end
 
           def clear
             @stack.clear
