@@ -13,7 +13,7 @@ module ScaffoldParser
 
             def complex_type(source)
               if source.has_name?
-                template = Klass.new(source.name.camelize, elements) do |template|
+                template = Klass.new(source, elements) do |template|
                   template.inherit_from = attributes['base'].camelize
                 end
 

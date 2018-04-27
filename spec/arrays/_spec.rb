@@ -1,4 +1,118 @@
 RSpec.describe 'arrays' do
+  it 'schema with namespaces' do
+    schema = <<-XSD
+      <?xml version="1.0" encoding="UTF-8"?>
+      <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+        <xs:complexType name="orderType">
+          <xs:sequence>
+            <xs:element name="links" type="linksType"/>
+          </xs:sequence>
+        </xs:complexType>
+
+        <xs:complexType name="linksType">
+          <xs:sequence>
+            <xs:element name="link" type="linkElemetType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:schema>
+    XSD
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/order_type.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  class OrderType
+      |    include ParserCore::BaseParser
+      |
+      |    def links
+      |      array_of_at(LinkElemetType, ['links', 'link'])
+      |    end
+      |
+      |    def to_h_with_attrs
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |
+      |      hash[:links] = links.map(&:to_h_with_attrs) if has? 'links'
+      |
+      |      hash
+      |    end
+      |  end
+      |end })
+  end
+
+  it 'schema with namespaces' do
+    schema = <<-XSD
+      <?xml version="1.0" encoding="UTF-8"?>
+      <xs:schema
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:inv="http://www.stormware.cz/schema/version_2/invoice.xsd"
+        xmlns="http://www.stormware.cz/schema/version_2/invoice.xsd"
+        targetNamespace="http://www.stormware.cz/schema/version_2/invoice.xsd"
+        elementFormDefault="qualified">
+        <xs:element name="order" type="orderType"/>
+
+        <xs:complexType name="orderType">
+          <xs:sequence>
+            <xs:element name="item" type="item:itemType" maxOccurs="unbounded"/>
+            <xs:element name="note" maxOccurs="unbounded"/>
+            <xs:element name="emails">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="address" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="payments">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="payment" type="pay:paymentType" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:schema>
+    XSD
+
+    scaffolds = ScaffoldParser.scaffold_to_string(schema)
+    scaffold = Hash[scaffolds]['parsers/inv/order_type.rb']
+    expect(scaffold).to eq_multiline(%{
+      |module Parsers
+      |  module Inv
+      |    class OrderType
+      |      include ParserCore::BaseParser
+      |
+      |      def item
+      |        array_of_at(Item::ItemType, ['inv:item'])
+      |      end
+      |
+      |      def note
+      |        array_of_at(String, ['inv:note'])
+      |      end
+      |
+      |      def emails
+      |        array_of_at(String, ['inv:emails', 'inv:address'])
+      |      end
+      |
+      |      def payments
+      |        array_of_at(Pay::PaymentType, ['inv:payments', 'inv:payment'])
+      |      end
+      |
+      |      def to_h_with_attrs
+      |        hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |
+      |        hash[:item] = item.map(&:to_h_with_attrs) if has? 'inv:item'
+      |        hash[:note] = note if has? 'inv:note'
+      |        hash[:emails] = emails if has? 'inv:emails'
+      |        hash[:payments] = payments.map(&:to_h_with_attrs) if has? 'inv:payments'
+      |
+      |        hash
+      |      end
+      |    end
+      |  end
+      |end })
+  end
+
   it 'fixed max occurs' do
     schema = multiline(%{
       |<?xml version="1.0" encoding="UTF-8"?>
@@ -32,7 +146,7 @@ RSpec.describe 'arrays' do
     expect(scaffold).to eq_multiline(%{
       |module Parsers
       |  class SouhrnDPHType
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def zaklad0
       |      at 'Zaklad0'
@@ -43,7 +157,7 @@ RSpec.describe 'arrays' do
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:zaklad0] = zaklad0 if has? 'Zaklad0'
       |      hash[:seznam_dalsi_sazby] = seznam_dalsi_sazby.map(&:to_h_with_attrs) if has? 'SeznamDalsiSazby'
@@ -81,6 +195,12 @@ RSpec.describe 'arrays' do
       |      </xs:sequence>
       |    </xs:complexType>
       |  </xs:element>
+      |
+      |  <xs:complexType name="seznamType">
+      |    <xs:sequence>
+      |      <xs:element name="title" type"xs:string"/>
+      |    </xs:sequence>
+      |  </xs:complexType>
       |</xs:schema> })
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
@@ -88,14 +208,14 @@ RSpec.describe 'arrays' do
     expect(scaffold).to eq_multiline(%{
       |module Parsers
       |  class MoneyData
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def seznam_fakt_vyd
       |      submodel_at(SeznamFaktVyd, 'SeznamFaktVyd')
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:seznam_fakt_vyd] = seznam_fakt_vyd.to_h_with_attrs if has? 'SeznamFaktVyd'
       |
@@ -108,14 +228,14 @@ RSpec.describe 'arrays' do
     expect(scaffold).to eq_multiline(%{
       |module Parsers
       |  class SeznamFaktVyd < SeznamType
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def fakt_vyd
       |      array_of_at(FaktVyd, ['FaktVyd'])
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:fakt_vyd] = fakt_vyd.map(&:to_h_with_attrs) if has? 'FaktVyd'
       |
@@ -132,7 +252,7 @@ RSpec.describe 'arrays' do
     expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Parsers
       |  class Order
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def items
       |      array_of_at(ItemType, ['items', 'Item'])
@@ -155,7 +275,7 @@ RSpec.describe 'arrays' do
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:items] = items.map(&:to_h_with_attrs) if has? 'items'
       |      hash[:payments] = payments.to_h_with_attrs if has? 'payments'
@@ -173,14 +293,14 @@ RSpec.describe 'arrays' do
     expect(scaffolds['parsers/payment_type.rb']).to eq_multiline(%{
       |module Parsers
       |  class PaymentType
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def payments_list
       |      array_of_at(Payment, ['payments_list', 'payment'])
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:payments_list] = payments_list.map(&:to_h_with_attrs) if has? 'payments_list'
       |
@@ -194,14 +314,14 @@ RSpec.describe 'arrays' do
     expect(scaffolds['parsers/payment.rb']).to eq_multiline(%{
       |module Parsers
       |  class Payment
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def amount
       |      at 'amount'
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:amount] = amount if has? 'amount'
       |
@@ -215,14 +335,14 @@ RSpec.describe 'arrays' do
     expect(scaffolds['parsers/messages.rb']).to eq_multiline(%{
       |module Parsers
       |  class Messages < MessageType
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def recipient
       |      array_of_at(RecipientType, ['recipient'])
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:recipient] = recipient.map(&:to_h_with_attrs) if has? 'recipient'
       |
@@ -237,14 +357,14 @@ RSpec.describe 'arrays' do
     expect(scaffolds['parsers/recipient_type.rb']).to eq_multiline(%{
       |module Parsers
       |  class RecipientType
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def name
       |      at 'name'
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:name] = name if has? 'name'
       |
@@ -258,14 +378,14 @@ RSpec.describe 'arrays' do
     expect(scaffolds['parsers/message_type.rb']).to eq_multiline(%{
       |module Parsers
       |  class MessageType
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def error
       |      array_of_at(String, ['error'])
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:error] = error if has? 'error'
       |
@@ -279,7 +399,7 @@ RSpec.describe 'arrays' do
     expect(scaffolds['builders/order.rb']).to eq_multiline(%{
       |module Builders
       |  class Order
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)
@@ -317,7 +437,7 @@ RSpec.describe 'arrays' do
     expect(scaffolds['builders/payment_type.rb']).to eq_multiline(%{
       |module Builders
       |  class PaymentType
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)
@@ -342,7 +462,7 @@ RSpec.describe 'arrays' do
     expect(payment_parser).to eq_multiline(%{
       |module Builders
       |  class Payment
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)
@@ -362,7 +482,7 @@ RSpec.describe 'arrays' do
     expect(scaffolds['builders/messages.rb']).to eq_multiline(%{
       |module Builders
       |  class Messages < MessageType
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)
@@ -388,7 +508,7 @@ RSpec.describe 'arrays' do
     expect(scaffolds['builders/recipient_type.rb']).to eq_multiline(%{
       |module Builders
       |  class RecipientType
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)
@@ -408,7 +528,7 @@ RSpec.describe 'arrays' do
     expect(scaffolds['builders/message_type.rb']).to eq_multiline(%{
       |module Builders
       |  class MessageType
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)

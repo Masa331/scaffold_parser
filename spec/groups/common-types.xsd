@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:cmn="common-types"
+  xmlns="common-types"
+  targetNamespace="common-types"
+  elementFormDefault="qualified" >
+
+  <xs:group name="secondGroup">
+    <xs:all>
+      <xs:element name="accountNo"/>
+      <xs:element name="bankCode"/>
+    </xs:all>
+  </xs:group>
+</xs:schema>

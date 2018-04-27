@@ -8,15 +8,19 @@ module ScaffoldParser
             include Utils
 
             def method_body
-              "at '#{source.name}'"
+              "at '#{at}'"
+            end
+
+            def at
+              [source.xmlns_prefix, "#{source.name}"].compact.join(':')
             end
 
             def to_h_with_attrs_method
-              "hash[:#{method_name}] = #{method_name} if has? '#{source.name}'"
+              "hash[:#{method_name}] = #{method_name} if has? '#{at}'"
             end
 
             def to_builder
-              "root << build_element('#{source.name}', data[:#{source.name.underscore}]) if data.key? :#{source.name.underscore}"
+              "root << build_element('#{at}', data[:#{method_name}]) if data.key? :#{method_name}"
             end
 
             def sequence(_)

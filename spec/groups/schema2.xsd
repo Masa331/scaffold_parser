@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:cmn="common-types"
+  xmlns:ord="order"
+  xmlns="order"
+  targetNamespace="order"
+  elementFormDefault="qualified">
+
+  <xs:import namespace="common-types" schemaLocation="spec/groups/common-types.xsd"/>
+
+  <xs:complexType name="order">
+    <xs:sequence>
+      <xs:group ref="cmn:secondGroup"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

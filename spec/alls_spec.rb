@@ -18,7 +18,7 @@ RSpec.describe 'simple types' do
     expect(scaffold).to eq_multiline(%{
       |module Parsers
       |  class Order
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def name
       |      at 'name'
@@ -29,7 +29,7 @@ RSpec.describe 'simple types' do
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:name] = name if has? 'name'
       |      hash[:company_name] = company_name if has? 'company_name'

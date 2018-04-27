@@ -5,7 +5,7 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Parsers
       |  class Order
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def title
       |      at 'title'
@@ -16,7 +16,7 @@ RSpec.describe ScaffoldParser do
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:title] = title if has? 'title'
       |      hash[:title2] = title2 if has? 'title2'
@@ -31,14 +31,14 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['parsers/person.rb']).to eq_multiline(%{
       |module Parsers
       |  class Person
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def name
       |      at 'name'
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:name] = name if has? 'name'
       |
@@ -52,7 +52,7 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['builders/order.rb']).to eq_multiline(%{
       |module Builders
       |  class Order
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)
@@ -73,7 +73,7 @@ RSpec.describe ScaffoldParser do
     expect(scaffolds['builders/person.rb']).to eq_multiline(%{
       |module Builders
       |  class Person
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)

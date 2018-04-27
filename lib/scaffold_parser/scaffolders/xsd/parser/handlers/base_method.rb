@@ -11,7 +11,12 @@ module ScaffoldParser
             end
 
             def method_name
-              source.name.underscore
+              if source.name
+                source.name.underscore
+              elsif source.ref
+                prefix, name = source.ref.split(':')
+                name.underscore
+              end
             end
 
             def to_s

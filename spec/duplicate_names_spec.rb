@@ -21,11 +21,11 @@ RSpec.describe 'simple types' do
     expect(scaffold).to eq_multiline(%{
       |module Parsers
       |  class Konfigurace
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |    include Groups::Konfigurace
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      mega.inject(hash) { |memo, r| memo.merge r }
       |    end
@@ -42,7 +42,7 @@ RSpec.describe 'simple types' do
       |      end
       |
       |      def to_h_with_attrs
-      |        hash = HashWithAttributes.new({}, attributes)
+      |        hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |        hash[:flag] = flag if has? 'flag'
       |

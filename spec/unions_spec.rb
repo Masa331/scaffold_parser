@@ -19,14 +19,14 @@ RSpec.describe 'unions' do
     expect(scaffold).to eq_multiline(%{
       |module Parsers
       |  class Order
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def flag
       |      at 'flag'
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:flag] = flag if has? 'flag'
       |

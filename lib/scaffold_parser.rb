@@ -1,17 +1,13 @@
 require 'xsd_model'
+require 'fileutils'
 require 'active_support/all'
 require 'scaffold_parser/scaffolders/xsd'
 
 module ScaffoldParser
   def self.scaffold(path, options = {})
-    ensure_dir_exists('./tmp/')
-    ensure_dir_exists('./tmp/builders')
-    ensure_dir_exists('./tmp/builders/groups')
-    ensure_dir_exists('./tmp/parsers')
-    ensure_dir_exists('./tmp/parsers/groups')
-
     scaffold_to_string(File.read(path), options).each do |path, content|
       complete_path = path.prepend('./tmp/')
+      ensure_dir_exists(complete_path, options)
 
       puts "Writing out #{complete_path}" if options[:verbose]
 
@@ -37,10 +33,13 @@ module ScaffoldParser
 
   private
 
-  def self.ensure_dir_exists(path)
-    unless Dir.exists?(path)
-      Dir.mkdir(path)
-      puts "#{path} directory created"
+  def self.ensure_dir_exists(path, options)
+    dir = path.split('/')[0..-2].join('/')
+
+    unless Dir.exists?(dir)
+      FileUtils.mkdir_p(dir)
+
+      puts "#{dir} directory created" if options[:verbose]
     end
   end
 end

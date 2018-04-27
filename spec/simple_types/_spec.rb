@@ -5,7 +5,7 @@ RSpec.describe 'simple types' do
     expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Parsers
       |  class Order
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def name
       |      at 'name'
@@ -20,7 +20,7 @@ RSpec.describe 'simple types' do
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:name] = name if has? 'name'
       |      hash[:title] = title if has? 'title'
@@ -36,7 +36,7 @@ RSpec.describe 'simple types' do
     expect(scaffolds['builders/order.rb']).to eq_multiline(%{
       |module Builders
       |  class Order
-      |    include BaseBuilder
+      |    include ParserCore::BaseBuilder
       |
       |    def builder
       |      root = Ox::Element.new(name)

@@ -5,14 +5,14 @@ RSpec.describe 'simple types' do
     expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
       |module Parsers
       |  class Order
-      |    include BaseParser
+      |    include ParserCore::BaseParser
       |
       |    def name
       |      at 'name'
       |    end
       |
       |    def to_h_with_attrs
-      |      hash = HashWithAttributes.new({}, attributes)
+      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
       |
       |      hash[:name] = name if has? 'name'
       |
