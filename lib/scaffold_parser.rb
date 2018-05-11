@@ -3,54 +3,6 @@ require 'fileutils'
 require 'active_support/all'
 require 'scaffold_parser/scaffolders/xsd'
 
-module XsdModel
-  module Elements
-    module BaseElement
-      def xmlns_prefix
-        nil if xmlns_uri.nil?
-
-        ary = namespaces.to_a
-
-        candidates = ary.select do |n|
-          n[1] == xmlns_uri
-        end.map(&:first)
-
-        full_prefix = candidates.find do |c|
-          c.start_with? 'xmlns:'
-        end
-
-        full_prefix&.gsub('xmlns:', '')
-      end
-
-      def xmlns_uri
-        namespaces['xmlns']
-      end
-
-      def name_with_prefix
-        [xmlns_prefix, name].compact.join(':')
-      end
-
-      def type_with_prefix
-        if type&.include? ':'
-          type
-        else
-          [xmlns_prefix, type].compact.join(':')
-        end
-      end
-    end
-
-    class Element
-      def has_ref?
-        !ref.nil?
-      end
-
-      def ref
-        attributes['ref']
-      end
-    end
-  end
-end
-
 module ScaffoldParser
   def self.scaffold(path, options = {})
     scaffold_to_string(File.read(path), options).each do |path, content|

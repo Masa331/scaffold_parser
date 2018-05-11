@@ -11,7 +11,6 @@ module ScaffoldParser
 
             def initialize(source)
               @source = source
-              # @at = [source.name]
               @at = [[source.xmlns_prefix, "#{source.name}"].compact.join(':')]
 
               yield self if block_given?

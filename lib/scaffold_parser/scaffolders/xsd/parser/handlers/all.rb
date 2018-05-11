@@ -11,7 +11,6 @@ module ScaffoldParser
             end
 
             def group(source)
-              # STACK.push Module.new("Groups::#{source.name.camelize}", elements)
               STACK.push Module.new(source, elements)
             end
 

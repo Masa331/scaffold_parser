@@ -83,7 +83,6 @@ module ScaffoldParser
             end
 
             def to_builder_s
-              #TODO: includes are missing from here?
               f = StringIO.new
 
               if inherit_from

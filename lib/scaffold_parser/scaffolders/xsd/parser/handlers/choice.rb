@@ -4,6 +4,8 @@ module ScaffoldParser
       class Parser
         module Handlers
           class Choice
+            include OrderElements
+
             attr_accessor :elements
 
             def initialize(elements = [])
@@ -16,19 +18,6 @@ module ScaffoldParser
               else
                 ComplexType.new(elements)
               end
-            end
-
-            def sequence(_)
-              flattened = elements.flat_map do |element|
-                case element
-                when Sequence, Choice, All
-                  then element.elements
-                else
-                  element
-                end
-              end
-
-              Sequence.new flattened
             end
 
             def extension(source)

@@ -1,3 +1,4 @@
+require 'scaffold_parser/scaffolders/xsd/parser/handlers/order_elements'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/blank'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/complex_type'
 require 'scaffold_parser/scaffolders/xsd/parser/handlers/elements'

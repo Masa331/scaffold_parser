@@ -24,10 +24,6 @@ module ScaffoldParser
               elsif source.has_custom_type?
                 SubmodelMethod.new(source)
               elsif source.has_ref?
-                # name = source.ref.split(':').map(&:classify).join('::')
-                #
-                # SubmodelMethod.new(source, name)
-
                 ElementRef.new(source)
               else
                 if elements.any?
@@ -53,7 +49,6 @@ module ScaffoldParser
               else # basic xsd extension
                 self
               end
-
             end
 
             def include(_)

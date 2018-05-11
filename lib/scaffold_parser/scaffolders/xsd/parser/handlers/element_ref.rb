@@ -9,7 +9,6 @@ module ScaffoldParser
             end
 
             def to_submodel_method(ref_map)
-              # name = source.ref.split(':').map(&:classify).join('::')
               name = ref_map[@source.ref].split(':').map(&:classify).join('::')
 
               SubmodelMethod.new(@source, name)
