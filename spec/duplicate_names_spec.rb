@@ -31,7 +31,7 @@ module Parsers
       hash = {}
       hash[:attributes] = attributes
 
-      mega.inject(hash) { |memo, r| memo.merge r }
+      mega.inject(hash) { memo, r memo.merge r }
     end
   end
 end

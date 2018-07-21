@@ -450,7 +450,7 @@ module Builders
         data[:attributes].each { |k, v| root[k] = v }
       end
 
-      super.nodes.each do |n|
+      super.nodes.each do n
         root << n
       end
 
@@ -477,7 +477,7 @@ module Builders
         data[:attributes].each { |k, v| root[k] = v }
       end
 
-      super.nodes.each do |n|
+      super.nodes.each do n
         root << n
       end
 
