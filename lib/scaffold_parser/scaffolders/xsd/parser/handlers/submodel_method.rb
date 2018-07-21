@@ -32,8 +32,8 @@ module ScaffoldParser
               [source.xmlns_prefix, "#{method_name}"].compact.join(':')
             end
 
-            def to_h_with_attrs_method
-              "hash[:#{method_name}] = #{method_name}.to_h_with_attrs if has? '#{at}'"
+            def to_h_method
+              "hash[:#{method_name}] = #{method_name}.to_h if has? '#{at}'"
             end
 
             def to_builder

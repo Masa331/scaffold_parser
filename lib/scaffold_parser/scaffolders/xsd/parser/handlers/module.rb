@@ -35,10 +35,11 @@ module ScaffoldParser
                   methods.each { |method| template.methods << indent(method.to_s.lines).join  }
 
                   meth = StringIO.new
-                  meth.puts "  def to_h_with_attrs"
-                  meth.puts "    hash = ParserCore::HashWithAttributes.new({}, attributes)"
+                  meth.puts "  def to_h"
+                  meth.puts "    hash = {}"
+                  meth.puts "    hash[:attributes] = attributes"
                   meth.puts
-                  methods.each { |method| meth.puts "    #{method.to_h_with_attrs_method}" }
+                  methods.each { |method| meth.puts "    #{method.to_h_method}" }
                   meth.puts
                   meth.puts "    hash"
                   meth.puts "  end"

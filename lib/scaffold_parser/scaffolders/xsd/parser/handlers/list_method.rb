@@ -24,11 +24,11 @@ module ScaffoldParser
               [source.xmlns_prefix, "#{source.name}"].compact.join(':')
             end
 
-            def to_h_with_attrs_method
+            def to_h_method
               if item_class == 'String'
                 "hash[:#{method_name}] = #{method_name} if has? '#{name_with_prefix}'"
               else
-                "hash[:#{method_name}] = #{method_name}.map(&:to_h_with_attrs) if has? '#{name_with_prefix}'"
+                "hash[:#{method_name}] = #{method_name}.map(&:to_h) if has? '#{name_with_prefix}'"
               end
             end
 

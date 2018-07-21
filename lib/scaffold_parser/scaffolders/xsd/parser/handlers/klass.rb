@@ -56,10 +56,15 @@ module ScaffoldParser
                 f.puts if methods.any?
                 f.puts methods.map { |method| indent(method.to_s.lines).join  }.join("\n\n")
                 f.puts if methods.any?
-                f.puts "  def to_h_with_attrs"
-                f.puts "    hash = ParserCore::HashWithAttributes.new({}, attributes)"
+                f.puts "  def to_h"
+                f.puts "    hash = {}"
+                f.puts "    hash[:attributes] = attributes"
                 f.puts
-                methods.each { |method| f.puts "    #{method.to_h_with_attrs_method}" }
+                methods.each do |method|
+                  method.to_h_method.lines.each do |line|
+                    f.puts "    #{line}"
+                  end
+                end
                 f.puts if methods.any?
                 if includes.any?
                   f.puts "    mega.inject(hash) { |memo, r| memo.merge r }"
@@ -96,8 +101,8 @@ module ScaffoldParser
               f.puts
               f.puts "  def builder"
               f.puts "    root = Ox::Element.new(name)"
-              f.puts "    if data.respond_to? :attributes"
-              f.puts "      data.attributes.each { |k, v| root[k] = v }"
+              f.puts "    if data.key? :attributes"
+              f.puts "      data[:attributes].each { |k, v| root[k] = v }"
               f.puts "    end"
               f.puts
               if inherit_from
