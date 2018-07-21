@@ -50,13 +50,13 @@ RSpec.describe 'choices' do
       |      submodel_at(CustomerInfo, 'customer_info')
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:customer_name] = customer_name if has? 'customer_name'
       |      hash[:id] = id if has? 'id'
       |      hash[:vat_id] = vat_id if has? 'vat_id'
-      |      hash[:customer_info] = customer_info.to_h_with_attrs if has? 'customer_info'
+      |      hash[:customer_info] = customer_info.to_h if has? 'customer_info'
       |
       |      hash
       |    end
@@ -80,8 +80,8 @@ RSpec.describe 'choices' do
       |      at 'company_name'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:name] = name if has? 'name'
       |      hash[:company_name] = company_name if has? 'company_name'

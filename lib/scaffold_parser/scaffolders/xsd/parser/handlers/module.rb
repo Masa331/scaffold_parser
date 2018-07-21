@@ -39,7 +39,11 @@ module ScaffoldParser
                   meth.puts "    hash = {}"
                   meth.puts "    hash[:attributes] = attributes"
                   meth.puts
-                  methods.each { |method| meth.puts "    #{method.to_h_method}" }
+                  methods.each do |method|
+                    method.to_h_method.lines.each do |line|
+                      meth.puts "    #{line}"
+                    end
+                  end
                   meth.puts
                   meth.puts "    hash"
                   meth.puts "  end"

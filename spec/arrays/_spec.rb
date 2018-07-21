@@ -29,10 +29,10 @@ RSpec.describe 'arrays' do
       |      array_of_at(LinkElemetType, ['links', 'link'])
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:links] = links.map(&:to_h_with_attrs) if has? 'links'
+      |      hash[:links] = links.map(&:to_h) if has? 'links'
       |
       |      hash
       |    end
@@ -98,13 +98,13 @@ RSpec.describe 'arrays' do
       |        array_of_at(Pay::PaymentType, ['inv:payments', 'inv:payment'])
       |      end
       |
-      |      def to_h_with_attrs
-      |        hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |      def to_h
+      |        hash[:attributes] = attributes
       |
-      |        hash[:item] = item.map(&:to_h_with_attrs) if has? 'inv:item'
+      |        hash[:item] = item.map(&:to_h) if has? 'inv:item'
       |        hash[:note] = note if has? 'inv:note'
       |        hash[:emails] = emails if has? 'inv:emails'
-      |        hash[:payments] = payments.map(&:to_h_with_attrs) if has? 'inv:payments'
+      |        hash[:payments] = payments.map(&:to_h) if has? 'inv:payments'
       |
       |        hash
       |      end
@@ -156,11 +156,11 @@ RSpec.describe 'arrays' do
       |      array_of_at(DalsiSazba, ['SeznamDalsiSazby', 'DalsiSazba'])
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:zaklad0] = zaklad0 if has? 'Zaklad0'
-      |      hash[:seznam_dalsi_sazby] = seznam_dalsi_sazby.map(&:to_h_with_attrs) if has? 'SeznamDalsiSazby'
+      |      hash[:seznam_dalsi_sazby] = seznam_dalsi_sazby.map(&:to_h) if has? 'SeznamDalsiSazby'
       |
       |      hash
       |    end
@@ -214,10 +214,10 @@ RSpec.describe 'arrays' do
       |      submodel_at(SeznamFaktVyd, 'SeznamFaktVyd')
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:seznam_fakt_vyd] = seznam_fakt_vyd.to_h_with_attrs if has? 'SeznamFaktVyd'
+      |      hash[:seznam_fakt_vyd] = seznam_fakt_vyd.to_h if has? 'SeznamFaktVyd'
       |
       |      hash
       |    end
@@ -234,10 +234,10 @@ RSpec.describe 'arrays' do
       |      array_of_at(FaktVyd, ['FaktVyd'])
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:fakt_vyd] = fakt_vyd.map(&:to_h_with_attrs) if has? 'FaktVyd'
+      |      hash[:fakt_vyd] = fakt_vyd.map(&:to_h) if has? 'FaktVyd'
       |
       |      hash
       |      super.merge(hash)
@@ -274,13 +274,13 @@ RSpec.describe 'arrays' do
       |      array_of_at(String, ['ID'])
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:items] = items.map(&:to_h_with_attrs) if has? 'items'
-      |      hash[:payments] = payments.to_h_with_attrs if has? 'payments'
+      |      hash[:items] = items.map(&:to_h) if has? 'items'
+      |      hash[:payments] = payments.to_h if has? 'payments'
       |      hash[:documents] = documents if has? 'documents'
-      |      hash[:messages] = messages.to_h_with_attrs if has? 'messages'
+      |      hash[:messages] = messages.to_h if has? 'messages'
       |      hash[:id] = id if has? 'ID'
       |
       |      hash
@@ -299,10 +299,10 @@ RSpec.describe 'arrays' do
       |      array_of_at(Payment, ['payments_list', 'payment'])
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:payments_list] = payments_list.map(&:to_h_with_attrs) if has? 'payments_list'
+      |      hash[:payments_list] = payments_list.map(&:to_h) if has? 'payments_list'
       |
       |      hash
       |    end
@@ -320,8 +320,8 @@ RSpec.describe 'arrays' do
       |      at 'amount'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:amount] = amount if has? 'amount'
       |
@@ -341,10 +341,10 @@ RSpec.describe 'arrays' do
       |      array_of_at(RecipientType, ['recipient'])
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:recipient] = recipient.map(&:to_h_with_attrs) if has? 'recipient'
+      |      hash[:recipient] = recipient.map(&:to_h) if has? 'recipient'
       |
       |      hash
       |      super.merge(hash)
@@ -363,8 +363,8 @@ RSpec.describe 'arrays' do
       |      at 'name'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:name] = name if has? 'name'
       |
@@ -384,8 +384,8 @@ RSpec.describe 'arrays' do
       |      array_of_at(String, ['error'])
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:error] = error if has? 'error'
       |

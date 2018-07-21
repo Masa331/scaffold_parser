@@ -11,8 +11,8 @@ RSpec.describe 'simple types' do
       |      at 'name'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:name] = name if has? 'name'
       |

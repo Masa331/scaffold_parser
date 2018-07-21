@@ -16,11 +16,11 @@ RSpec.describe ScaffoldParser do
       |        submodel_at(Cmn::ItemType, 'cmn:item')
       |      end
       |
-      |      def to_h_with_attrs
-      |        hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |      def to_h
+      |        hash[:attributes] = attributes
       |
       |        hash[:name] = name if has? 'ord:name'
-      |        hash[:item] = item.to_h_with_attrs if has? 'cmn:item'
+      |        hash[:item] = item.to_h if has? 'cmn:item'
       |
       |        hash
       |      end

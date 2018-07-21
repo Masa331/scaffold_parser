@@ -27,8 +27,8 @@ RSpec.describe 'simple types' do
       |      at 'name'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:name] = name if has? 'name'
       |
@@ -48,8 +48,8 @@ RSpec.describe 'simple types' do
       |      include ParserCore::BaseParser
       |      include Cmn::Groups::SecondGroup
       |
-      |      def to_h_with_attrs
-      |        hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |      def to_h
+      |        hash[:attributes] = attributes
       |
       |        mega.inject(hash) { |memo, r| memo.merge r }
       |      end
@@ -70,8 +70,8 @@ RSpec.describe 'simple types' do
       |          at 'cmn:bankCode'
       |        end
       |
-      |        def to_h_with_attrs
-      |          hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |        def to_h
+      |          hash[:attributes] = attributes
       |
       |          hash[:account_no] = account_no if has? 'cmn:accountNo'
       |          hash[:bank_code] = bank_code if has? 'cmn:bankCode'
@@ -132,8 +132,8 @@ RSpec.describe 'simple types' do
       |          at 'typ:bankCode'
       |        end
       |
-      |        def to_h_with_attrs
-      |          hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |        def to_h
+      |          hash[:attributes] = attributes
       |
       |          hash[:account_no] = account_no if has? 'typ:accountNo'
       |          hash[:bank_code] = bank_code if has? 'typ:bankCode'
@@ -154,8 +154,8 @@ RSpec.describe 'simple types' do
       |      include Typ::Groups::MyGroupOfAccount
       |      include Typ::Groups::SecondGroup
       |
-      |      def to_h_with_attrs
-      |        hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |      def to_h
+      |        hash[:attributes] = attributes
       |
       |        mega.inject(hash) { |memo, r| memo.merge r }
       |      end
@@ -191,10 +191,10 @@ RSpec.describe 'simple types' do
       |        submodel_at(Flag, 'flag')
       |      end
       |
-      |      def to_h_with_attrs
-      |        hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |      def to_h
+      |        hash[:attributes] = attributes
       |
-      |        hash[:flag] = flag.to_h_with_attrs if has? 'flag'
+      |        hash[:flag] = flag.to_h if has? 'flag'
       |
       |        hash
       |      end
@@ -249,8 +249,8 @@ RSpec.describe 'simple types' do
       |    include ParserCore::BaseParser
       |    include Groups::Configuration
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      mega.inject(hash) { |memo, r| memo.merge r }
       |    end
@@ -303,8 +303,8 @@ RSpec.describe 'simple types' do
       |    include ParserCore::BaseParser
       |    include Groups::Configuration
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      mega.inject(hash) { |memo, r| memo.merge r }
       |    end
@@ -337,8 +337,8 @@ RSpec.describe 'simple types' do
       |    include ParserCore::BaseParser
       |    include Groups::Configuration
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      mega.inject(hash) { |memo, r| memo.merge r }
       |    end
@@ -374,8 +374,8 @@ RSpec.describe 'simple types' do
       |        at 'flag2'
       |      end
       |
-      |      def to_h_with_attrs
-      |        hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |      def to_h
+      |        hash[:attributes] = attributes
       |
       |        hash[:flag] = flag if has? 'flag'
       |        hash[:flag2] = flag2 if has? 'flag2'
@@ -400,10 +400,10 @@ RSpec.describe 'simple types' do
       |      submodel_at(Buyer, 'buyer')
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:buyer] = buyer.to_h_with_attrs if has? 'buyer'
+      |      hash[:buyer] = buyer.to_h if has? 'buyer'
       |
       |      mega.inject(hash) { |memo, r| memo.merge r }
       |    end
@@ -418,8 +418,8 @@ RSpec.describe 'simple types' do
       |    include ParserCore::BaseParser
       |    include Groups::Configuration
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      mega.inject(hash) { |memo, r| memo.merge r }
       |    end
@@ -436,8 +436,8 @@ RSpec.describe 'simple types' do
       |        at 'flag'
       |      end
       |
-      |      def to_h_with_attrs
-      |        hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |      def to_h
+      |        hash[:attributes] = attributes
       |
       |        hash[:flag] = flag if has? 'flag'
       |

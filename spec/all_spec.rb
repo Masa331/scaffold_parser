@@ -28,8 +28,8 @@ RSpec.describe 'simple types' do
       |      at 'company_name'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:name] = name if has? 'name'
       |      hash[:company_name] = company_name if has? 'company_name'

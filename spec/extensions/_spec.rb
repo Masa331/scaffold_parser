@@ -66,8 +66,8 @@ RSpec.describe ScaffoldParser do
       |      at 'numberRequested'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:number_requested] = number_requested if has? 'numberRequested'
       |
@@ -103,8 +103,8 @@ RSpec.describe ScaffoldParser do
       |      at 'name'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:name] = name if has? 'name'
       |
@@ -146,8 +146,8 @@ RSpec.describe ScaffoldParser do
       |      at 'name'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:name] = name if has? 'name'
       |
@@ -182,13 +182,13 @@ RSpec.describe ScaffoldParser do
       |      submodel_at(ReferenceType, 'invoice')
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:customer] = customer.to_h_with_attrs if has? 'customer'
-      |      hash[:company] = company.to_h_with_attrs if has? 'company'
-      |      hash[:seller] = seller.to_h_with_attrs if has? 'seller'
-      |      hash[:invoice] = invoice.to_h_with_attrs if has? 'invoice'
+      |      hash[:customer] = customer.to_h if has? 'customer'
+      |      hash[:company] = company.to_h if has? 'company'
+      |      hash[:seller] = seller.to_h if has? 'seller'
+      |      hash[:invoice] = invoice.to_h if has? 'invoice'
       |
       |      hash
       |    end
@@ -206,8 +206,8 @@ RSpec.describe ScaffoldParser do
       |      at 'id'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:id] = id if has? 'id'
       |
@@ -228,10 +228,10 @@ RSpec.describe ScaffoldParser do
       |      submodel_at(ContactInfo, 'contactInfo')
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:contact_info] = contact_info.to_h_with_attrs if has? 'contactInfo'
+      |      hash[:contact_info] = contact_info.to_h if has? 'contactInfo'
       |
       |      hash
       |      super.merge(hash)
@@ -250,8 +250,8 @@ RSpec.describe ScaffoldParser do
       |      at 'ID'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:id] = id if has? 'ID'
       |
@@ -275,8 +275,8 @@ RSpec.describe ScaffoldParser do
       |      at 'phone'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:email] = email if has? 'email'
       |      hash[:phone] = phone if has? 'phone'
@@ -297,8 +297,8 @@ RSpec.describe ScaffoldParser do
       |      at 'title'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:title] = title if has? 'title'
       |

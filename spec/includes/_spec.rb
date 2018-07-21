@@ -15,8 +15,8 @@ RSpec.describe ScaffoldParser do
       |      at 'title2'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:title] = title if has? 'title'
       |      hash[:title2] = title2 if has? 'title2'
@@ -37,8 +37,8 @@ RSpec.describe ScaffoldParser do
       |      at 'name'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:name] = name if has? 'name'
       |

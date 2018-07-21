@@ -35,10 +35,10 @@ RSpec.describe 'complex types' do
       |        submodel_at(Inv::InvoiceHeaderType, 'inv:invoiceHeader')
       |      end
       |
-      |      def to_h_with_attrs
-      |        hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |      def to_h
+      |        hash[:attributes] = attributes
       |
-      |        hash[:invoice_header] = invoice_header.to_h_with_attrs if has? 'inv:invoiceHeader'
+      |        hash[:invoice_header] = invoice_header.to_h if has? 'inv:invoiceHeader'
       |
       |        hash
       |      end
@@ -85,10 +85,10 @@ RSpec.describe 'complex types' do
       |        submodel_at(Inv::Customer, 'inv:customer')
       |      end
       |
-      |      def to_h_with_attrs
-      |        hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |      def to_h
+      |        hash[:attributes] = attributes
       |
-      |        hash[:customer] = customer.to_h_with_attrs if has? 'inv:customer'
+      |        hash[:customer] = customer.to_h if has? 'inv:customer'
       |
       |        hash
       |      end
@@ -111,8 +111,8 @@ RSpec.describe 'complex types' do
       |        at 'inv:address'
       |      end
       |
-      |      def to_h_with_attrs
-      |        hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |      def to_h
+      |        hash[:attributes] = attributes
       |
       |        hash[:name] = name if has? 'inv:name'
       |        hash[:address] = address if has? 'inv:address'
@@ -188,10 +188,10 @@ RSpec.describe 'complex types' do
       |      array_of_at(KmKarta, ['KmKarta'])
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:km_karta] = km_karta.map(&:to_h_with_attrs) if has? 'KmKarta'
+      |      hash[:km_karta] = km_karta.map(&:to_h) if has? 'KmKarta'
       |
       |      hash
       |      super.merge(hash)
@@ -234,8 +234,8 @@ RSpec.describe 'complex types' do
       |      at 'company_address'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:name] = name if has? 'name'
       |      hash[:company_name] = company_name if has? 'company_name'
@@ -300,8 +300,8 @@ RSpec.describe 'complex types' do
       |      at 'ISDOC'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:isdoc] = isdoc if has? 'ISDOC'
       |
@@ -345,10 +345,10 @@ RSpec.describe 'complex types' do
       |      submodel_at(SomeType, 'DalsiSazba')
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:dalsi_sazba] = dalsi_sazba.to_h_with_attrs if has? 'DalsiSazba'
+      |      hash[:dalsi_sazba] = dalsi_sazba.to_h if has? 'DalsiSazba'
       |
       |      hash
       |    end
@@ -376,12 +376,12 @@ RSpec.describe 'complex types' do
       |      submodel_at(CustomerType, 'customer2')
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:currency] = currency.to_h_with_attrs if has? 'currency'
-      |      hash[:customer] = customer.to_h_with_attrs if has? 'customer'
-      |      hash[:customer2] = customer2.to_h_with_attrs if has? 'customer2'
+      |      hash[:currency] = currency.to_h if has? 'currency'
+      |      hash[:customer] = customer.to_h if has? 'customer'
+      |      hash[:customer2] = customer2.to_h if has? 'customer2'
       |
       |      hash
       |    end
@@ -399,8 +399,8 @@ RSpec.describe 'complex types' do
       |      at 'currencyId'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:currency_id] = currency_id if has? 'currencyId'
       |
@@ -420,8 +420,8 @@ RSpec.describe 'complex types' do
       |      at 'name'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:name] = name if has? 'name'
       |

@@ -15,11 +15,11 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      submodel_at(Seller, 'seller')
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:buyer] = buyer.to_h_with_attrs if has? 'buyer'
-      |      hash[:seller] = seller.to_h_with_attrs if has? 'seller'
+      |      hash[:buyer] = buyer.to_h if has? 'buyer'
+      |      hash[:seller] = seller.to_h if has? 'seller'
       |
       |      hash
       |    end
@@ -41,11 +41,11 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      submodel_at(Seller, 'seller')
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:buyer] = buyer.to_h_with_attrs if has? 'buyer'
-      |      hash[:seller] = seller.to_h_with_attrs if has? 'seller'
+      |      hash[:buyer] = buyer.to_h if has? 'buyer'
+      |      hash[:seller] = seller.to_h if has? 'seller'
       |
       |      hash
       |    end
@@ -63,10 +63,10 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      submodel_at(Buyer3, 'buyer')
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:buyer] = buyer.to_h_with_attrs if has? 'buyer'
+      |      hash[:buyer] = buyer.to_h if has? 'buyer'
       |
       |      hash
       |    end
@@ -84,10 +84,10 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      submodel_at(Buyer3, 'buyer')
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
-      |      hash[:buyer] = buyer.to_h_with_attrs if has? 'buyer'
+      |      hash[:buyer] = buyer.to_h if has? 'buyer'
       |
       |      hash
       |    end
@@ -105,8 +105,8 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      at 'name'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:name] = name if has? 'name'
       |
@@ -130,8 +130,8 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      at 'company_id'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:name] = name if has? 'name'
       |      hash[:company_id] = company_id if has? 'company_id'
@@ -156,8 +156,8 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      at 'referer'
       |    end
       |
-      |    def to_h_with_attrs
-      |      hash = ParserCore::HashWithAttributes.new({}, attributes)
+      |    def to_h
+      |      hash[:attributes] = attributes
       |
       |      hash[:name] = name if has? 'name'
       |      hash[:referer] = referer if has? 'referer'
