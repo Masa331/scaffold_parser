@@ -192,7 +192,77 @@ end
     )
   end
 
-  let(:scaffolds) { scaffold_schema('./spec/extensions/schema.xsd') }
+  let(:schema) do
+    <<-XSD
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="order">
+    <xs:sequence>
+      <xs:element name="customer">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="baseElement">
+              <xs:sequence>
+                <xs:element name="id" type="xs:string"/>
+              </xs:sequence>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="company" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="baseElement"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="seller" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="baseElement">
+              <xs:sequence>
+                <xs:element name="contactInfo" minOccurs="0">
+                  <xs:complexType>
+                    <xs:choice>
+                      <xs:element name="email" type="xs:string"/>
+                      <xs:element name="phone" type="xs:string"/>
+                    </xs:choice>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="invoice" type="referenceType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="baseElement">
+    <xs:sequence>
+      <xs:element name="title" type"xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="referenceType">
+    <xs:sequence>
+      <xs:element name="ID">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string"/>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+    XSD
+  end
+
+  let(:scaffolds) { Hash[ScaffoldParser.scaffold_to_string(schema)] }
 
   it 'scaffolds parser for type with various extensions' do
     expect(scaffolds['parsers/order.rb']).to eq(
