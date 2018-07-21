@@ -13,7 +13,7 @@ RSpec.describe 'unions' do
             </xs:element>
           </xs:sequence>
         </xs:complexType>
-      </xs:schema> })
+      </xs:schema>
     XSD
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
