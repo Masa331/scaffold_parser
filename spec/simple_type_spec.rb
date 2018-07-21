@@ -37,20 +37,36 @@ module Parsers
       at 'name'
     end
 
+    def name_attributes
+      attributes_at 'name'
+    end
+
     def title
       at 'title'
+    end
+
+    def title_attributes
+      attributes_at 'title'
     end
 
     def total
       at 'Total'
     end
 
-    def to_h_with_attrs
-      hash = ParserCore::HashWithAttributes.new({}, attributes)
+    def total_attributes
+      attributes_at 'Total'
+    end
+
+    def to_h
+      hash = {}
+      hash[:attributes] = attributes
 
       hash[:name] = name if has? 'name'
+      hash[:name_attributes] = name_attributes if has? 'name'
       hash[:title] = title if has? 'title'
+      hash[:title_attributes] = title_attributes if has? 'title'
       hash[:total] = total if has? 'Total'
+      hash[:total_attributes] = total_attributes if has? 'Total'
 
       hash
     end
@@ -69,13 +85,13 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.respond_to? :attributes
-        data.attributes.each { |k, v| root[k] = v }
+      if data.key? :attributes
+        data[:attributes].each { |k, v| root[k] = v }
       end
 
-      root << build_element('name', data[:name]) if data.key? :name
-      root << build_element('title', data[:title]) if data.key? :title
-      root << build_element('Total', data[:total]) if data.key? :total
+      root << build_element('name', data[:name], data[:name_attributes]) if data.key? :name
+      root << build_element('title', data[:title], data[:title_attributes]) if data.key? :title
+      root << build_element('Total', data[:total], data[:total_attributes]) if data.key? :total
 
       root
     end

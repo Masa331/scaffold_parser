@@ -35,10 +35,15 @@ module ScaffoldParser
                   methods.each { |method| template.methods << indent(method.to_s.lines).join  }
 
                   meth = StringIO.new
-                  meth.puts "  def to_h_with_attrs"
-                  meth.puts "    hash = ParserCore::HashWithAttributes.new({}, attributes)"
+                  meth.puts "  def to_h"
+                  meth.puts "    hash = {}"
+                  meth.puts "    hash[:attributes] = attributes"
                   meth.puts
-                  methods.each { |method| meth.puts "    #{method.to_h_with_attrs_method}" }
+                  methods.each do |method|
+                    method.to_h_method.lines.each do |line|
+                      meth.puts "    #{line}"
+                    end
+                  end
                   meth.puts
                   meth.puts "    hash"
                   meth.puts "  end"
@@ -60,8 +65,8 @@ module ScaffoldParser
                   meth = StringIO.new
                   meth.puts "  def builder"
                   meth.puts "    root = Ox::Element.new(name)"
-                  meth.puts "    if data.respond_to? :attributes"
-                  meth.puts "      data.attributes.each { |k, v| root[k] = v }"
+                  meth.puts "    if data.key? :attributes"
+                  meth.puts "      data[:attributes].each { |k, v| root[k] = v }"
                   meth.puts "    end"
                   meth.puts
                   meth.puts methods.map { |method| indent(indent(method.to_builder.lines)).join  }.join("\n")

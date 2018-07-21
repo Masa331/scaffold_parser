@@ -7,6 +7,22 @@ module ScaffoldParser
             include BaseMethod
             include Utils
 
+            def to_s
+              f = StringIO.new
+
+              f.puts "def #{method_name}"
+              f.puts indent(method_body.lines).join
+              f.puts "end"
+
+              f.puts
+
+              f.puts "def #{method_name}_attributes"
+              f.puts "  attributes_at '#{at}'"
+              f.puts "end"
+
+              f.string.strip
+            end
+
             def method_body
               "at '#{at}'"
             end
@@ -15,12 +31,13 @@ module ScaffoldParser
               [source.xmlns_prefix, "#{source.name}"].compact.join(':')
             end
 
-            def to_h_with_attrs_method
-              "hash[:#{method_name}] = #{method_name} if has? '#{at}'"
+            def to_h_method
+              "hash[:#{method_name}] = #{method_name} if has? '#{at}'\n"\
+                "hash[:#{method_name}_attributes] = #{method_name}_attributes if has? '#{at}'"
             end
 
             def to_builder
-              "root << build_element('#{at}', data[:#{method_name}]) if data.key? :#{method_name}"
+              "root << build_element('#{at}', data[:#{method_name}], data[:#{method_name}_attributes]) if data.key? :#{method_name}"
             end
 
             def sequence(_)
