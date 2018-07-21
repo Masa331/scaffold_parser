@@ -403,8 +403,8 @@ RSpec.describe 'arrays' do
       |
       |    def builder
       |      root = Ox::Element.new(name)
-      |      if data.respond_to? :attributes
-      |        data.attributes.each { |k, v| root[k] = v }
+      |      if data.key? :attributes
+      |        data[:attributes].each { |k, v| root[k] = v }
       |      end
       |
       |      if data.key? :items
@@ -441,8 +441,8 @@ RSpec.describe 'arrays' do
       |
       |    def builder
       |      root = Ox::Element.new(name)
-      |      if data.respond_to? :attributes
-      |        data.attributes.each { |k, v| root[k] = v }
+      |      if data.key? :attributes
+      |        data[:attributes].each { |k, v| root[k] = v }
       |      end
       |
       |      if data.key? :payments_list
@@ -466,8 +466,8 @@ RSpec.describe 'arrays' do
       |
       |    def builder
       |      root = Ox::Element.new(name)
-      |      if data.respond_to? :attributes
-      |        data.attributes.each { |k, v| root[k] = v }
+      |      if data.key? :attributes
+      |        data[:attributes].each { |k, v| root[k] = v }
       |      end
       |
       |      root << build_element('amount', data[:amount]) if data.key? :amount
@@ -486,8 +486,8 @@ RSpec.describe 'arrays' do
       |
       |    def builder
       |      root = Ox::Element.new(name)
-      |      if data.respond_to? :attributes
-      |        data.attributes.each { |k, v| root[k] = v }
+      |      if data.key? :attributes
+      |        data[:attributes].each { |k, v| root[k] = v }
       |      end
       |
       |      super.nodes.each do |n||
@@ -512,8 +512,8 @@ RSpec.describe 'arrays' do
       |
       |    def builder
       |      root = Ox::Element.new(name)
-      |      if data.respond_to? :attributes
-      |        data.attributes.each { |k, v| root[k] = v }
+      |      if data.key? :attributes
+      |        data[:attributes].each { |k, v| root[k] = v }
       |      end
       |
       |      root << build_element('name', data[:name]) if data.key? :name
@@ -532,8 +532,8 @@ RSpec.describe 'arrays' do
       |
       |    def builder
       |      root = Ox::Element.new(name)
-      |      if data.respond_to? :attributes
-      |        data.attributes.each { |k, v| root[k] = v }
+      |      if data.key? :attributes
+      |        data[:attributes].each { |k, v| root[k] = v }
       |      end
       |
       |      if data.key? :error

@@ -133,8 +133,8 @@ RSpec.describe 'complex types' do
       |
       |      def builder
       |        root = Ox::Element.new(name)
-      |        if data.respond_to? :attributes
-      |          data.attributes.each { |k, v| root[k] = v }
+      |        if data.key? :attributes
+      |          data[:attributes].each { |k, v| root[k] = v }
       |        end
       |
       |        if data.key? :customer
@@ -439,8 +439,8 @@ RSpec.describe 'complex types' do
       |
       |    def builder
       |      root = Ox::Element.new(name)
-      |      if data.respond_to? :attributes
-      |        data.attributes.each { |k, v| root[k] = v }
+      |      if data.key? :attributes
+      |        data[:attributes].each { |k, v| root[k] = v }
       |      end
       |
       |      if data.key? :currency
@@ -467,8 +467,8 @@ RSpec.describe 'complex types' do
       |
       |    def builder
       |      root = Ox::Element.new(name)
-      |      if data.respond_to? :attributes
-      |        data.attributes.each { |k, v| root[k] = v }
+      |      if data.key? :attributes
+      |        data[:attributes].each { |k, v| root[k] = v }
       |      end
       |
       |      root << build_element('currencyId', data[:currency_id]) if data.key? :currency_id
@@ -487,8 +487,8 @@ RSpec.describe 'complex types' do
       |
       |    def builder
       |      root = Ox::Element.new(name)
-      |      if data.respond_to? :attributes
-      |        data.attributes.each { |k, v| root[k] = v }
+      |      if data.key? :attributes
+      |        data[:attributes].each { |k, v| root[k] = v }
       |      end
       |
       |      root << build_element('name', data[:name]) if data.key? :name

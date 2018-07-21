@@ -209,8 +209,8 @@ RSpec.describe 'simple types' do
       |    module Configuration
       |      def builder
       |        root = Ox::Element.new(name)
-      |        if data.respond_to? :attributes
-      |          data.attributes.each { |k, v| root[k] = v }
+      |        if data.key? :attributes
+      |          data[:attributes].each { |k, v| root[k] = v }
       |        end
       |
       |        if data.key? :flag
@@ -266,8 +266,8 @@ RSpec.describe 'simple types' do
       |
       |    def builder
       |      root = Ox::Element.new(name)
-      |      if data.respond_to? :attributes
-      |        data.attributes.each { |k, v| root[k] = v }
+      |      if data.key? :attributes
+      |        data[:attributes].each { |k, v| root[k] = v }
       |      end
       |
       |      mega.each do |r||
