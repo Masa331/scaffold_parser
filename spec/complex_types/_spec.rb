@@ -25,7 +25,7 @@ RSpec.describe 'complex types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/inv/invoice_type.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  module Inv
       |    class InvoiceType
@@ -44,7 +44,7 @@ RSpec.describe 'complex types' do
       |      end
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'complex type with namespaces' do
@@ -75,7 +75,7 @@ RSpec.describe 'complex types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/inv/order_type.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  module Inv
       |    class OrderType
@@ -94,10 +94,10 @@ RSpec.describe 'complex types' do
       |      end
       |    end
       |  end
-      |end })
+      end
 
     scaffold = Hash[scaffolds]['parsers/inv/customer.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  module Inv
       |    class Customer
@@ -121,11 +121,11 @@ RSpec.describe 'complex types' do
       |      end
       |    end
       |  end
-      |end })
+      end
 
     # scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['builders/inv/order_type.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Builders
       |  module Inv
       |    class OrderType
@@ -145,11 +145,11 @@ RSpec.describe 'complex types' do
       |      end
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'model names are not pluralized' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:element name="order">
@@ -179,7 +179,7 @@ RSpec.describe 'complex types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/order.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class Order < SeznamType
       |    include ParserCore::BaseParser
@@ -197,11 +197,11 @@ RSpec.describe 'complex types' do
       |      super.merge(hash)
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'sequence inside a sequence inside i sequence... i know..' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:complexType name="order">
@@ -217,7 +217,7 @@ RSpec.describe 'complex types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/order.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -244,11 +244,11 @@ RSpec.describe 'complex types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   # it 'empty complex type' do
-  #   schema = multiline(%{
+  #   schema =
   #     |<?xml version="1.0" encoding="UTF-8"?>
   #     |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   #     |  <xs:complexType name="list_type"/>
@@ -256,16 +256,16 @@ RSpec.describe 'complex types' do
   #
   #   scaffolds = ScaffoldParser.scaffold_to_string(schema)
   #   scaffold = Hash[scaffolds]['parsers/list_type.rb']
-  #   expect(scaffold).to eq_multiline(%{
+  #   expect(scaffold).to eq(
   #     |module Parsers
   #     |  class ListType
   #     |    include ParserCore::BaseParser
   #     |  end
-  #     |end })
+  #     end
   # end
 
   it 'empty complex type' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:complexType name="order">
@@ -291,7 +291,7 @@ RSpec.describe 'complex types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/order.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -308,11 +308,11 @@ RSpec.describe 'complex types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'parses complex type allright' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:complexType name="souhrnDPHType">
@@ -336,7 +336,7 @@ RSpec.describe 'complex types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/seznam_dalsi_sazby.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class SeznamDalsiSazby
       |    include ParserCore::BaseParser
@@ -353,13 +353,13 @@ RSpec.describe 'complex types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   let(:scaffolds) { scaffold_schema('./spec/complex_types/schema.xsd') }
 
   it 'scaffolds parser for type with various complex types' do
-    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/order.rb']).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -386,11 +386,11 @@ RSpec.describe 'complex types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for subtype' do
-    expect(scaffolds['parsers/currency.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/currency.rb']).to eq(
       |module Parsers
       |  class Currency
       |    include ParserCore::BaseParser
@@ -407,11 +407,11 @@ RSpec.describe 'complex types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for type including simpleType' do
-    expect(scaffolds['parsers/customer_type.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/customer_type.rb']).to eq(
       |module Parsers
       |  class CustomerType
       |    include ParserCore::BaseParser
@@ -428,11 +428,11 @@ RSpec.describe 'complex types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for type with various complex types' do
-    expect(scaffolds['builders/order.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/order.rb']).to eq(
       |module Builders
       |  class Order
       |    include ParserCore::BaseBuilder
@@ -456,11 +456,11 @@ RSpec.describe 'complex types' do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for type with various complex types' do
-    expect(scaffolds['builders/currency.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/currency.rb']).to eq(
       |module Builders
       |  class Currency
       |    include ParserCore::BaseBuilder
@@ -476,11 +476,11 @@ RSpec.describe 'complex types' do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for type with various complex types' do
-    expect(scaffolds['builders/customer_type.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/customer_type.rb']).to eq(
       |module Builders
       |  class CustomerType
       |    include ParserCore::BaseBuilder
@@ -496,6 +496,6 @@ RSpec.describe 'complex types' do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 end

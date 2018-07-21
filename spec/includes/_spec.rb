@@ -2,7 +2,7 @@ RSpec.describe ScaffoldParser do
   let(:scaffolds) { scaffold_schema('./spec/includes/schema.xsd') }
 
   it 'scaffolds parser for type referencing subtypes from included schema' do
-    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/order.rb']).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -24,11 +24,11 @@ RSpec.describe ScaffoldParser do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for type defined in included schema' do
-    expect(scaffolds['parsers/person.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/person.rb']).to eq(
       |module Parsers
       |  class Person
       |    include ParserCore::BaseParser
@@ -45,11 +45,11 @@ RSpec.describe ScaffoldParser do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for type referencing subtypes from included schema' do
-    expect(scaffolds['builders/order.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/order.rb']).to eq(
       |module Builders
       |  class Order
       |    include ParserCore::BaseBuilder
@@ -66,11 +66,11 @@ RSpec.describe ScaffoldParser do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for type defined in included schema' do
-    expect(scaffolds['builders/person.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/person.rb']).to eq(
       |module Builders
       |  class Person
       |    include ParserCore::BaseBuilder
@@ -86,6 +86,6 @@ RSpec.describe ScaffoldParser do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 end

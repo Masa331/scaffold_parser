@@ -1,6 +1,6 @@
 RSpec.describe 'simple types' do
   it 'all' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:complexType name="order">
@@ -15,7 +15,7 @@ RSpec.describe 'simple types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/order.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -37,6 +37,6 @@ RSpec.describe 'simple types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 end

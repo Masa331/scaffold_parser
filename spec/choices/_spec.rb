@@ -1,6 +1,6 @@
 RSpec.describe 'choices' do
   it 'choice inside complexType' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |<xs:complexType name="order">
@@ -29,7 +29,7 @@ RSpec.describe 'choices' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/order.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -61,13 +61,13 @@ RSpec.describe 'choices' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   let(:scaffolds) { scaffold_schema('./spec/choices/schema.xsd') }
 
   it 'scaffolds parser for type which includes choice' do
-    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/order.rb']).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -89,11 +89,11 @@ RSpec.describe 'choices' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for type which includes choice' do
-    expect(scaffolds['builders/order.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/order.rb']).to eq(
       |module Builders
       |  class Order
       |    include ParserCore::BaseBuilder
@@ -110,6 +110,6 @@ RSpec.describe 'choices' do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 end

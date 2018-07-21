@@ -26,14 +26,14 @@ RSpec.describe ScaffoldParser do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/ord/number_requested.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  module Ord
       |    class NumberRequested < Ord::BaseElement
       |      include ParserCore::BaseParser
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'extension from custom simple type' do
@@ -57,7 +57,7 @@ RSpec.describe ScaffoldParser do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/number_ad_type.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class NumberADType
       |    include ParserCore::BaseParser
@@ -74,11 +74,11 @@ RSpec.describe ScaffoldParser do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'parses elements with extension' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:complexType name="order">
@@ -94,7 +94,7 @@ RSpec.describe ScaffoldParser do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/order.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -111,11 +111,11 @@ RSpec.describe ScaffoldParser do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'parses elements with extension' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:complexType name="order">
@@ -137,7 +137,7 @@ RSpec.describe ScaffoldParser do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/order.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class Order < BaseElement
       |    include ParserCore::BaseParser
@@ -155,13 +155,13 @@ RSpec.describe ScaffoldParser do
       |      super.merge(hash)
       |    end
       |  end
-      |end })
+      end
   end
 
   let(:scaffolds) { scaffold_schema('./spec/extensions/schema.xsd') }
 
   it 'scaffolds parser for type with various extensions' do
-    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/order.rb']).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -193,11 +193,11 @@ RSpec.describe ScaffoldParser do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for subtype with extension' do
-    expect(scaffolds['parsers/customer.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/customer.rb']).to eq(
       |module Parsers
       |  class Customer < BaseElement
       |    include ParserCore::BaseParser
@@ -215,11 +215,11 @@ RSpec.describe ScaffoldParser do
       |      super.merge(hash)
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for subtype with extension and choice' do
-    expect(scaffolds['parsers/seller.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/seller.rb']).to eq(
       |module Parsers
       |  class Seller < BaseElement
       |    include ParserCore::BaseParser
@@ -237,11 +237,11 @@ RSpec.describe ScaffoldParser do
       |      super.merge(hash)
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for type with simpleType extension' do
-    expect(scaffolds['parsers/reference_type.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/reference_type.rb']).to eq(
       |module Parsers
       |  class ReferenceType
       |    include ParserCore::BaseParser
@@ -258,11 +258,11 @@ RSpec.describe ScaffoldParser do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for subtype from extension' do
-    expect(scaffolds['parsers/contact_info.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/contact_info.rb']).to eq(
       |module Parsers
       |  class ContactInfo
       |    include ParserCore::BaseParser
@@ -284,11 +284,11 @@ RSpec.describe ScaffoldParser do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for element from which is extended' do
-    expect(scaffolds['parsers/base_element.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/base_element.rb']).to eq(
       |module Parsers
       |  class BaseElement
       |    include ParserCore::BaseParser
@@ -305,29 +305,29 @@ RSpec.describe ScaffoldParser do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   # it 'scaffolds parser for elements with only extension and no other content' do
-  #   expect(scaffolds['parsers/person.rb']).to eq_multiline(%{
+  #   expect(scaffolds['parsers/person.rb']).to eq(
   #     |module Parsers
   #     |  class Person < BaseElement
   #     |    include ParserCore::BaseParser
   #     |  end
-  #     |end })
+  #     end
   # end
 
   it 'scaffolds parser for company' do
-    expect(scaffolds['parsers/company.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/company.rb']).to eq(
       |module Parsers
       |  class Company < BaseElement
       |    include ParserCore::BaseParser
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for type with various extensions' do
-    expect(scaffolds['builders/order.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/order.rb']).to eq(
       |module Builders
       |  class Order
       |    include ParserCore::BaseBuilder
@@ -354,11 +354,11 @@ RSpec.describe ScaffoldParser do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for subtype with extension' do
-    expect(scaffolds['builders/customer.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/customer.rb']).to eq(
       |module Builders
       |  class Customer < BaseElement
       |    include ParserCore::BaseBuilder
@@ -378,11 +378,11 @@ RSpec.describe ScaffoldParser do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for subtype with extension and choice' do
-    expect(scaffolds['builders/seller.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/seller.rb']).to eq(
       |module Builders
       |  class Seller < BaseElement
       |    include ParserCore::BaseBuilder
@@ -404,11 +404,11 @@ RSpec.describe ScaffoldParser do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for type with simpleType extension' do
-    expect(scaffolds['builders/reference_type.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/reference_type.rb']).to eq(
       |module Builders
       |  class ReferenceType
       |    include ParserCore::BaseBuilder
@@ -424,11 +424,11 @@ RSpec.describe ScaffoldParser do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for subtype from extension' do
-    expect(scaffolds['builders/contact_info.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/contact_info.rb']).to eq(
       |module Builders
       |  class ContactInfo
       |    include ParserCore::BaseBuilder
@@ -445,11 +445,11 @@ RSpec.describe ScaffoldParser do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for element from which is extended' do
-    expect(scaffolds['builders/base_element.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/base_element.rb']).to eq(
       |module Builders
       |  class BaseElement
       |    include ParserCore::BaseBuilder
@@ -465,6 +465,6 @@ RSpec.describe ScaffoldParser do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 end

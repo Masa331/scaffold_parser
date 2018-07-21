@@ -18,7 +18,7 @@ RSpec.describe 'simple types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/order.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -35,13 +35,13 @@ RSpec.describe 'simple types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for type referencing subtypes from included schema' do
     scaffolds = scaffold_schema('./spec/groups/schema2.xsd')
 
-    expect(scaffolds['parsers/ord/order.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/ord/order.rb']).to eq(
       |module Parsers
       |  module Ord
       |    class Order
@@ -55,9 +55,9 @@ RSpec.describe 'simple types' do
       |      end
       |    end
       |  end
-      |end })
+      end
 
-    expect(scaffolds['parsers/cmn/groups/second_group.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/cmn/groups/second_group.rb']).to eq(
       |module Parsers
       |  module Cmn
       |    module Groups
@@ -81,7 +81,7 @@ RSpec.describe 'simple types' do
       |      end
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'group with namespaces' do
@@ -119,7 +119,7 @@ RSpec.describe 'simple types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/typ/groups/my_group_of_account.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  module Typ
       |    module Groups
@@ -143,10 +143,10 @@ RSpec.describe 'simple types' do
       |      end
       |    end
       |  end
-      |end })
+      end
 
     scaffold = Hash[scaffolds]['parsers/typ/order.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  module Typ
       |    class Order
@@ -161,11 +161,11 @@ RSpec.describe 'simple types' do
       |      end
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'parses one member group allright' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:group name="configuration">
@@ -183,7 +183,7 @@ RSpec.describe 'simple types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/groups/configuration.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  module Groups
       |    module Configuration
@@ -200,10 +200,10 @@ RSpec.describe 'simple types' do
       |      end
       |    end
       |  end
-      |end })
+      end
 
     scaffold = Hash[scaffolds]['builders/groups/configuration.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Builders
       |  module Groups
       |    module Configuration
@@ -221,11 +221,11 @@ RSpec.describe 'simple types' do
       |      end
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'group inside a sequence' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:complexType name="order">
@@ -243,7 +243,7 @@ RSpec.describe 'simple types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/order.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -255,10 +255,10 @@ RSpec.describe 'simple types' do
       |      mega.inject(hash) { |memo, r| memo.merge r }
       |    end
       |  end
-      |end })
+      end
 
     scaffold = Hash[scaffolds]['builders/order.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Builders
       |  class Order
       |    include ParserCore::BaseBuilder
@@ -277,11 +277,11 @@ RSpec.describe 'simple types' do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'group directly inside a complex type' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:complexType name="order">
@@ -297,7 +297,7 @@ RSpec.describe 'simple types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/order.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -309,11 +309,11 @@ RSpec.describe 'simple types' do
       |      mega.inject(hash) { |memo, r| memo.merge r }
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'group in element' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:element name="order" minOccurs="0">
@@ -331,7 +331,7 @@ RSpec.describe 'simple types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/order.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -343,11 +343,11 @@ RSpec.describe 'simple types' do
       |      mega.inject(hash) { |memo, r| memo.merge r }
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'parses complex type allright' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:group name="configuration">
@@ -362,7 +362,7 @@ RSpec.describe 'simple types' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/groups/configuration.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  module Groups
       |    module Configuration
@@ -384,13 +384,13 @@ RSpec.describe 'simple types' do
       |      end
       |    end
       |  end
-      |end })
+      end
   end
 
   let(:scaffolds) { scaffold_schema('./spec/groups/schema.xsd') }
 
   it 'scaffolds parser for type including group' do
-    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/order.rb']).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -408,11 +408,11 @@ RSpec.describe 'simple types' do
       |      mega.inject(hash) { |memo, r| memo.merge r }
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for type including group' do
-    expect(scaffolds['parsers/buyer.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/buyer.rb']).to eq(
       |module Parsers
       |  class Buyer
       |    include ParserCore::BaseParser
@@ -424,11 +424,11 @@ RSpec.describe 'simple types' do
       |      mega.inject(hash) { |memo, r| memo.merge r }
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for group' do
-    expect(scaffolds['parsers/groups/configuration.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/groups/configuration.rb']).to eq(
       |module Parsers
       |  module Groups
       |    module Configuration
@@ -445,6 +445,6 @@ RSpec.describe 'simple types' do
       |      end
       |    end
       |  end
-      |end })
+      end
   end
 end

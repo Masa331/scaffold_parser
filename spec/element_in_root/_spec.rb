@@ -2,7 +2,7 @@ RSpec.describe 'simple types' do
   let(:scaffolds) { scaffold_schema('./spec/element_in_root/schema.xsd') }
 
   it 'scaffolds parser for schema with element in root' do
-    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/order.rb']).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -19,6 +19,6 @@ RSpec.describe 'simple types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 end

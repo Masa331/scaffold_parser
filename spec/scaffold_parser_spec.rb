@@ -2,7 +2,7 @@ RSpec.describe ScaffoldParser do
   let(:scaffolds) { scaffold_schema('./order.xsd', namespace: 'Something') }
 
   it 'scaffolds parser with given namespace' do
-    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/order.rb']).to eq(
       |module Something
       |  module Parsers
       |    class Order
@@ -26,11 +26,11 @@ RSpec.describe ScaffoldParser do
       |      end
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder with given namespace' do
-    expect(scaffolds['builders/order.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/order.rb']).to eq(
       |module Something
       |  module Builders
       |    class Order
@@ -51,11 +51,11 @@ RSpec.describe ScaffoldParser do
       |      end
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for schema with namespaced elements' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema
       |  xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -79,7 +79,7 @@ RSpec.describe ScaffoldParser do
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
 
     scaffold = Hash[scaffolds]['parsers/inv/order_type.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  module Inv
       |    class OrderType
@@ -108,10 +108,10 @@ RSpec.describe ScaffoldParser do
       |      end
       |    end
       |  end
-      |end })
+      end
 
     scaffold = Hash[scaffolds]['builders/inv/order_type.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Builders
       |  module Inv
       |    class OrderType
@@ -131,6 +131,6 @@ RSpec.describe ScaffoldParser do
       |      end
       |    end
       |  end
-      |end })
+      end
   end
 end

@@ -20,7 +20,7 @@ RSpec.describe 'arrays' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/order_type.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class OrderType
       |    include ParserCore::BaseParser
@@ -37,7 +37,7 @@ RSpec.describe 'arrays' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'schema with namespaces' do
@@ -76,7 +76,7 @@ RSpec.describe 'arrays' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/inv/order_type.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  module Inv
       |    class OrderType
@@ -110,11 +110,11 @@ RSpec.describe 'arrays' do
       |      end
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'fixed max occurs' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:complexType name="souhrnDPHType">
@@ -143,7 +143,7 @@ RSpec.describe 'arrays' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/souhrn_dph_type.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class SouhrnDPHType
       |    include ParserCore::BaseParser
@@ -165,11 +165,11 @@ RSpec.describe 'arrays' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'unbounded element with extension wrapped in extension...' do
-    schema = multiline(%{
+    schema =
       |<?xml version="1.0" encoding="UTF-8"?>
       |<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
       |  <xs:element name="MoneyData">
@@ -205,7 +205,7 @@ RSpec.describe 'arrays' do
 
     scaffolds = ScaffoldParser.scaffold_to_string(schema)
     scaffold = Hash[scaffolds]['parsers/money_data.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class MoneyData
       |    include ParserCore::BaseParser
@@ -222,10 +222,10 @@ RSpec.describe 'arrays' do
       |      hash
       |    end
       |  end
-      |end })
+      end
 
     scaffold = Hash[scaffolds]['parsers/seznam_fakt_vyd.rb']
-    expect(scaffold).to eq_multiline(%{
+    expect(scaffold).to eq(
       |module Parsers
       |  class SeznamFaktVyd < SeznamType
       |    include ParserCore::BaseParser
@@ -243,13 +243,13 @@ RSpec.describe 'arrays' do
       |      super.merge(hash)
       |    end
       |  end
-      |end })
+      end
   end
 
   let(:scaffolds) { scaffold_schema('./spec/arrays/schema.xsd') }
 
   it 'scaffolds parser for type with various elements which can occure more than once' do
-    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/order.rb']).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -286,11 +286,11 @@ RSpec.describe 'arrays' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for type including element which can occure more than once' do
-    expect(scaffolds['parsers/payment_type.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/payment_type.rb']).to eq(
       |module Parsers
       |  class PaymentType
       |    include ParserCore::BaseParser
@@ -307,11 +307,11 @@ RSpec.describe 'arrays' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for subtype which can occure more than once' do
-    expect(scaffolds['parsers/payment.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/payment.rb']).to eq(
       |module Parsers
       |  class Payment
       |    include ParserCore::BaseParser
@@ -328,11 +328,11 @@ RSpec.describe 'arrays' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for subtype with extension and element which can occure more than once' do
-    expect(scaffolds['parsers/messages.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/messages.rb']).to eq(
       |module Parsers
       |  class Messages < MessageType
       |    include ParserCore::BaseParser
@@ -350,11 +350,11 @@ RSpec.describe 'arrays' do
       |      super.merge(hash)
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for subtype in extension which can occure more than once' do
-    expect(scaffolds['parsers/recipient_type.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/recipient_type.rb']).to eq(
       |module Parsers
       |  class RecipientType
       |    include ParserCore::BaseParser
@@ -371,11 +371,11 @@ RSpec.describe 'arrays' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser subtype which is inherited with element which can occure more than once' do
-    expect(scaffolds['parsers/message_type.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/message_type.rb']).to eq(
       |module Parsers
       |  class MessageType
       |    include ParserCore::BaseParser
@@ -392,11 +392,11 @@ RSpec.describe 'arrays' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for type with various elements which can occure more than once' do
-    expect(scaffolds['builders/order.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/order.rb']).to eq(
       |module Builders
       |  class Order
       |    include ParserCore::BaseBuilder
@@ -430,11 +430,11 @@ RSpec.describe 'arrays' do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for type including element which can occure more than once' do
-    expect(scaffolds['builders/payment_type.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/payment_type.rb']).to eq(
       |module Builders
       |  class PaymentType
       |    include ParserCore::BaseBuilder
@@ -454,12 +454,12 @@ RSpec.describe 'arrays' do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for subtype which can occure more than once' do
     payment_parser = scaffolds['builders/payment.rb']
-    expect(payment_parser).to eq_multiline(%{
+    expect(payment_parser).to eq(
       |module Builders
       |  class Payment
       |    include ParserCore::BaseBuilder
@@ -475,11 +475,11 @@ RSpec.describe 'arrays' do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for subtype with extension and element which can occure more than once' do
-    expect(scaffolds['builders/messages.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/messages.rb']).to eq(
       |module Builders
       |  class Messages < MessageType
       |    include ParserCore::BaseBuilder
@@ -501,11 +501,11 @@ RSpec.describe 'arrays' do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for subtype in extension which can occure more than once' do
-    expect(scaffolds['builders/recipient_type.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/recipient_type.rb']).to eq(
       |module Builders
       |  class RecipientType
       |    include ParserCore::BaseBuilder
@@ -521,11 +521,11 @@ RSpec.describe 'arrays' do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds builder for subtype which is inherited with element which can occure more than once' do
-    expect(scaffolds['builders/message_type.rb']).to eq_multiline(%{
+    expect(scaffolds['builders/message_type.rb']).to eq(
       |module Builders
       |  class MessageType
       |    include ParserCore::BaseBuilder
@@ -543,6 +543,6 @@ RSpec.describe 'arrays' do
       |      root
       |    end
       |  end
-      |end })
+      end
   end
 end

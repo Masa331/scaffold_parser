@@ -2,7 +2,7 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
   let(:scaffolds) { scaffold_schema('./spec/duplicate_anonymous_types/schema.xsd') }
 
   it 'scaffolds parser for order' do
-    expect(scaffolds['parsers/order.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/order.rb']).to eq(
       |module Parsers
       |  class Order
       |    include ParserCore::BaseParser
@@ -24,11 +24,11 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for invoice' do
-    expect(scaffolds['parsers/invoice.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/invoice.rb']).to eq(
       |module Parsers
       |  class Invoice
       |    include ParserCore::BaseParser
@@ -50,11 +50,11 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for offer' do
-    expect(scaffolds['parsers/offer.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/offer.rb']).to eq(
       |module Parsers
       |  class Offer
       |    include ParserCore::BaseParser
@@ -71,11 +71,11 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for offer' do
-    expect(scaffolds['parsers/reservation.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/reservation.rb']).to eq(
       |module Parsers
       |  class Reservation
       |    include ParserCore::BaseParser
@@ -92,11 +92,11 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for buyer with only name' do
-    expect(scaffolds['parsers/buyer.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/buyer.rb']).to eq(
       |module Parsers
       |  class Buyer
       |    include ParserCore::BaseParser
@@ -113,11 +113,11 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for buyer with name and company_id' do
-    expect(scaffolds['parsers/buyer2.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/buyer2.rb']).to eq(
       |module Parsers
       |  class Buyer2
       |    include ParserCore::BaseParser
@@ -139,11 +139,11 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 
   it 'scaffolds parser for buyer with name and referer' do
-    expect(scaffolds['parsers/buyer3.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/buyer3.rb']).to eq(
       |module Parsers
       |  class Buyer3
       |    include ParserCore::BaseParser
@@ -165,6 +165,6 @@ RSpec.describe 'schema with duplicate and same named anonymous complex types' do
       |      hash
       |    end
       |  end
-      |end })
+      end
   end
 end

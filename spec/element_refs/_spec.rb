@@ -2,7 +2,7 @@ RSpec.describe ScaffoldParser do
   let(:scaffolds) { scaffold_schema('./spec/element_refs/schema.xsd') }
 
   it 'scaffolds parser for type referencing subtypes from included schema' do
-    expect(scaffolds['parsers/ord/order.rb']).to eq_multiline(%{
+    expect(scaffolds['parsers/ord/order.rb']).to eq(
       |module Parsers
       |  module Ord
       |    class Order
@@ -26,6 +26,6 @@ RSpec.describe ScaffoldParser do
       |      end
       |    end
       |  end
-      |end })
+      end
   end
 end
