@@ -155,9 +155,7 @@ module Builders
 
       def builder
         root = Ox::Element.new(name)
-        if data.key? :attributes
-          data[:attributes].each { |k, v| root[k] = v }
-        end
+        root = add_attributes_and_namespaces(root)
 
         if data.key? :customer
           root << Inv::Customer.new('inv:customer', data[:customer]).builder
@@ -551,9 +549,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       if data.key? :currency
         root << Currency.new('currency', data[:currency]).builder
@@ -582,9 +578,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       root << build_element('currencyId', data[:currency_id], data[:currency_id_attributes]) if data.key? :currency_id
 
@@ -605,9 +599,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       root << build_element('name', data[:name], data[:name_attributes]) if data.key? :name
 

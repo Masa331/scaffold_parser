@@ -552,9 +552,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       if data.key? :items
         element = Ox::Element.new('items')
@@ -593,9 +591,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       if data.key? :payments_list
         element = Ox::Element.new('payments_list')
@@ -621,9 +617,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       root << build_element('amount', data[:amount], data[:amount_attributes]) if data.key? :amount
 
@@ -644,9 +638,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       super.nodes.each do |n|
         root << n
@@ -673,9 +665,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       root << build_element('name', data[:name], data[:name_attributes]) if data.key? :name
 
@@ -696,9 +686,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       if data.key? :error
         data[:error].map { |i| Ox::Element.new('error') << i }.each { |i| root << i }

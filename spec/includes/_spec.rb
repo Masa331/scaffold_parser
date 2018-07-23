@@ -80,9 +80,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       root << build_element('title', data[:title], data[:title_attributes]) if data.key? :title
       root << build_element('title2', data[:title2], data[:title2_attributes]) if data.key? :title2
@@ -104,9 +102,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       root << build_element('name', data[:name], data[:name_attributes]) if data.key? :name
 

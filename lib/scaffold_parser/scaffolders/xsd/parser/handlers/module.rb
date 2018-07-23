@@ -65,9 +65,7 @@ module ScaffoldParser
                   meth = StringIO.new
                   meth.puts "  def builder"
                   meth.puts "    root = Ox::Element.new(name)"
-                  meth.puts "    if data.key? :attributes"
-                  meth.puts "      data[:attributes].each { |k, v| root[k] = v }"
-                  meth.puts "    end"
+                  meth.puts "    root = add_attributes_and_namespaces(root)"
                   meth.puts
                   meth.puts methods.map { |method| indent(indent(method.to_builder.lines)).join  }.join("\n")
                   meth.puts

@@ -482,9 +482,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       if data.key? :customer
         root << Customer.new('customer', data[:customer]).builder
@@ -516,9 +514,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       super.nodes.each do |n|
         root << n
@@ -543,9 +539,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       super.nodes.each do |n|
         root << n
@@ -572,9 +566,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       root << build_element('ID', data[:id], data[:id_attributes]) if data.key? :id
 
@@ -595,9 +587,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       root << build_element('email', data[:email], data[:email_attributes]) if data.key? :email
       root << build_element('phone', data[:phone], data[:phone_attributes]) if data.key? :phone
@@ -619,9 +609,7 @@ module Builders
 
     def builder
       root = Ox::Element.new(name)
-      if data.key? :attributes
-        data[:attributes].each { |k, v| root[k] = v }
-      end
+      root = add_attributes_and_namespaces(root)
 
       root << build_element('title', data[:title], data[:title_attributes]) if data.key? :title
 

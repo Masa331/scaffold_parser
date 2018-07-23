@@ -101,9 +101,7 @@ module ScaffoldParser
               f.puts
               f.puts "  def builder"
               f.puts "    root = Ox::Element.new(name)"
-              f.puts "    if data.key? :attributes"
-              f.puts "      data[:attributes].each { |k, v| root[k] = v }"
-              f.puts "    end"
+              f.puts "    root = add_attributes_and_namespaces(root)"
               f.puts
               if inherit_from
                 f.puts "    super.nodes.each do |n|"
