@@ -15,6 +15,11 @@ Premysl Donat
 
 ## Changelog
 
+### 20.10.2019
+
+* Improve logging when error occure
+* Handle empty sequences
+
 ### 16.1.2019
 
 * Removed dependency on local gem copy
