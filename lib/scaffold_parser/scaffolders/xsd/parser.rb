@@ -33,6 +33,9 @@ module ScaffoldParser
                 end
 
               handler.send(element.element_name, element)
+            rescue
+              p "Something happened during processing schema #{xsd.source} and node #{element.css_path}"
+              raise
             end
           end
 

@@ -66,6 +66,10 @@ module ScaffoldParser
             def group(source)
               ModuleInclude.new(source)
             end
+
+            def sequence(_)
+              self
+            end
           end
         end
       end
